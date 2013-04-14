@@ -38,7 +38,7 @@ import com.sun.net.httpserver.HttpServer;
 
 public class SubmissionTest {
 
-    private final static String BASE_URL = "http://localhost:8080/rest";
+    private final static String BASE_URL = "http://localhost:7766/rest";
 
     private static HttpServer httpServer;
 
