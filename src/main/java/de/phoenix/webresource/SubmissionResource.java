@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 
-import de.phoenix.impl.submission.PSubmission;
 import de.phoenix.submission.Submission;
 
 /**
@@ -102,7 +101,7 @@ public class SubmissionResource {
      *            The author of the submission
      */
     private void storeSubmission(String text, String author) {
-        Submission submission = new PSubmission(author, text);
+        Submission submission = new Submission(author, text);
         // TODO: Persist submission
     }
 }
