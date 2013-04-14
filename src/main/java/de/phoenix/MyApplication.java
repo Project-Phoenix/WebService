@@ -24,10 +24,14 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import de.phoenix.security.TokenManager;
 import de.phoenix.webresource.SubmissionResource;
+import de.phoenix.webresource.TokenResource;
 
 @ApplicationPath("/rest")
 public class MyApplication extends Application {
+
+    public static final TokenManager tokenManager = new TokenManager();
 
     public MyApplication() {
         // Main Constructor - called once in the application lifecycle
@@ -40,6 +44,7 @@ public class MyApplication extends Application {
 
         classSet.add(HelloWorld.class);
         classSet.add(SubmissionResource.class);
+        classSet.add(TokenResource.class);
 
         return classSet;
     }
