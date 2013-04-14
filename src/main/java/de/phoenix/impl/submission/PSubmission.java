@@ -16,32 +16,33 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix;
+package de.phoenix.impl.submission;
 
-import java.util.HashSet;
-import java.util.Set;
+import de.phoenix.submission.Submission;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+public class PSubmission implements Submission {
 
-import de.phoenix.webresource.SubmissionResource;
+    private String author;
+    private String text;
 
-@ApplicationPath("/rest")
-public class MyApplication extends Application {
-
-    public MyApplication() {
-        // Main Constructor - called once in the application lifecycle
+    public PSubmission(String author, String text) {
+        this.author = author;
+        this.text = text;
     }
 
-    // Add all webresource to the set so jersey know what resources are existing
     @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
+    public String getAuthor() {
+        return author;
+    }
 
-        classSet.add(HelloWorld.class);
-        classSet.add(SubmissionResource.class);
+    @Override
+    public String getText() {
+        return text;
+    }
 
-        return classSet;
+    @Override
+    public String toString() {
+        return String.format("Submission={Author=%s;Text=%s}", author, text);
     }
 
 }
