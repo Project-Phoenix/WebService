@@ -29,35 +29,69 @@ public class PermissionTree implements Comparable<PermissionTree> {
 
     private final String node;
 
+    /**
+     * Creates a new permission tree without a node and without any childs
+     */
     public PermissionTree() {
         this(null, null);
     }
 
+    /**
+     * Create a dummy node. Only used for searching childs
+     * 
+     * @param node
+     *            The node without any "."
+     */
     private PermissionTree(final String node) {
         this(null, node);
     }
 
+    /**
+     * Creates a child node
+     * 
+     * @param root
+     *            The parent of this child
+     * @param node
+     *            The node without any "."
+     */
     private PermissionTree(final PermissionTree root, final String node) {
         this.root = root;
         this.node = node;
     }
 
+    /**
+     * @return The root of this tree
+     */
     public PermissionTree getRoot() {
         return root;
     }
 
+    /**
+     * @return An unmodifiable copy when the tree has childs and an empty list
+     *         when the tree has no childs
+     */
     public List<PermissionTree> getChilds() {
-        return childs != null ? Collections.unmodifiableList(childs) : Collections.<PermissionTree> emptyList();
+        return !isLeaf() ? Collections.unmodifiableList(childs) : Collections.<PermissionTree> emptyList();
     }
 
+    /**
+     * @return The permission node. Without any "."
+     */
     public String getNode() {
         return node;
     }
 
     private final static String WILDCARD = "*";
-    private static final char NODE_SEPERATOR = '.';
     private final static PermissionTree WILDCARD_NODE = new PermissionTree(WILDCARD);
+    private static final char NODE_SEPERATOR = '.';
 
+    /**
+     * Insert the new permission node to a direct child of the tree
+     * 
+     * @param node
+     *            The node without any "."
+     * @return The newly created child holding the node
+     */
     private PermissionTree add(String node) {
         if (isLeaf())
             childs = new SortedList<PermissionTree>();
@@ -81,6 +115,12 @@ public class PermissionTree implements Comparable<PermissionTree> {
         }
     }
 
+    /**
+     * Add a new permission node to the permission tree.
+     * 
+     * @param node
+     *            A permission node to add in the format "node.node"
+     */
     public void addNode(String node) {
         // Split at first fullstop
         int pointIndex = node.indexOf(NODE_SEPERATOR);
@@ -108,6 +148,16 @@ public class PermissionTree implements Comparable<PermissionTree> {
         }
     }
 
+    /**
+     * Check if the permission tree is holding the specific node or has a
+     * wildcard which includes the specific node
+     * 
+     * @param node
+     *            A permission node to add in the format "node.node"
+     * @return True when the permission node is holding the specific node or
+     *         when the permission tree has in a higher level of the hierachie
+     *         of the specific node a wildcard
+     */
     public boolean hasNode(String node) {
 
         if (isEmpty())
@@ -136,10 +186,20 @@ public class PermissionTree implements Comparable<PermissionTree> {
         }
     }
 
+    /**
+     * Removes the node of the permission tree. When there is a wildcard on the
+     * hierachie of the specific node, no node is deleted or changed!
+     * 
+     * @param node
+     *            A permission node to add in the format "node.node"
+     * @return True when the permission node was part of the tree, otherwise
+     *         false
+     */
     public boolean removeNode(String node) {
         if (isEmpty())
             return false;
 
+        // Search for the node
         int pointIndex = node.indexOf(NODE_SEPERATOR);
         if (pointIndex == -1) {
             int i = Collections.binarySearch(childs, new PermissionTree(node));
@@ -148,11 +208,13 @@ public class PermissionTree implements Comparable<PermissionTree> {
                 return false;
             else {
                 childs.remove(i);
+                // Safe memory
                 if (childs.isEmpty())
                     childs = null;
                 return true;
             }
         }
+        // Split the node
         String prefix = node.substring(0, pointIndex);
         String suffix = node.substring(pointIndex + 1);
         int i = Collections.binarySearch(childs, new PermissionTree(prefix));
@@ -162,10 +224,23 @@ public class PermissionTree implements Comparable<PermissionTree> {
             return childs.get(i).removeNode(suffix);
     }
 
+    /**
+     * Creates a 1:1 copy of this permission tree
+     * 
+     * @return A new permission tree
+     */
     public PermissionTree copy() {
         return copyAndAdd(new PermissionTree());
     }
 
+    /**
+     * Add all permission nodes of this permission tree to the copy
+     * 
+     * @param copy
+     *            The target permission tree holding all permissions of this and
+     *            the copy tree
+     * @return The completly filled permission tree
+     */
     public PermissionTree copyAndAdd(final PermissionTree copy) {
         if (isEmpty())
             return copy;
@@ -175,6 +250,14 @@ public class PermissionTree implements Comparable<PermissionTree> {
         return copy;
     }
 
+    /**
+     * Recursive helper function
+     * 
+     * @param copy
+     *            Target permission tree
+     * @param parentNode
+     *            Current node
+     */
     private void copy(final PermissionTree copy, String parentNode) {
         if (isLeaf()) {
             copy.addNode(parentNode);
@@ -185,14 +268,26 @@ public class PermissionTree implements Comparable<PermissionTree> {
         }
     }
 
+    /**
+     * @return True when the tree is holding no permission tree
+     */
     public boolean isEmpty() {
         return this.node == null && this.childs == null;
     }
 
+    /**
+     * @return True when the tree has no childs(but can have a root)
+     */
     private boolean isLeaf() {
         return this.childs == null;
     }
 
+    /**
+     * Transform the permission tree to a list containing all permission node.
+     * The format of the node is "node.node"
+     * 
+     * @return LinkedList of all permission nodes
+     */
     public List<String> toList() {
         if (isEmpty())
             return Collections.<String> emptyList();
@@ -203,6 +298,14 @@ public class PermissionTree implements Comparable<PermissionTree> {
         return list;
     }
 
+    /**
+     * Recursive helper function
+     * 
+     * @param list
+     *            The target lis t
+     * @param parentNode
+     *            The current node
+     */
     private void toList(final List<String> list, String parentNode) {
         if (isLeaf()) {
             list.add(parentNode);
@@ -213,11 +316,17 @@ public class PermissionTree implements Comparable<PermissionTree> {
         }
     }
 
+    /**
+     * @return The node of this permission tree
+     */
     @Override
     public String toString() {
         return node;
     }
 
+    /**
+     * Compares the permission node of the permission tree
+     */
     public int compareTo(PermissionTree other) {
         return this.node.compareTo(other.node);
     }

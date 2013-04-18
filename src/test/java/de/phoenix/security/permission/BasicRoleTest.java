@@ -28,6 +28,13 @@ import java.util.List;
 
 import org.junit.Test;
 
+/**
+ * A normal role with a permission tree. This role has no restricted permission
+ * and have only the permission that has been granted
+ * 
+ * @author Meldanor
+ * 
+ */
 public class BasicRoleTest {
 
     @Test
