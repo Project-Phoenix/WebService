@@ -35,10 +35,13 @@ import com.sun.jersey.core.util.Base64;
 public class AccountManager {
 
     // Placeholder for database
-    private Map<String, SaltedPassword> userMap;
+    private Map<String, SaltedPassword> TEMPpwMap;
+
+    private Map<String, User> userMap;
 
     public AccountManager() {
-        this.userMap = new HashMap<String, SaltedPassword>();
+        this.TEMPpwMap = new HashMap<String, SaltedPassword>();
+        this.userMap = new HashMap<String, User>();
     }
 
     /**
@@ -100,7 +103,7 @@ public class AccountManager {
      *            at least SHA2. The password is Hex encoded and must be decoded
      */
     public void createUser(String name, String password) {
-        if (userMap.containsKey(name)) {
+        if (TEMPpwMap.containsKey(name)) {
             // TOOD: Duplicate user!
         }
         try {
@@ -112,11 +115,23 @@ public class AccountManager {
             int saltLength = pw.length / 2;
             byte[] salt = generateSalt(saltLength);
 
+            name = name.toLowerCase();
             SaltedPassword saltedPassword = saltPassword(pw, salt, saltLength);
-            userMap.put(name, saltedPassword);
+            this.TEMPpwMap.put(name, saltedPassword);
+
+            this.userMap.put(name, new User(name));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 
+     * @param username
+     * @return
+     */
+    public User getUser(String username) {
+        return userMap.get(username.toLowerCase());
     }
 
     /**
@@ -161,7 +176,7 @@ public class AccountManager {
      */
     private boolean validateUser(String username, String password) {
         try {
-            SaltedPassword origin = userMap.get(username);
+            SaltedPassword origin = TEMPpwMap.get(username);
             if (origin == null)
                 return false;
             byte[] salt = origin.getSalt();
