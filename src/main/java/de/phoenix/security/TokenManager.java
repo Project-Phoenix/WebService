@@ -75,19 +75,29 @@ public class TokenManager {
      * @return True, when the token is valid and not expired
      */
     public boolean isValidToken(HttpHeaders headers) {
-        return isValidToken(headers.getRequestHeaders().getFirst(TokenFilter.TOKEN_HEAD));
+        return isValidToken(extractTokenID(headers));
     }
 
     public boolean isValidToken(String tokenID) {
         if (tokenID == null)
             return false;
-        Token token = tokenmapByID.get(tokenID);
-        if (token == null)
-            return false;
-        if (token.isExpired()) {
-            // TODO: What to do with expired tokens?
-            return false;
-        } else
-            return true;
+        return isValidToken(tokenmapByID.get(tokenID));
     }
+
+    public boolean isValidToken(Token token) {
+        return token != null && !token.isExpired();
+    }
+
+    public String extractTokenID(HttpHeaders headers) {
+        return headers.getRequestHeaders().getFirst(TokenFilter.TOKEN_HEAD);
+    }
+
+    public Token getToken(HttpHeaders headers) {
+        return getToken(extractTokenID(headers));
+    }
+
+    public Token getToken(String tokenID) {
+        return tokenmapByID.get(tokenID);
+    }
+
 }

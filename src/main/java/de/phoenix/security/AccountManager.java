@@ -125,11 +125,6 @@ public class AccountManager {
         }
     }
 
-    /**
-     * 
-     * @param username
-     * @return
-     */
     public User getUser(String username) {
         return userMap.get(username.toLowerCase());
     }
