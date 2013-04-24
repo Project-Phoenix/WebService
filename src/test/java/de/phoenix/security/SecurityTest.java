@@ -18,7 +18,9 @@
 
 package de.phoenix.security;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.AfterClass;
@@ -50,7 +52,7 @@ public class SecurityTest {
         httpServer.stop(0);
     }
 
-    @Test
+//    @Test
     public void APITest() {
 
         // User information
@@ -58,6 +60,14 @@ public class SecurityTest {
         String password = "password";
 
         Client client = Client.create();
+
+        /* ***************************
+         * !!!!!!!! IMPORTANT !!!!!!!!
+         * 
+         * DO NOT USE THIS CODE SNIPPET FOR ACCOUNT CREATION!
+         * 
+         * See createAccountTest for the new API!
+         */
 
         // Create a new account
         WebResource createAccountRes = client.resource(BASE_URL).path("account").path("create");
@@ -82,5 +92,46 @@ public class SecurityTest {
         response = validateTokenRes.get(ClientResponse.class);
 
         assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+    }
+
+    @Test
+    public void createAccountTest() {
+        // User information
+        String user = "account";
+        String password = "password";
+
+        Client client = Client.create();
+
+        // Create a new account
+        WebResource createAccountRes = client.resource(BASE_URL).path("account").path("create");
+        // Use temponary filter for the password encription
+        createAccountRes.addFilter(new CreateAccountFilter(user, password));
+
+        ClientResponse response = createAccountRes.get(ClientResponse.class);
+
+        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+
+        try {
+            createAccountRes.get(ClientResponse.class); // Fly exception - fly!
+            fail();
+        } catch (Exception e) {
+            // Everything went fine
+        }
+
+        // Remove temponary filter
+        createAccountRes.removeAllFilters();
+        // test without the filter
+        response = createAccountRes.get(ClientResponse.class);
+
+        assertFalse(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+
+        // Request a token - also check if the account is valid
+        WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
+        requestTokenRes.addFilter(new LoginFilter(user, password));
+        response = requestTokenRes.get(ClientResponse.class);
+        requestTokenRes.removeAllFilters();
+
+        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+
     }
 }
