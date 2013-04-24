@@ -16,6 +16,44 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `phoenix`.`role`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `phoenix`.`role` (
+  `id` INT NOT NULL ,
+  `name` VARCHAR(45) NULL ,
+  `inheritedRole` INT NOT NULL ,
+  PRIMARY KEY (`id`, `inheritedRole`) ,
+  INDEX `fk_role_role1_idx` (`inheritedRole` ASC) ,
+  CONSTRAINT `fk_role_role1`
+    FOREIGN KEY (`inheritedRole` )
+    REFERENCES `phoenix`.`role` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`user`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `phoenix`.`user` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
+  `pw` VARCHAR(64) NOT NULL ,
+  `salt` VARCHAR(64) NOT NULL ,
+  `regdate` DATETIME NOT NULL ,
+  `active` TINYINT(1) NOT NULL ,
+  `role_id` INT NOT NULL ,
+  PRIMARY KEY (`id`, `role_id`) ,
+  INDEX `fk_user_role1_idx` (`role_id` ASC) ,
+  CONSTRAINT `fk_user_role1`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `phoenix`.`role` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `phoenix`.`student`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `phoenix`.`student` (
@@ -23,8 +61,15 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`student` (
   `surname` VARCHAR(45) NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
   `matrikelnr` INT NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `name` (`surname` ASC, `name` ASC) )
+  `user_id` INT NOT NULL ,
+  PRIMARY KEY (`id`, `user_id`) ,
+  INDEX `name` (`surname` ASC, `name` ASC) ,
+  INDEX `fk_student_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_student_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -94,6 +139,22 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`submission_has_files` (
   CONSTRAINT `fk_submission_has_files_files1`
     FOREIGN KEY (`files_id` )
     REFERENCES `phoenix`.`files` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`permission`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `phoenix`.`permission` (
+  `permission` VARCHAR(64) NOT NULL ,
+  `role_id` INT NOT NULL ,
+  PRIMARY KEY (`permission`, `role_id`) ,
+  INDEX `fk_permission_role1_idx` (`role_id` ASC) ,
+  CONSTRAINT `fk_permission_role1`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `phoenix`.`role` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

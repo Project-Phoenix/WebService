@@ -18,6 +18,9 @@
 
 package de.phoenix;
 
+import java.sql.Connection;
+import java.sql.Statement;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -29,6 +32,16 @@ public class HelloWorld {
     @Produces("text/plain")
     public String helloWorld() {
         System.out.println("Hello World!");
+        try {
+            Connection con = PhoenixApplication.databaseConnection;
+            if (con == null) {
+                return "ERROR";
+            }
+            Statement st = con.createStatement();
+            st.executeUpdate("INSERT INTO bla (text) VALUES ('hello world');");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "Hello World!";
     }
 
