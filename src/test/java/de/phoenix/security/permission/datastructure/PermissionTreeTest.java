@@ -134,7 +134,7 @@ public class PermissionTreeTest {
     }
 
     // Start of
-    // © Connor Garvey at January 30th, 2009.
+    // (C) Connor Garvey at January 30th, 2009.
     public static String toStringTree(PermissionTree node) {
         final StringBuilder buffer = new StringBuilder();
         return toStringTreeHelper(node, buffer, new LinkedList<Iterator<PermissionTree>>()).toString();
@@ -178,6 +178,6 @@ public class PermissionTreeTest {
         return buffer;
     }
     // End of
-    // © Connor Garvey at January 30th, 2009.
+    // (C) Connor Garvey at January 30th, 2009.
 
 }
