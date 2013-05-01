@@ -16,20 +16,26 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix;
+package de.phoenix.database;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import static org.junit.Assert.assertTrue;
 
-@Path("/helloworld")
-public class HelloWorld {
+import org.hibernate.Session;
+import org.junit.Test;
 
-    @GET
-    @Produces("text/plain")
-    public String helloWorld() {
-        System.out.println("Hello World!");
-        return "Hello World!";
+public class ConnectionTest {
+
+
+    @Test
+    public void test() {
+        DatabaseManager dbManager = new DatabaseManager();
+        Session session = dbManager.openSession();
+        
+        session.beginTransaction();
+        
+        assertTrue(session.isConnected());
+        
+        session.close();
     }
 
 }

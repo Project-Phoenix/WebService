@@ -18,15 +18,13 @@
 
 package de.phoenix;
 
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import de.phoenix.database.DatabaseManager;
 import de.phoenix.security.AccountManager;
 import de.phoenix.security.TokenManager;
 import de.phoenix.webresource.AccountResource;
@@ -38,25 +36,10 @@ public class PhoenixApplication extends Application {
 
     public static final TokenManager tokenManager = new TokenManager();
     public static final AccountManager accountManager = new AccountManager();
-
-    public static Connection databaseConnection;
+    public static final DatabaseManager databaseManager = new DatabaseManager();
 
     public PhoenixApplication() {
-        System.out.println("Hello world...Can you hear me:(");
-        initDatabaseConnection();
         // Main Constructor - called once in the application lifecycle
-    }
-
-    private void initDatabaseConnection() {
-
-        try {
-            InitialContext ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("PhoenixJDBCResource");
-            databaseConnection = ds.getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     // Add all webresource to the set so jersey know what resources are existing
