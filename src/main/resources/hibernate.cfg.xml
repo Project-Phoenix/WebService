@@ -22,6 +22,16 @@
 
 		<property name="hbm2ddl.auto">validate</property>
 
+		<mapping class="de.phoenix.database.entity.ExerciseSheet" />
+		<mapping class="de.phoenix.database.entity.ExerciseSheetHasTask" />
+		<mapping class="de.phoenix.database.entity.Files" />
+		<mapping class="de.phoenix.database.entity.Group" />
+		<mapping class="de.phoenix.database.entity.Instance" />
+		<mapping class="de.phoenix.database.entity.Lecture" />
+		<mapping class="de.phoenix.database.entity.Permission" />
+		<mapping class="de.phoenix.database.entity.Role" />		
+		<mapping class="de.phoenix.database.entity.Submission" />
+		<mapping class="de.phoenix.database.entity.Task" />
 		<mapping class="de.phoenix.database.entity.User" />
 
 	</session-factory>

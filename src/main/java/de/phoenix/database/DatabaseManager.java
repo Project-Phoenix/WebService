@@ -20,18 +20,19 @@ package de.phoenix.database;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
+//import org.hibernate.service.ServiceRegistry;
+//import org.hibernate.service.ServiceRegistryBuilder;
 
 public class DatabaseManager {
 
     private final SessionFactory sessionFactory;
 
     public DatabaseManager() {
-        Configuration config = new Configuration().configure();
-        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(config.getProperties()).buildServiceRegistry();
-        this.sessionFactory = config.buildSessionFactory(serviceRegistry);
+        Configuration config = new AnnotationConfiguration().configure();
+//        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(config.getProperties()).buildServiceRegistry();
+        this.sessionFactory = config.buildSessionFactory();
     }
 
     public void close() {
