@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -94,6 +96,8 @@ public class User implements Serializable {
         @JoinColumn(name = "lecture_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Lecture> lectureCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Collection<Submission> submissionCollection;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Role roleId;
@@ -231,6 +235,15 @@ public class User implements Serializable {
 
     public void setLectureCollection(Collection<Lecture> lectureCollection) {
         this.lectureCollection = lectureCollection;
+    }
+
+    @XmlTransient
+    public Collection<Submission> getSubmissionCollection() {
+        return submissionCollection;
+    }
+
+    public void setSubmissionCollection(Collection<Submission> submissionCollection) {
+        this.submissionCollection = submissionCollection;
     }
 
     public Role getRoleId() {

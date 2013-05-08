@@ -6,40 +6,6 @@ CREATE SCHEMA IF NOT EXISTS `phoenix` DEFAULT CHARACTER SET utf8 COLLATE utf8_ge
 USE `phoenix` ;
 
 -- -----------------------------------------------------
--- Table `phoenix`.`submission`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`submission` ;
-
-CREATE  TABLE IF NOT EXISTS `phoenix`.`submission` (
-  `id` INT NULL AUTO_INCREMENT ,
-  `status` INT NOT NULL ,
-  `controlStatus` INT NOT NULL ,
-  `sampleSolution` TINYINT(1) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `phoenix`.`files`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`files` ;
-
-CREATE  TABLE IF NOT EXISTS `phoenix`.`files` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `content` TEXT NOT NULL ,
-  `type` VARCHAR(10) NOT NULL ,
-  `submission_id` INT NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_files_submission1_idx` (`submission_id` ASC) ,
-  CONSTRAINT `fk_files_submission1`
-    FOREIGN KEY (`submission_id` )
-    REFERENCES `phoenix`.`submission` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`role`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `phoenix`.`role` ;
@@ -75,6 +41,46 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`user` (
   CONSTRAINT `fk_user_role1`
     FOREIGN KEY (`role_id` )
     REFERENCES `phoenix`.`role` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`submission`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`submission` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`submission` (
+  `id` INT NULL AUTO_INCREMENT ,
+  `status` INT NOT NULL ,
+  `controlStatus` INT NOT NULL ,
+  `user_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_submission_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_submission_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`submission_file`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`submission_file` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`submission_file` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `content` TEXT NOT NULL ,
+  `type` VARCHAR(10) NOT NULL ,
+  `submission_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_submission_file_submission1_idx` (`submission_id` ASC) ,
+  CONSTRAINT `fk_submission_file_submission1`
+    FOREIGN KEY (`submission_id` )
+    REFERENCES `phoenix`.`submission` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -123,6 +129,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `lectur` VARCHAR(45) NOT NULL ,
   `time` DATETIME NOT NULL ,
   `room` VARCHAR(45) NOT NULL ,
+  `isActive` TINYINT(1) NOT NULL DEFAULT true ,
   `instance_id` INT NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_lecture_instance1_idx` (`instance_id` ASC) ,
@@ -141,9 +148,13 @@ DROP TABLE IF EXISTS `phoenix`.`group` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`group` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
   `room` VARCHAR(45) NOT NULL ,
   `turnus` VARCHAR(45) NOT NULL ,
   `lecture_id` INT NOT NULL ,
+  `submission_expire_date` DATETIME NULL ,
+  `registration_start_date` DATETIME NOT NULL ,
+  `registration_end_date` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_group_lecture1_idx` (`lecture_id` ASC) ,
   CONSTRAINT `fk_group_lecture1`
@@ -161,7 +172,10 @@ DROP TABLE IF EXISTS `phoenix`.`exercise_sheet` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet` (
   `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
   `expirationDate` DATETIME NOT NULL ,
+  `release_date` DATETIME NOT NULL ,
+  `visible` TINYINT(1) NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
@@ -174,9 +188,7 @@ DROP TABLE IF EXISTS `phoenix`.`task` ;
 CREATE  TABLE IF NOT EXISTS `phoenix`.`task` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
-  `autoControl` VARCHAR(45) NOT NULL ,
   `text` TEXT NOT NULL ,
-  `expirationDate` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
@@ -321,6 +333,132 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`group_leader` (
   CONSTRAINT `fk_user_has_group_group1`
     FOREIGN KEY (`group_id` )
     REFERENCES `phoenix`.`group` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`automatic_task`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`automatic_task` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`automatic_task` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `backend` VARCHAR(45) NOT NULL ,
+  `task_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_automatic_task_task1_idx` (`task_id` ASC) ,
+  CONSTRAINT `fk_automatic_task_task1`
+    FOREIGN KEY (`task_id` )
+    REFERENCES `phoenix`.`task` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`automatic_task_template`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`automatic_task_template` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`automatic_task_template` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `text` TEXT NOT NULL ,
+  `automatic_task_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_automatic_task_template_automatic_task1_idx` (`automatic_task_id` ASC) ,
+  CONSTRAINT `fk_automatic_task_template_automatic_task1`
+    FOREIGN KEY (`automatic_task_id` )
+    REFERENCES `phoenix`.`automatic_task` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`automatic_test_test_file`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`automatic_test_test_file` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`automatic_test_test_file` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `text` TEXT NOT NULL ,
+  `automatic_task_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_automatic_test_test_files_automatic_task1_idx` (`automatic_task_id` ASC) ,
+  CONSTRAINT `fk_automatic_test_test_files_automatic_task1`
+    FOREIGN KEY (`automatic_task_id` )
+    REFERENCES `phoenix`.`automatic_task` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`sample_solution`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`sample_solution` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`sample_solution` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `author` VARCHAR(45) NOT NULL ,
+  `lecture_id` INT NOT NULL ,
+  `task_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_sample_solution_lecture1_idx` (`lecture_id` ASC) ,
+  INDEX `fk_sample_solution_task1_idx` (`task_id` ASC) ,
+  CONSTRAINT `fk_sample_solution_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_sample_solution_task1`
+    FOREIGN KEY (`task_id` )
+    REFERENCES `phoenix`.`task` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`sample_solution_file`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`sample_solution_file` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`sample_solution_file` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `content` TEXT NOT NULL ,
+  `type` VARCHAR(10) NOT NULL ,
+  `sample_solution_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_sample_solution_file_sample_solution1_idx` (`sample_solution_id` ASC) ,
+  CONSTRAINT `fk_sample_solution_file_sample_solution1`
+    FOREIGN KEY (`sample_solution_id` )
+    REFERENCES `phoenix`.`sample_solution` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`material` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`material` (
+  `id` INT NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `category` VARCHAR(45) NULL ,
+  `data` LONGBLOB NOT NULL ,
+  `visible` TINYINT(1) NOT NULL ,
+  `release_date` DATETIME NULL ,
+  `lecture_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_material_lecture1_idx` (`lecture_id` ASC) ,
+  CONSTRAINT `fk_material_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -34,8 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Submission.findAll", query = "SELECT s FROM Submission s"),
     @NamedQuery(name = "Submission.findById", query = "SELECT s FROM Submission s WHERE s.id = :id"),
     @NamedQuery(name = "Submission.findByStatus", query = "SELECT s FROM Submission s WHERE s.status = :status"),
-    @NamedQuery(name = "Submission.findByControlStatus", query = "SELECT s FROM Submission s WHERE s.controlStatus = :controlStatus"),
-    @NamedQuery(name = "Submission.findBySampleSolution", query = "SELECT s FROM Submission s WHERE s.sampleSolution = :sampleSolution")})
+    @NamedQuery(name = "Submission.findByControlStatus", query = "SELECT s FROM Submission s WHERE s.controlStatus = :controlStatus")})
 public class Submission implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -49,9 +49,6 @@ public class Submission implements Serializable {
     @Basic(optional = false)
     @Column(name = "controlStatus")
     private int controlStatus;
-    @Basic(optional = false)
-    @Column(name = "sampleSolution")
-    private boolean sampleSolution;
     @JoinTable(name = "submission_for_task", joinColumns = {
         @JoinColumn(name = "submission_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "exercise_sheet_has_task_exercise_sheet_id", referencedColumnName = "exercise_sheet_id"),
@@ -60,6 +57,11 @@ public class Submission implements Serializable {
     private Collection<ExerciseSheetHasTask> exerciseSheetHasTaskCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "submissionId")
     private Collection<Files> filesCollection;
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private User userId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "submissionId")
+    private Collection<SubmissionFile> submissionFileCollection;
 
     public Submission() {
     }
@@ -68,11 +70,10 @@ public class Submission implements Serializable {
         this.id = id;
     }
 
-    public Submission(Integer id, int status, int controlStatus, boolean sampleSolution) {
+    public Submission(Integer id, int status, int controlStatus) {
         this.id = id;
         this.status = status;
         this.controlStatus = controlStatus;
-        this.sampleSolution = sampleSolution;
     }
 
     public Integer getId() {
@@ -99,14 +100,6 @@ public class Submission implements Serializable {
         this.controlStatus = controlStatus;
     }
 
-    public boolean getSampleSolution() {
-        return sampleSolution;
-    }
-
-    public void setSampleSolution(boolean sampleSolution) {
-        this.sampleSolution = sampleSolution;
-    }
-
     @XmlTransient
     public Collection<ExerciseSheetHasTask> getExerciseSheetHasTaskCollection() {
         return exerciseSheetHasTaskCollection;
@@ -123,6 +116,23 @@ public class Submission implements Serializable {
 
     public void setFilesCollection(Collection<Files> filesCollection) {
         this.filesCollection = filesCollection;
+    }
+
+    public User getUserId() {
+        return userId;
+    }
+
+    public void setUserId(User userId) {
+        this.userId = userId;
+    }
+
+    @XmlTransient
+    public Collection<SubmissionFile> getSubmissionFileCollection() {
+        return submissionFileCollection;
+    }
+
+    public void setSubmissionFileCollection(Collection<SubmissionFile> submissionFileCollection) {
+        this.submissionFileCollection = submissionFileCollection;
     }
 
     @Override

@@ -34,7 +34,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "ExerciseSheet.findAll", query = "SELECT e FROM ExerciseSheet e"),
     @NamedQuery(name = "ExerciseSheet.findById", query = "SELECT e FROM ExerciseSheet e WHERE e.id = :id"),
-    @NamedQuery(name = "ExerciseSheet.findByExpirationDate", query = "SELECT e FROM ExerciseSheet e WHERE e.expirationDate = :expirationDate")})
+    @NamedQuery(name = "ExerciseSheet.findByName", query = "SELECT e FROM ExerciseSheet e WHERE e.name = :name"),
+    @NamedQuery(name = "ExerciseSheet.findByExpirationDate", query = "SELECT e FROM ExerciseSheet e WHERE e.expirationDate = :expirationDate"),
+    @NamedQuery(name = "ExerciseSheet.findByReleaseDate", query = "SELECT e FROM ExerciseSheet e WHERE e.releaseDate = :releaseDate"),
+    @NamedQuery(name = "ExerciseSheet.findByVisible", query = "SELECT e FROM ExerciseSheet e WHERE e.visible = :visible")})
 public class ExerciseSheet implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,9 +46,19 @@ public class ExerciseSheet implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
+    @Column(name = "name")
+    private String name;
+    @Basic(optional = false)
     @Column(name = "expirationDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expirationDate;
+    @Basic(optional = false)
+    @Column(name = "release_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date releaseDate;
+    @Basic(optional = false)
+    @Column(name = "visible")
+    private boolean visible;
     @ManyToMany(mappedBy = "exerciseSheetCollection")
     private Collection<Group> GroupCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "exerciseSheet")
@@ -58,9 +71,12 @@ public class ExerciseSheet implements Serializable {
         this.id = id;
     }
 
-    public ExerciseSheet(Integer id, Date expirationDate) {
+    public ExerciseSheet(Integer id, String name, Date expirationDate, Date releaseDate, boolean visible) {
         this.id = id;
+        this.name = name;
         this.expirationDate = expirationDate;
+        this.releaseDate = releaseDate;
+        this.visible = visible;
     }
 
     public Integer getId() {
@@ -71,12 +87,36 @@ public class ExerciseSheet implements Serializable {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Date getExpirationDate() {
         return expirationDate;
     }
 
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public Date getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     @XmlTransient

@@ -13,9 +13,10 @@ import javax.persistence.Embeddable;
  *
  * @author Meldanor
  */
-@SuppressWarnings("serial")
 @Embeddable
 public class ExerciseSheetHasTaskPK implements Serializable {
+
+    private static final long serialVersionUID = 780111852590263672L;
     @Basic(optional = false)
     @Column(name = "exercise_sheet_id")
     private int exerciseSheetId;

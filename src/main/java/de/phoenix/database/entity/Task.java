@@ -6,7 +6,6 @@ package de.phoenix.database.entity;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,8 +18,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -34,9 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
     @NamedQuery(name = "Task.findById", query = "SELECT t FROM Task t WHERE t.id = :id"),
-    @NamedQuery(name = "Task.findByName", query = "SELECT t FROM Task t WHERE t.name = :name"),
-    @NamedQuery(name = "Task.findByAutoControl", query = "SELECT t FROM Task t WHERE t.autoControl = :autoControl"),
-    @NamedQuery(name = "Task.findByExpirationDate", query = "SELECT t FROM Task t WHERE t.expirationDate = :expirationDate")})
+    @NamedQuery(name = "Task.findByName", query = "SELECT t FROM Task t WHERE t.name = :name")})
 public class Task implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,18 +43,15 @@ public class Task implements Serializable {
     @Column(name = "name")
     private String name;
     @Basic(optional = false)
-    @Column(name = "autoControl")
-    private String autoControl;
-    @Basic(optional = false)
     @Lob
     @Column(name = "text", columnDefinition = "text")
     private String text;
-    @Basic(optional = false)
-    @Column(name = "expirationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date expirationDate;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskId")
+    private Collection<SampleSolution> sampleSolutionCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
     private Collection<ExerciseSheetHasTask> exerciseSheetHasTaskCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskId")
+    private Collection<AutomaticTask> automaticTaskCollection;
 
     public Task() {
     }
@@ -68,12 +60,10 @@ public class Task implements Serializable {
         this.id = id;
     }
 
-    public Task(Integer id, String name, String autoControl, String text, Date expirationDate) {
+    public Task(Integer id, String name, String text) {
         this.id = id;
         this.name = name;
-        this.autoControl = autoControl;
         this.text = text;
-        this.expirationDate = expirationDate;
     }
 
     public Integer getId() {
@@ -92,14 +82,6 @@ public class Task implements Serializable {
         this.name = name;
     }
 
-    public String getAutoControl() {
-        return autoControl;
-    }
-
-    public void setAutoControl(String autoControl) {
-        this.autoControl = autoControl;
-    }
-
     public String getText() {
         return text;
     }
@@ -108,12 +90,13 @@ public class Task implements Serializable {
         this.text = text;
     }
 
-    public Date getExpirationDate() {
-        return expirationDate;
+    @XmlTransient
+    public Collection<SampleSolution> getSampleSolutionCollection() {
+        return sampleSolutionCollection;
     }
 
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
+    public void setSampleSolutionCollection(Collection<SampleSolution> sampleSolutionCollection) {
+        this.sampleSolutionCollection = sampleSolutionCollection;
     }
 
     @XmlTransient
@@ -123,6 +106,15 @@ public class Task implements Serializable {
 
     public void setExerciseSheetHasTaskCollection(Collection<ExerciseSheetHasTask> exerciseSheetHasTaskCollection) {
         this.exerciseSheetHasTaskCollection = exerciseSheetHasTaskCollection;
+    }
+
+    @XmlTransient
+    public Collection<AutomaticTask> getAutomaticTaskCollection() {
+        return automaticTaskCollection;
+    }
+
+    public void setAutomaticTaskCollection(Collection<AutomaticTask> automaticTaskCollection) {
+        this.automaticTaskCollection = automaticTaskCollection;
     }
 
     @Override

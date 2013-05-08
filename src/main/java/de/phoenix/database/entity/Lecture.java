@@ -37,7 +37,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Lecture.findByName", query = "SELECT l FROM Lecture l WHERE l.name = :name"),
     @NamedQuery(name = "Lecture.findByLectur", query = "SELECT l FROM Lecture l WHERE l.lectur = :lectur"),
     @NamedQuery(name = "Lecture.findByTime", query = "SELECT l FROM Lecture l WHERE l.time = :time"),
-    @NamedQuery(name = "Lecture.findByRoom", query = "SELECT l FROM Lecture l WHERE l.room = :room")})
+    @NamedQuery(name = "Lecture.findByRoom", query = "SELECT l FROM Lecture l WHERE l.room = :room"),
+    @NamedQuery(name = "Lecture.findByIsActive", query = "SELECT l FROM Lecture l WHERE l.isActive = :isActive")})
 public class Lecture implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -57,11 +58,18 @@ public class Lecture implements Serializable {
     @Basic(optional = false)
     @Column(name = "room")
     private String room;
+    @Basic(optional = false)
+    @Column(name = "isActive")
+    private boolean isActive;
     @ManyToMany(mappedBy = "lectureCollection")
     private Collection<User> userCollection;
     @JoinColumn(name = "instance_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Instance instanceId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
+    private Collection<SampleSolution> sampleSolutionCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
+    private Collection<Material> materialCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
     private Collection<Group> GroupCollection;
 
@@ -72,12 +80,13 @@ public class Lecture implements Serializable {
         this.id = id;
     }
 
-    public Lecture(Integer id, String name, String lectur, Date time, String room) {
+    public Lecture(Integer id, String name, String lectur, Date time, String room, boolean isActive) {
         this.id = id;
         this.name = name;
         this.lectur = lectur;
         this.time = time;
         this.room = room;
+        this.isActive = isActive;
     }
 
     public Integer getId() {
@@ -120,6 +129,14 @@ public class Lecture implements Serializable {
         this.room = room;
     }
 
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     @XmlTransient
     public Collection<User> getUserCollection() {
         return userCollection;
@@ -135,6 +152,24 @@ public class Lecture implements Serializable {
 
     public void setInstanceId(Instance instanceId) {
         this.instanceId = instanceId;
+    }
+
+    @XmlTransient
+    public Collection<SampleSolution> getSampleSolutionCollection() {
+        return sampleSolutionCollection;
+    }
+
+    public void setSampleSolutionCollection(Collection<SampleSolution> sampleSolutionCollection) {
+        this.sampleSolutionCollection = sampleSolutionCollection;
+    }
+
+    @XmlTransient
+    public Collection<Material> getMaterialCollection() {
+        return materialCollection;
+    }
+
+    public void setMaterialCollection(Collection<Material> materialCollection) {
+        this.materialCollection = materialCollection;
     }
 
     @XmlTransient
