@@ -463,6 +463,30 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`material` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`user_is_in_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`user_is_in_group` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`user_is_in_group` (
+  `user_id` INT NOT NULL ,
+  `group_id` INT NOT NULL ,
+  PRIMARY KEY (`user_id`, `group_id`) ,
+  INDEX `fk_user_has_group_group2_idx` (`group_id` ASC) ,
+  INDEX `fk_user_has_group_user2_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_user_has_group_user2`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_has_group_group2`
+    FOREIGN KEY (`group_id` )
+    REFERENCES `phoenix`.`group` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 

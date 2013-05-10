@@ -86,11 +86,16 @@ public class User implements Serializable {
     private boolean isActive;
     @ManyToMany(mappedBy = "userCollection")
     private Collection<Instance> instanceCollection;
+    @JoinTable(name = "user_is_in_group", joinColumns = {
+        @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
+        @JoinColumn(name = "group_id", referencedColumnName = "id")})
+    @ManyToMany
+    private Collection<Group> joinedGroups;
     @JoinTable(name = "group_leader", joinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
-    private Collection<Group> GroupCollection;
+    private Collection<Group> leadingGroups;
     @JoinTable(name = "lectur", joinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "lecture_id", referencedColumnName = "id")})
@@ -220,12 +225,21 @@ public class User implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Group> getGroupCollection() {
-        return GroupCollection;
+    public Collection<Group> getjoinedGroups() {
+        return joinedGroups;
     }
 
-    public void setGroupCollection(Collection<Group> GroupCollection) {
-        this.GroupCollection = GroupCollection;
+    public void setjoinedGroups(Collection<Group> joinedGroups) {
+        this.joinedGroups = joinedGroups;
+    }
+
+    @XmlTransient
+    public Collection<Group> getleadingGroups() {
+        return leadingGroups;
+    }
+
+    public void setleadingGroups(Collection<Group> leadingGroups) {
+        this.leadingGroups = leadingGroups;
     }
 
     @XmlTransient

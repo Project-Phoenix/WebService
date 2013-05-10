@@ -68,8 +68,10 @@ public class Group implements Serializable {
     @Column(name = "registration_end_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date registrationEndDate;
-    @ManyToMany(mappedBy = "GroupCollection")
-    private Collection<User> userCollection;
+    @ManyToMany(mappedBy = "joinedGroups")
+    private Collection<User> groupLeader;
+    @ManyToMany(mappedBy = "leadingGroups")
+    private Collection<User> groupMember;
     @JoinTable(name = "group_has_exercise_sheet", joinColumns = {
         @JoinColumn(name = "group_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "exercise_sheet_id", referencedColumnName = "id")})
@@ -152,12 +154,21 @@ public class Group implements Serializable {
     }
 
     @XmlTransient
-    public Collection<User> getUserCollection() {
-        return userCollection;
+    public Collection<User> getGroupLeader() {
+        return groupLeader;
     }
 
-    public void setUserCollection(Collection<User> userCollection) {
-        this.userCollection = userCollection;
+    public void setGroupLeader(Collection<User> groupLeader) {
+        this.groupLeader = groupLeader;
+    }
+
+    @XmlTransient
+    public Collection<User> getGroupMember() {
+        return groupMember;
+    }
+
+    public void GroupMember(Collection<User> groupMember) {
+        this.groupMember = groupMember;
     }
 
     @XmlTransient
