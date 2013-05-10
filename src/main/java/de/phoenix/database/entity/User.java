@@ -101,6 +101,8 @@ public class User implements Serializable {
         @JoinColumn(name = "lecture_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Lecture> lectureCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
+    private Collection<News> writtenNews;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Collection<Submission> submissionCollection;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
@@ -249,6 +251,15 @@ public class User implements Serializable {
 
     public void setLectureCollection(Collection<Lecture> lectureCollection) {
         this.lectureCollection = lectureCollection;
+    }
+    
+    @XmlTransient
+    public Collection<News> getWrittenNews() {
+        return writtenNews;
+    }
+
+    public void WrittenNews(Collection<News> writtenNews) {
+        this.writtenNews = writtenNews;
     }
 
     @XmlTransient

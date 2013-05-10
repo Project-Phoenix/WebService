@@ -487,6 +487,35 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`user_is_in_group` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`news`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`news` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`news` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `content` TEXT NOT NULL ,
+  `title` TEXT NOT NULL ,
+  `releaseDate` DATETIME NULL ,
+  `creationDate` DATETIME NOT NULL ,
+  `lecture_id` INT NOT NULL ,
+  `author` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_news_lecture1_idx` (`lecture_id` ASC) ,
+  INDEX `fk_news_user1_idx` (`author` ASC) ,
+  CONSTRAINT `fk_news_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_news_user1`
+    FOREIGN KEY (`author` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 

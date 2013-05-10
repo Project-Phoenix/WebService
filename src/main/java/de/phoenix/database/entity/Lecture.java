@@ -69,6 +69,8 @@ public class Lecture implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
     private Collection<SampleSolution> sampleSolutionCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
+    private Collection<News> newsCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
     private Collection<Material> materialCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureId")
     private Collection<Group> GroupCollection;
@@ -161,6 +163,15 @@ public class Lecture implements Serializable {
 
     public void setSampleSolutionCollection(Collection<SampleSolution> sampleSolutionCollection) {
         this.sampleSolutionCollection = sampleSolutionCollection;
+    }
+    
+    @XmlTransient
+    public Collection<News> getNewsCollection() {
+        return newsCollection;
+    }
+
+    public void setNewsCollection(Collection<News> newsCollection) {
+        this.newsCollection = newsCollection;
     }
 
     @XmlTransient
