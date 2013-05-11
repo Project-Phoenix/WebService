@@ -28,25 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
+ * 
  * @author Meldanor
  */
 @Entity
 @Table(name = "user")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
-    @NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"),
-    @NamedQuery(name = "User.findByAccountName", query = "SELECT u FROM User u WHERE u.accountName = :accountName"),
-    @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name"),
-    @NamedQuery(name = "User.findBySurname", query = "SELECT u FROM User u WHERE u.surname = :surname"),
-    @NamedQuery(name = "User.findByGender", query = "SELECT u FROM User u WHERE u.gender = :gender"),
-    @NamedQuery(name = "User.findByTitle", query = "SELECT u FROM User u WHERE u.title = :title"),
-    @NamedQuery(name = "User.findByMatrikel", query = "SELECT u FROM User u WHERE u.matrikel = :matrikel"),
-    @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
-    @NamedQuery(name = "User.findBySalt", query = "SELECT u FROM User u WHERE u.salt = :salt"),
-    @NamedQuery(name = "User.findByRegdate", query = "SELECT u FROM User u WHERE u.regdate = :regdate"),
-    @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive")})
+@NamedQueries({@NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"), @NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"), @NamedQuery(name = "User.findByAccountName", query = "SELECT u FROM User u WHERE u.accountName = :accountName"), @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name"), @NamedQuery(name = "User.findBySurname", query = "SELECT u FROM User u WHERE u.surname = :surname"), @NamedQuery(name = "User.findByGender", query = "SELECT u FROM User u WHERE u.gender = :gender"), @NamedQuery(name = "User.findByTitle", query = "SELECT u FROM User u WHERE u.title = :title"), @NamedQuery(name = "User.findByMatrikel", query = "SELECT u FROM User u WHERE u.matrikel = :matrikel"), @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"), @NamedQuery(name = "User.findBySalt", query = "SELECT u FROM User u WHERE u.salt = :salt"), @NamedQuery(name = "User.findByRegdate", query = "SELECT u FROM User u WHERE u.regdate = :regdate"), @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive")})
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -86,25 +74,23 @@ public class User implements Serializable {
     private boolean isActive;
     @ManyToMany(mappedBy = "userCollection")
     private Collection<Instance> instanceCollection;
-    @JoinTable(name = "user_is_in_group", joinColumns = {
-        @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "group_id", referencedColumnName = "id")})
+    @JoinTable(name = "user_is_in_group", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Group> joinedGroups;
-    @JoinTable(name = "group_leader", joinColumns = {
-        @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "group_id", referencedColumnName = "id")})
+    @JoinTable(name = "group_leader", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Group> leadingGroups;
-    @JoinTable(name = "lectur", joinColumns = {
-        @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "lecture_id", referencedColumnName = "id")})
+    @JoinTable(name = "lectur", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "lecture_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Lecture> lectureCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
     private Collection<News> writtenNews;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Collection<Submission> submissionCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver")
+    private Collection<Message> receivedMessages;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender")
+    private Collection<Message> sentMessages;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Role roleId;
@@ -252,7 +238,7 @@ public class User implements Serializable {
     public void setLectureCollection(Collection<Lecture> lectureCollection) {
         this.lectureCollection = lectureCollection;
     }
-    
+
     @XmlTransient
     public Collection<News> getWrittenNews() {
         return writtenNews;
@@ -269,6 +255,24 @@ public class User implements Serializable {
 
     public void setSubmissionCollection(Collection<Submission> submissionCollection) {
         this.submissionCollection = submissionCollection;
+    }
+
+    @XmlTransient
+    public Collection<Message> getSentMessages() {
+        return this.sentMessages;
+    }
+
+    public void setSentMessages(Collection<Message> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    @XmlTransient
+    public Collection<Message> getReceivedMessages() {
+        return this.receivedMessages;
+    }
+
+    public void setReceivedMessages(Collection<Message> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 
     public Role getRoleId() {
@@ -288,7 +292,8 @@ public class User implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
         if (!(object instanceof User)) {
             return false;
         }
@@ -303,5 +308,5 @@ public class User implements Serializable {
     public String toString() {
         return "de.phoenix.database.entity.User[ id=" + id + " ]";
     }
-    
+
 }

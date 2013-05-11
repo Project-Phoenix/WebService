@@ -516,6 +516,33 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`news` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`message`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`message` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`message` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `title` VARCHAR(80) NOT NULL ,
+  `text` TEXT NULL ,
+  `sender` INT NOT NULL ,
+  `receiver` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_message_user1_idx` (`sender` ASC) ,
+  INDEX `fk_message_user2_idx` (`receiver` ASC) ,
+  CONSTRAINT `fk_message_user1`
+    FOREIGN KEY (`sender` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_message_user2`
+    FOREIGN KEY (`receiver` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 

@@ -38,6 +38,7 @@
 	    <mapping class="de.phoenix.database.entity.Instance" />
 	    <mapping class="de.phoenix.database.entity.Lecture" />
 	    <mapping class="de.phoenix.database.entity.Material" />
+	    <mapping class="de.phoenix.database.entity.Message" />
 	    <mapping class="de.phoenix.database.entity.News" />
 	    <mapping class="de.phoenix.database.entity.Permission" />
 	    <mapping class="de.phoenix.database.entity.Role" />
