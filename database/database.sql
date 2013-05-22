@@ -87,6 +87,36 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`permission` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`user` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`user` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `surname` VARCHAR(64) NOT NULL ,
+  `name` VARCHAR(64) NOT NULL ,
+  `title` VARCHAR(45) NOT NULL ,
+  `matrikelNr` VARCHAR(16) NULL ,
+  `username` VARCHAR(64) NOT NULL ,
+  `password` VARCHAR(64) NOT NULL ,
+  `salt` VARCHAR(64) NOT NULL ,
+  `email` VARCHAR(64) NOT NULL ,
+  `regdate` DATETIME NOT NULL ,
+  `isActive` TINYINT(1) NOT NULL DEFAULT 1 ,
+  `role_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `name` (`surname` ASC, `name` ASC) ,
+  INDEX `userName` (`username` ASC) ,
+  INDEX `fk_user_role1_idx` (`role_id` ASC) ,
+  CONSTRAINT `fk_user_role1`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `phoenix`.`role` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
