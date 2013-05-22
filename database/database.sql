@@ -117,6 +117,51 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`user` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`message`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`message` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`message` (
+  `id` INT UNSIGNED NOT NULL ,
+  `title` VARCHAR(80) NOT NULL ,
+  `sentDate` DATETIME NOT NULL ,
+  `text` TEXT NOT NULL ,
+  `sender` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_message_user1_idx` (`sender` ASC) ,
+  CONSTRAINT `fk_message_user1`
+    FOREIGN KEY (`sender` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`message_receiver`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`message_receiver` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`message_receiver` (
+  `message` INT UNSIGNED NOT NULL ,
+  `receiver` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`message`, `receiver`) ,
+  INDEX `fk_message_receiver_user_idx` (`receiver` ASC) ,
+  INDEX `fk_message_receiver_message_idx` (`message` ASC) ,
+  CONSTRAINT `fk_message_receiver_message`
+    FOREIGN KEY (`message` )
+    REFERENCES `phoenix`.`message` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_message_receiver_user`
+    FOREIGN KEY (`receiver` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
