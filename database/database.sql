@@ -258,6 +258,85 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture_leader` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`group` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`group` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
+  `room` VARCHAR(45) NOT NULL ,
+  `turnus` VARCHAR(45) NOT NULL ,
+  `submission_expire_date` DATETIME NULL ,
+  `registration_start_date` DATETIME NOT NULL ,
+  `registration_end_date` DATETIME NOT NULL ,
+  `lecture` INT NOT NULL ,
+  `exerciseLeader` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_group_lecture1_idx` (`lecture` ASC) ,
+  INDEX `fk_group_user1_idx` (`exerciseLeader` ASC) ,
+  CONSTRAINT `fk_group_lecture1`
+    FOREIGN KEY (`lecture` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_group_user1`
+    FOREIGN KEY (`exerciseLeader` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`group_leader`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`group_leader` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`group_leader` (
+  `user_id` INT UNSIGNED NOT NULL ,
+  `lecture_id` INT NOT NULL ,
+  PRIMARY KEY (`user_id`, `lecture_id`) ,
+  INDEX `fk_group_leader_lecture1_idx` (`lecture_id` ASC) ,
+  INDEX `fk_group_leader_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_group_leader_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_group_leader_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`groupMember`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`groupMember` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`groupMember` (
+  `user_id` INT UNSIGNED NOT NULL ,
+  `group_id` INT NOT NULL ,
+  PRIMARY KEY (`user_id`, `group_id`) ,
+  INDEX `fk_groupMember_group1_idx` (`group_id` ASC) ,
+  INDEX `fk_groupMember_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_groupMember_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_groupMember_group1`
+    FOREIGN KEY (`group_id` )
+    REFERENCES `phoenix`.`group` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
