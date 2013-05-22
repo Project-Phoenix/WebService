@@ -20,11 +20,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`standard_role`
+-- Table `phoenix`.`default_role`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`standard_role` ;
+DROP TABLE IF EXISTS `phoenix`.`default_role` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`standard_role` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`default_role` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `inheritatedRole` INT NOT NULL DEFAULT -1 ,
@@ -51,6 +51,42 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`role` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`default_permission`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`default_permission` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`default_permission` (
+  `node` VARCHAR(64) NOT NULL ,
+  `default_role_id` INT NOT NULL ,
+  PRIMARY KEY (`node`) ,
+  INDEX `fk_default_permission_default_role1_idx` (`default_role_id` ASC) ,
+  CONSTRAINT `fk_default_permission_default_role1`
+    FOREIGN KEY (`default_role_id` )
+    REFERENCES `phoenix`.`default_role` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`permission`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`permission` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`permission` (
+  `node` VARCHAR(64) NOT NULL ,
+  `role_id` INT NOT NULL ,
+  PRIMARY KEY (`node`) ,
+  INDEX `fk_permission_role1_idx` (`role_id` ASC) ,
+  CONSTRAINT `fk_permission_role1`
+    FOREIGN KEY (`role_id` )
+    REFERENCES `phoenix`.`role` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
@@ -59,17 +95,17 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
--- Data for table `phoenix`.`standard_role`
+-- Data for table `phoenix`.`default_role`
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `phoenix`;
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (1, 'guest', -1);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (2, 'student', 1);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (3, 'tutor', 2);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (4, 'exerciseLeader', 3);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (5, 'groupLeader', 4);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (6, 'lectureLeader', 5);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (7, 'instanceAdmin', 6);
-INSERT INTO `phoenix`.`standard_role` (`id`, `name`, `inheritatedRole`) VALUES (8, 'admin', 7);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (1, 'guest', -1);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (2, 'student', 1);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (3, 'tutor', 2);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (4, 'exerciseLeader', 3);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (5, 'groupLeader', 4);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (6, 'lectureLeader', 5);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (7, 'instanceAdmin', 6);
+INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (8, 'admin', 7);
 
 COMMIT;
