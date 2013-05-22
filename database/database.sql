@@ -162,6 +162,54 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`message_receiver` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`message_receiver`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`message_receiver` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`message_receiver` (
+  `message` INT UNSIGNED NOT NULL ,
+  `receiver` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`message`, `receiver`) ,
+  INDEX `fk_message_receiver_user_idx` (`receiver` ASC) ,
+  INDEX `fk_message_receiver_message_idx` (`message` ASC) ,
+  CONSTRAINT `fk_message_receiver_message`
+    FOREIGN KEY (`message` )
+    REFERENCES `phoenix`.`message` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_message_receiver_user`
+    FOREIGN KEY (`receiver` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`instance_admin`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`instance_admin` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`instance_admin` (
+  `user_id` INT UNSIGNED NOT NULL ,
+  `instance_id` INT NOT NULL ,
+  PRIMARY KEY (`user_id`, `instance_id`) ,
+  INDEX `fk_instance_admin_instance1_idx` (`instance_id` ASC) ,
+  INDEX `fk_instance_admin_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_instance_admin_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_instance_admin_instance1`
+    FOREIGN KEY (`instance_id` )
+    REFERENCES `phoenix`.`instance` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
