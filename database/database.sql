@@ -210,6 +210,54 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`instance_admin` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`lecture`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`lecture` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(80) NOT NULL ,
+  `startTime` DATETIME NOT NULL ,
+  `endTime` DATETIME NOT NULL ,
+  `room` VARCHAR(45) NOT NULL ,
+  `isActive` TINYINT(1) NOT NULL DEFAULT 1 ,
+  `instance_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `name` (`name` ASC) ,
+  INDEX `fk_lecture_instance1_idx` (`instance_id` ASC) ,
+  CONSTRAINT `fk_lecture_instance1`
+    FOREIGN KEY (`instance_id` )
+    REFERENCES `phoenix`.`instance` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`lecture_leader`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`lecture_leader` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture_leader` (
+  `user_id` INT UNSIGNED NOT NULL ,
+  `lecture_id` INT NOT NULL ,
+  PRIMARY KEY (`user_id`, `lecture_id`) ,
+  INDEX `fk_lecture_leader_lecture1_idx` (`lecture_id` ASC) ,
+  INDEX `fk_lecture_leader_user1_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_lecture_leader_user1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_lecture_leader_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
