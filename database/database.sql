@@ -124,7 +124,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `phoenix`.`message` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`message` (
-  `id` INT UNSIGNED NOT NULL ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `title` VARCHAR(80) NOT NULL ,
   `sentDate` DATETIME NOT NULL ,
   `text` TEXT NOT NULL ,
@@ -320,7 +320,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `phoenix`.`news` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`news` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `title` VARCHAR(64) NOT NULL ,
   `text` TEXT NOT NULL ,
   `creationDate` DATETIME NOT NULL ,
@@ -349,7 +349,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `phoenix`.`task_pool` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`task_pool` (
-  `id` INT UNSIGNED NOT NULL ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `description` TEXT NOT NULL ,
   PRIMARY KEY (`id`) )
@@ -362,7 +362,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `phoenix`.`tag` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`tag` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `tag` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `tag` (`tag` ASC) )
@@ -399,7 +399,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `phoenix`.`exercise_sheet_pool` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet_pool` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
@@ -416,7 +416,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet` (
   `releaseDate` DATETIME NULL ,
   `expirationDate` DATETIME NULL ,
   `visible` TINYINT(1) NULL DEFAULT 1 ,
-  PRIMARY KEY (`group_id`, `exercise_sheet_id`) ,
+  PRIMARY KEY (`exercise_sheet_id`, `group_id`) ,
   INDEX `fk_group_has_exercise_sheet_exercise_sheet1_idx` (`exercise_sheet_id` ASC) ,
   INDEX `fk_group_has_exercise_sheet_group1_idx` (`group_id` ASC) ,
   CONSTRAINT `fk_group_has_exercise_sheet_group1`
@@ -451,6 +451,70 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`task` (
   CONSTRAINT `fk_exercise_sheet_pool_has_task_task1`
     FOREIGN KEY (`task_id` )
     REFERENCES `phoenix`.`task_pool` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`material` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`material` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
+  `category` VARCHAR(45) NULL ,
+  `data` LONGBLOB NOT NULL ,
+  `visible` TINYINT(1) NOT NULL DEFAULT 1 ,
+  `releaseDate` DATETIME NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`lecture_has_material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`lecture_has_material` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture_has_material` (
+  `lecture_id` INT NOT NULL ,
+  `material_id` INT NOT NULL ,
+  PRIMARY KEY (`lecture_id`, `material_id`) ,
+  INDEX `fk_lecture_has_material_material1_idx` (`material_id` ASC) ,
+  INDEX `fk_lecture_has_material_lecture1_idx` (`lecture_id` ASC) ,
+  CONSTRAINT `fk_lecture_has_material_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_lecture_has_material_material1`
+    FOREIGN KEY (`material_id` )
+    REFERENCES `phoenix`.`material` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`group_has_material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`group_has_material` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`group_has_material` (
+  `group_id` INT NOT NULL ,
+  `material_id` INT NOT NULL ,
+  PRIMARY KEY (`group_id`, `material_id`) ,
+  INDEX `fk_group_has_material_material1_idx` (`material_id` ASC) ,
+  INDEX `fk_group_has_material_group1_idx` (`group_id` ASC) ,
+  CONSTRAINT `fk_group_has_material_group1`
+    FOREIGN KEY (`group_id` )
+    REFERENCES `phoenix`.`group` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_group_has_material_material1`
+    FOREIGN KEY (`material_id` )
+    REFERENCES `phoenix`.`material` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
