@@ -164,30 +164,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`message_receiver`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`message_receiver` ;
-
-CREATE  TABLE IF NOT EXISTS `phoenix`.`message_receiver` (
-  `message` INT UNSIGNED NOT NULL ,
-  `receiver` INT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`message`, `receiver`) ,
-  INDEX `fk_message_receiver_user_idx` (`receiver` ASC) ,
-  INDEX `fk_message_receiver_message_idx` (`message` ASC) ,
-  CONSTRAINT `fk_message_receiver_message`
-    FOREIGN KEY (`message` )
-    REFERENCES `phoenix`.`message` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_receiver_user`
-    FOREIGN KEY (`receiver` )
-    REFERENCES `phoenix`.`user` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`instance_admin`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `phoenix`.`instance_admin` ;
@@ -362,6 +338,119 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`news` (
   CONSTRAINT `fk_news_user1`
     FOREIGN KEY (`author` )
     REFERENCES `phoenix`.`user` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`task_pool`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`task_pool` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`task_pool` (
+  `id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `description` TEXT NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`tag`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`tag` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`tag` (
+  `id` INT NOT NULL ,
+  `tag` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `tag` (`tag` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`task_has_tag`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`task_has_tag` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`task_has_tag` (
+  `task_id` INT UNSIGNED NOT NULL ,
+  `tag_id` INT NOT NULL ,
+  PRIMARY KEY (`task_id`, `tag_id`) ,
+  INDEX `fk_task_has_tag_tag1_idx` (`tag_id` ASC) ,
+  INDEX `fk_task_has_tag_task1_idx` (`task_id` ASC) ,
+  CONSTRAINT `fk_task_has_tag_task1`
+    FOREIGN KEY (`task_id` )
+    REFERENCES `phoenix`.`task_pool` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_task_has_tag_tag1`
+    FOREIGN KEY (`tag_id` )
+    REFERENCES `phoenix`.`tag` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`exercise_sheet_pool`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`exercise_sheet_pool` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet_pool` (
+  `id` INT NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`exercise_sheet`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`exercise_sheet` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet` (
+  `group_id` INT NOT NULL ,
+  `exercise_sheet_id` INT NOT NULL ,
+  `releaseDate` DATETIME NULL ,
+  `expirationDate` DATETIME NULL ,
+  `visible` TINYINT(1) NULL DEFAULT 1 ,
+  PRIMARY KEY (`group_id`, `exercise_sheet_id`) ,
+  INDEX `fk_group_has_exercise_sheet_exercise_sheet1_idx` (`exercise_sheet_id` ASC) ,
+  INDEX `fk_group_has_exercise_sheet_group1_idx` (`group_id` ASC) ,
+  CONSTRAINT `fk_group_has_exercise_sheet_group1`
+    FOREIGN KEY (`group_id` )
+    REFERENCES `phoenix`.`group` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_group_has_exercise_sheet_exercise_sheet1`
+    FOREIGN KEY (`exercise_sheet_id` )
+    REFERENCES `phoenix`.`exercise_sheet_pool` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`task`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`task` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`task` (
+  `exercise_sheet_pool_id` INT NOT NULL ,
+  `task_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`exercise_sheet_pool_id`, `task_id`) ,
+  INDEX `fk_exercise_sheet_pool_has_task_task1_idx` (`task_id` ASC) ,
+  INDEX `fk_exercise_sheet_pool_has_task_exercise_sheet_pool1_idx` (`exercise_sheet_pool_id` ASC) ,
+  CONSTRAINT `fk_exercise_sheet_pool_has_task_exercise_sheet_pool1`
+    FOREIGN KEY (`exercise_sheet_pool_id` )
+    REFERENCES `phoenix`.`exercise_sheet_pool` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_exercise_sheet_pool_has_task_task1`
+    FOREIGN KEY (`task_id` )
+    REFERENCES `phoenix`.`task_pool` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
