@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 CREATE SCHEMA IF NOT EXISTS `phoenix` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE `phoenix` ;
@@ -519,7 +519,56 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`group_has_material` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
-USE `phoenix` ;
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`submission`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`submission` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`submission` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `submissionDate` DATETIME NOT NULL ,
+  `status` INT NOT NULL ,
+  `controllStatus` INT NOT NULL ,
+  `task_exercise_sheet_pool_id` INT NOT NULL ,
+  `task_task_id` INT UNSIGNED NOT NULL ,
+  `exercise_sheet_exercise_sheet_id` INT NOT NULL ,
+  `exercise_sheet_group_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_submission_task1` (`task_exercise_sheet_pool_id` ASC, `task_task_id` ASC) ,
+  INDEX `fk_submission_exercise_sheet1` (`exercise_sheet_exercise_sheet_id` ASC, `exercise_sheet_group_id` ASC) ,
+  CONSTRAINT `fk_submission_task1`
+    FOREIGN KEY (`task_exercise_sheet_pool_id` , `task_task_id` )
+    REFERENCES `phoenix`.`task` (`exercise_sheet_pool_id` , `task_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_submission_exercise_sheet1`
+    FOREIGN KEY (`exercise_sheet_exercise_sheet_id` , `exercise_sheet_group_id` )
+    REFERENCES `phoenix`.`exercise_sheet` (`exercise_sheet_id` , `group_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`submissionFiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`submissionFiles` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`submissionFiles` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `content` TEXT NOT NULL ,
+  `filename` VARCHAR(64) NOT NULL ,
+  `submission_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_submissionFiles_submission1` (`submission_id` ASC) ,
+  CONSTRAINT `fk_submissionFiles_submission1`
+    FOREIGN KEY (`submission_id` )
+    REFERENCES `phoenix`.`submission` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
