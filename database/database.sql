@@ -579,7 +579,42 @@ DROP TABLE IF EXISTS `phoenix`.`sampleSolution` ;
 CREATE  TABLE IF NOT EXISTS `phoenix`.`sampleSolution` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `author` VARCHAR(64) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  `task_exercise_sheet_pool_id` INT NOT NULL ,
+  `task_task_id` INT UNSIGNED NOT NULL ,
+  `lecture_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_sampleSolution_task1_idx` (`task_exercise_sheet_pool_id` ASC, `task_task_id` ASC) ,
+  INDEX `fk_sampleSolution_lecture1_idx` (`lecture_id` ASC) ,
+  CONSTRAINT `fk_sampleSolution_task1`
+    FOREIGN KEY (`task_exercise_sheet_pool_id` , `task_task_id` )
+    REFERENCES `phoenix`.`task` (`exercise_sheet_pool_id` , `task_id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_sampleSolution_lecture1`
+    FOREIGN KEY (`lecture_id` )
+    REFERENCES `phoenix`.`lecture` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`sampleSolutionFile`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`sampleSolutionFile` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`sampleSolutionFile` (
+  `id` INT NOT NULL ,
+  `content` TEXT NOT NULL ,
+  `fileName` VARCHAR(45) NOT NULL ,
+  `sampleSolution_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_sampleSolutionFile_sampleSolution1_idx` (`sampleSolution_id` ASC) ,
+  CONSTRAINT `fk_sampleSolutionFile_sampleSolution1`
+    FOREIGN KEY (`sampleSolution_id` )
+    REFERENCES `phoenix`.`sampleSolution` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 USE `phoenix` ;
