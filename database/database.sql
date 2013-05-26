@@ -20,11 +20,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`default_role`
+-- Table `phoenix`.`defaultRole`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`default_role` ;
+DROP TABLE IF EXISTS `phoenix`.`defaultRole` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`default_role` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`defaultRole` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `inheritatedRole` INT NOT NULL DEFAULT -1 ,
@@ -53,18 +53,18 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`default_permission`
+-- Table `phoenix`.`defaultPermission`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`default_permission` ;
+DROP TABLE IF EXISTS `phoenix`.`defaultPermission` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`default_permission` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`defaultPermission` (
   `node` VARCHAR(64) NOT NULL ,
   `default_role_id` INT NOT NULL ,
   PRIMARY KEY (`node`) ,
   INDEX `fk_default_permission_default_role1_idx` (`default_role_id` ASC) ,
   CONSTRAINT `fk_default_permission_default_role1`
     FOREIGN KEY (`default_role_id` )
-    REFERENCES `phoenix`.`default_role` (`id` )
+    REFERENCES `phoenix`.`defaultRole` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -140,11 +140,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`message_receiver`
+-- Table `phoenix`.`messageReceiver`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`message_receiver` ;
+DROP TABLE IF EXISTS `phoenix`.`messageReceiver` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`message_receiver` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`messageReceiver` (
   `message` INT UNSIGNED NOT NULL ,
   `receiver` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`message`, `receiver`) ,
@@ -164,11 +164,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`instance_admin`
+-- Table `phoenix`.`instanceAdmin`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`instance_admin` ;
+DROP TABLE IF EXISTS `phoenix`.`instanceAdmin` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`instance_admin` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`instanceAdmin` (
   `user_id` INT UNSIGNED NOT NULL ,
   `instance_id` INT NOT NULL ,
   PRIMARY KEY (`user_id`, `instance_id`) ,
@@ -212,11 +212,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`lecture_leader`
+-- Table `phoenix`.`lectureLeader`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`lecture_leader` ;
+DROP TABLE IF EXISTS `phoenix`.`lectureLeader` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture_leader` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`lectureLeader` (
   `user_id` INT UNSIGNED NOT NULL ,
   `lecture_id` INT NOT NULL ,
   PRIMARY KEY (`user_id`, `lecture_id`) ,
@@ -267,11 +267,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`group_leader`
+-- Table `phoenix`.`groupLeader`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`group_leader` ;
+DROP TABLE IF EXISTS `phoenix`.`groupLeader` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`group_leader` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`groupLeader` (
   `user_id` INT UNSIGNED NOT NULL ,
   `lecture_id` INT NOT NULL ,
   PRIMARY KEY (`user_id`, `lecture_id`) ,
@@ -344,11 +344,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`task_pool`
+-- Table `phoenix`.`taskPool`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`task_pool` ;
+DROP TABLE IF EXISTS `phoenix`.`taskPool` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`task_pool` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`taskPool` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `description` TEXT NOT NULL ,
@@ -382,7 +382,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`task_has_tag` (
   INDEX `fk_task_has_tag_task1_idx` (`task_id` ASC) ,
   CONSTRAINT `fk_task_has_tag_task1`
     FOREIGN KEY (`task_id` )
-    REFERENCES `phoenix`.`task_pool` (`id` )
+    REFERENCES `phoenix`.`taskPool` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_task_has_tag_tag1`
@@ -394,11 +394,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`exercise_sheet_pool`
+-- Table `phoenix`.`exerciseSheetPool`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`exercise_sheet_pool` ;
+DROP TABLE IF EXISTS `phoenix`.`exerciseSheetPool` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet_pool` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`exerciseSheetPool` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`id`) )
@@ -406,11 +406,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`exercise_sheet`
+-- Table `phoenix`.`exerciseSheet`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`exercise_sheet` ;
+DROP TABLE IF EXISTS `phoenix`.`exerciseSheet` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`exerciseSheet` (
   `group_id` INT NOT NULL ,
   `exercise_sheet_id` INT NOT NULL ,
   `releaseDate` DATETIME NULL ,
@@ -426,7 +426,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`exercise_sheet` (
     ON UPDATE CASCADE,
   CONSTRAINT `fk_group_has_exercise_sheet_exercise_sheet1`
     FOREIGN KEY (`exercise_sheet_id` )
-    REFERENCES `phoenix`.`exercise_sheet_pool` (`id` )
+    REFERENCES `phoenix`.`exerciseSheetPool` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -445,12 +445,12 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`task` (
   INDEX `fk_exercise_sheet_pool_has_task_exercise_sheet_pool1_idx` (`exercise_sheet_pool_id` ASC) ,
   CONSTRAINT `fk_exercise_sheet_pool_has_task_exercise_sheet_pool1`
     FOREIGN KEY (`exercise_sheet_pool_id` )
-    REFERENCES `phoenix`.`exercise_sheet_pool` (`id` )
+    REFERENCES `phoenix`.`exerciseSheetPool` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_exercise_sheet_pool_has_task_task1`
     FOREIGN KEY (`task_id` )
-    REFERENCES `phoenix`.`task_pool` (`id` )
+    REFERENCES `phoenix`.`taskPool` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -473,11 +473,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`lecture_has_material`
+-- Table `phoenix`.`lectureMaterial`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`lecture_has_material` ;
+DROP TABLE IF EXISTS `phoenix`.`lectureMaterial` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`lecture_has_material` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`lectureMaterial` (
   `lecture_id` INT NOT NULL ,
   `material_id` INT NOT NULL ,
   PRIMARY KEY (`lecture_id`, `material_id`) ,
@@ -497,11 +497,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`group_has_material`
+-- Table `phoenix`.`groupMaterial`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`group_has_material` ;
+DROP TABLE IF EXISTS `phoenix`.`groupMaterial` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`group_has_material` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`groupMaterial` (
   `group_id` INT NOT NULL ,
   `material_id` INT NOT NULL ,
   PRIMARY KEY (`group_id`, `material_id`) ,
@@ -545,7 +545,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`submission` (
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_exercise_sheet1`
     FOREIGN KEY (`exercise_sheet_exercise_sheet_id` , `exercise_sheet_group_id` )
-    REFERENCES `phoenix`.`exercise_sheet` (`exercise_sheet_id` , `group_id` )
+    REFERENCES `phoenix`.`exerciseSheet` (`exercise_sheet_id` , `group_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -607,14 +607,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`sampleSolutionFile` (
   `id` INT NOT NULL ,
   `content` TEXT NOT NULL ,
   `fileName` VARCHAR(45) NOT NULL ,
-  `sampleSolution_id` INT NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_sampleSolutionFile_sampleSolution1_idx` (`sampleSolution_id` ASC) ,
-  CONSTRAINT `fk_sampleSolutionFile_sampleSolution1`
-    FOREIGN KEY (`sampleSolution_id` )
-    REFERENCES `phoenix`.`sampleSolution` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+  PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
 USE `phoenix` ;
@@ -625,17 +618,17 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
--- Data for table `phoenix`.`default_role`
+-- Data for table `phoenix`.`defaultRole`
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `phoenix`;
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (1, 'guest', -1);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (2, 'student', 1);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (3, 'tutor', 2);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (4, 'exerciseLeader', 3);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (5, 'groupLeader', 4);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (6, 'lectureLeader', 5);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (7, 'instanceAdmin', 6);
-INSERT INTO `phoenix`.`default_role` (`id`, `name`, `inheritatedRole`) VALUES (8, 'admin', 7);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (1, 'guest', -1);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (2, 'student', 1);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (3, 'tutor', 2);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (4, 'exerciseLeader', 3);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (5, 'groupLeader', 4);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (6, 'lectureLeader', 5);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (7, 'instanceAdmin', 6);
+INSERT INTO `phoenix`.`defaultRole` (`id`, `name`, `inheritatedRole`) VALUES (8, 'admin', 7);
 
 COMMIT;
