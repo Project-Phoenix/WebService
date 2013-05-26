@@ -607,7 +607,14 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`sampleSolutionFile` (
   `id` INT NOT NULL ,
   `content` TEXT NOT NULL ,
   `fileName` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  `sampleSolution_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_sampleSolutionFile_sampleSolution1_idx` (`sampleSolution_id` ASC) ,
+  CONSTRAINT `fk_sampleSolutionFile_sampleSolution1`
+    FOREIGN KEY (`sampleSolution_id` )
+    REFERENCES `phoenix`.`sampleSolution` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 USE `phoenix` ;
