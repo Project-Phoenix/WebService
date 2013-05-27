@@ -21,11 +21,8 @@ package de.phoenix.webresource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -35,12 +32,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.multipart.MultiPart;
+
+import de.phoenix.PhoenixApplication;
+import de.phoenix.database.entity.Submission;
+import de.phoenix.database.entity.SubmissionFiles;
 
 /**
  * Webresource for uploading and getting submissions from user.
@@ -77,53 +80,80 @@ public class SubmissionResource {
         return Response.ok().build();
     }
 
-    /**
-     * Interpret the inputstream as a char stream and read it to a set of lines
-     * 
-     * @param in
-     *            The stream to the char encoded file
-     * @param fileName
-     *            The name of file
-     * @return Complete input of the stream in one string. The lines of the file
-     *         are seperated by \r\n
-     * @throws Exception
-     *             Something went wrong while reading
-     */
-    private String readFile(InputStream in, String fileName) throws Exception {
-        BufferedReader bReader = new BufferedReader(new InputStreamReader(in));
-        StringBuilder text = new StringBuilder();
-        String line = "";
-        while ((line = bReader.readLine()) != null) {
-            text.append(line).append("\r\n");
-        }
-        bReader.close();
-        return text.toString();
-    }
+//    /**
+//     * Interpret the inputstream as a char stream and read it to a set of lines
+//     * 
+//     * @param in
+//     *            The stream to the char encoded file
+//     * @param fileName
+//     *            The name of file
+//     * @return Complete input of the stream in one string. The lines of the file
+//     *         are seperated by \r\n
+//     * @throws Exception
+//     *             Something went wrong while reading
+//     */
+//    private String readFile(InputStream in, String fileName) throws Exception {
+//        BufferedReader bReader = new BufferedReader(new InputStreamReader(in));
+//        StringBuilder text = new StringBuilder();
+//        String line = "";
+//        while ((line = bReader.readLine()) != null) {
+//            text.append(line).append("\r\n");
+//        }
+//        bReader.close();
+//        return text.toString();
+//    }
 
     @Path("/submit/")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response submit(MultiPart multiPart) {
-        List<BodyPart> bodyParts = multiPart.getBodyParts();
-        String fileName = "";
-        String content = "";
-        for (BodyPart bodyPart : bodyParts) {
-            fileName = bodyPart.getContentDisposition().getFileName();
-            File f = bodyPart.getEntityAs(File.class);
-            content = readFile(f, (int)bodyPart.getContentDisposition().getSize());
+        List<SubmissionFiles> files = readFiles(multiPart.getBodyParts());
 
+        Session session = PhoenixApplication.databaseManager.openSession();
+        Transaction tx = session.beginTransaction();
+
+        Submission sub = new Submission(true);
+        int id = (Integer) session.save(sub);
+        sub.setId(id);
+
+        for (SubmissionFiles file : files) {
+            file.setSubmission(sub);
+            session.save(file);
         }
+
+        tx.commit();
+
         return Response.ok().build();
     }
 
+    private List<SubmissionFiles> readFiles(List<BodyPart> bodyParts) {
+        String fileName = "";
+        String content = "";
+        List<SubmissionFiles> files = new ArrayList<SubmissionFiles>();
+        for (BodyPart bodyPart : bodyParts) {
+            fileName = bodyPart.getContentDisposition().getFileName();
+            File f = bodyPart.getEntityAs(File.class);
+            content = readFile(f, (int) bodyPart.getContentDisposition().getSize());
+            SubmissionFiles tmp = new SubmissionFiles();
+            tmp.setFilename(fileName);
+            tmp.setContent(content);
+            
+            files.add(tmp);
+        }
+
+        return files;
+    }
+    
     private String readFile(File file, int size) {
         try {
             StringBuffer content = new StringBuffer(size);
             BufferedReader bReader = new BufferedReader(new FileReader(file));
             String line = "";
-            while ((line = bReader.readLine()) != null) 
+            while ((line = bReader.readLine()) != null) {
                 content.append(line);
-            
+                content.append(System.lineSeparator());
+            }
+
             bReader.close();
             return content.toString();
         } catch (Exception e) {

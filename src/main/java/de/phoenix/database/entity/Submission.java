@@ -21,6 +21,7 @@ package de.phoenix.database.entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,6 +41,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.Session;
+
+import de.phoenix.PhoenixApplication;
 
 @Entity
 @Table(name = "submission")
@@ -98,6 +103,19 @@ public class Submission implements Serializable {
         this.submissionDate = submissionDate;
         this.status = status;
         this.controllStatus = controllStatus;
+    }
+
+    // TODO: Deprecated Constructor after 31.05.2013
+    public Submission(boolean tmp) {
+        this.submissionDate = new Date();
+        this.status = 1;
+        this.controllStatus = 1;
+        this.controllMessage = "Akzeptiert";
+        
+        Session ses = PhoenixApplication.databaseManager.openSession();
+        Task task = (Task)ses.getNamedQuery("Task.findByTaskId").setInteger("taskId", 1).iterate().next();
+        ses.close();
+        this.task = task;
     }
 
     public Integer getId() {

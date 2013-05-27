@@ -18,11 +18,9 @@
 
 package de.phoenix.submission;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import static org.junit.Assert.assertTrue;
 
-import javax.ws.rs.core.MediaType;
+import java.io.File;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,9 +30,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.net.httpserver.HttpServer;
+
+import de.phoenix.util.UploadHelper;
 
 public class SubmissionTest {
 
@@ -47,47 +45,21 @@ public class SubmissionTest {
         // Start Http Server
         httpServer = HttpServerFactory.create(BASE_URL);
         httpServer.start();
-
-        // Create temponary file
-        File f = new File("test.txt");
-        try {
-            BufferedWriter bWriter = new BufferedWriter(new FileWriter(f));
-            bWriter.write("Erste Zeile");
-            bWriter.newLine();
-            bWriter.write("Zweite Zeile");
-            bWriter.newLine();
-            bWriter.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop(0);
-        // Delete temponary file
-        File f = new File("test.txt");
-        f.delete();
     }
 
     @Test
     public void uploadTest() {
-        File fileToUpload = new File("test.txt");
-        String author = "Meldanor";
 
-        // Create the websresource
-        Client client = Client.create();
-        WebResource wr = client.resource(BASE_URL).path("/submission").path("/upload").path(author);
+        File[] files = {new File(".classpath"), new File("pom.xml")};
 
-        // Create file packet
-        FormDataMultiPart multiPart = new FormDataMultiPart();
-        if (fileToUpload != null) {
-            multiPart.bodyPart(new FileDataBodyPart("file", fileToUpload, MediaType.APPLICATION_OCTET_STREAM_TYPE));
-        }
-
-        // Send file to server
-        ClientResponse clientResp = wr.type(MediaType.MULTIPART_FORM_DATA_TYPE).put(ClientResponse.class, multiPart);
-        System.out.println("Response: " + clientResp.getClientResponseStatus());
+        Client c = Client.create();
+        WebResource resource = c.resource(BASE_URL).path("/submission").path("/submit");
+        ClientResponse response = UploadHelper.uploadFile(resource, files);
+        assertTrue(response.getStatus() == 200);
     }
-
 }
