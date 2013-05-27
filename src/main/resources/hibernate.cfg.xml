@@ -22,26 +22,28 @@
 
 		<property name="hbm2ddl.auto">validate</property>
 
-	    <mapping class="de.phoenix.database.entity.AutomaticTask" />
-	    <mapping class="de.phoenix.database.entity.AutomaticTaskTemplate" />
-	    <mapping class="de.phoenix.database.entity.AutomaticTestTestFile" />
-	    <mapping class="de.phoenix.database.entity.ExerciseSheet" />
-	    <mapping class="de.phoenix.database.entity.ExerciseSheetHasTask" />
-	    <mapping class="de.phoenix.database.entity.Files" />
-	    <mapping class="de.phoenix.database.entity.Group" />
-	    <mapping class="de.phoenix.database.entity.Instance" />
-	    <mapping class="de.phoenix.database.entity.Lecture" />
-	    <mapping class="de.phoenix.database.entity.Material" />
-	    <mapping class="de.phoenix.database.entity.Message" />
-	    <mapping class="de.phoenix.database.entity.News" />
-	    <mapping class="de.phoenix.database.entity.Permission" />
-	    <mapping class="de.phoenix.database.entity.Role" />
-	    <mapping class="de.phoenix.database.entity.SampleSolution" />
-	    <mapping class="de.phoenix.database.entity.SampleSolutionFile" />
-	    <mapping class="de.phoenix.database.entity.Submission" />
-	    <mapping class="de.phoenix.database.entity.SubmissionFile" />
-	    <mapping class="de.phoenix.database.entity.Task" />
-	    <mapping class="de.phoenix.database.entity.User" />
+		<mapping class="de.phoenix.database.entity.AutomaticTask" />
+		<mapping class="de.phoenix.database.entity.AutomaticTaskFiles" />
+		<mapping class="de.phoenix.database.entity.DefaultPermission" />
+		<mapping class="de.phoenix.database.entity.DefaultRole" />
+		<mapping class="de.phoenix.database.entity.ExerciseSheet" />
+		<mapping class="de.phoenix.database.entity.ExerciseSheetPool" />
+		<mapping class="de.phoenix.database.entity.Group" />
+		<mapping class="de.phoenix.database.entity.Instance" />
+		<mapping class="de.phoenix.database.entity.Lecture" />
+		<mapping class="de.phoenix.database.entity.Material" />
+		<mapping class="de.phoenix.database.entity.Message" />
+		<mapping class="de.phoenix.database.entity.News" />
+		<mapping class="de.phoenix.database.entity.Permission" />
+		<mapping class="de.phoenix.database.entity.Role" />
+		<mapping class="de.phoenix.database.entity.SampleSolution" />
+		<mapping class="de.phoenix.database.entity.SampleSolutionFile" />
+		<mapping class="de.phoenix.database.entity.Submission" />
+		<mapping class="de.phoenix.database.entity.SubmissionFiles" />
+		<mapping class="de.phoenix.database.entity.Tag" />
+		<mapping class="de.phoenix.database.entity.Task" />
+		<mapping class="de.phoenix.database.entity.TaskPool" />
+		<mapping class="de.phoenix.database.entity.User" />
 
 	</session-factory>
 </hibernate-configuration>

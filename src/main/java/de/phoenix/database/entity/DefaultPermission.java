@@ -31,14 +31,14 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@Table(name = "permission")
+@Table(name = "defaultPermission")
 @XmlRootElement
 //@formatter:off
 @NamedQueries({
-    @NamedQuery(name = "Permission.findAll", query = "SELECT p FROM Permission p"),
-    @NamedQuery(name = "Permission.findByNode", query = "SELECT p FROM Permission p WHERE p.node = :node")})
+    @NamedQuery(name = "DefaultPermission.findAll", query = "SELECT d FROM DefaultPermission d"),
+    @NamedQuery(name = "DefaultPermission.findByNode", query = "SELECT d FROM DefaultPermission d WHERE d.node = :node")})
 //@formatter:on
-public class Permission implements Serializable {
+public class DefaultPermission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,14 +47,14 @@ public class Permission implements Serializable {
     @Column(name = "node")
     private String node;
 
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    @JoinColumn(name = "default_role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Role roleId;
+    private DefaultRole defaultRoleId;
 
-    public Permission() {
+    public DefaultPermission() {
     }
 
-    public Permission(String node) {
+    public DefaultPermission(String node) {
         this.node = node;
     }
 
@@ -66,12 +66,12 @@ public class Permission implements Serializable {
         this.node = node;
     }
 
-    public Role getRole() {
-        return roleId;
+    public DefaultRole getDefaultRole() {
+        return defaultRoleId;
     }
 
-    public void setRole(Role role) {
-        this.roleId = role;
+    public void setDefaultRole(DefaultRole defaultRole) {
+        this.defaultRoleId = defaultRole;
     }
 
     @Override
@@ -85,10 +85,10 @@ public class Permission implements Serializable {
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are
         // not set
-        if (!(object instanceof Permission)) {
+        if (!(object instanceof DefaultPermission)) {
             return false;
         }
-        Permission other = (Permission) object;
+        DefaultPermission other = (DefaultPermission) object;
         if ((this.node == null && other.node != null) || (this.node != null && !this.node.equals(other.node))) {
             return false;
         }
@@ -97,7 +97,7 @@ public class Permission implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entity.Permission[ node=" + node + " ]";
+        return "de.phoenix.database.entity.DefaultPermission[ node=" + node + " ]";
     }
 
 }

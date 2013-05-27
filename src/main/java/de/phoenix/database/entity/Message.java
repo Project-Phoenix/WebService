@@ -1,10 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,40 +28,56 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Meldanor
- */
 @Entity
 @Table(name = "message")
 @XmlRootElement
+//@formatter:off
 @NamedQueries({
     @NamedQuery(name = "Message.findAll", query = "SELECT m FROM Message m"),
     @NamedQuery(name = "Message.findById", query = "SELECT m FROM Message m WHERE m.id = :id"),
-    @NamedQuery(name = "Message.findByTitle", query = "SELECT m FROM Message m WHERE m.title = :title")})
+    @NamedQuery(name = "Message.findByTitle", query = "SELECT m FROM Message m WHERE m.title = :title"),
+    @NamedQuery(name = "Message.findBySentDate", query = "SELECT m FROM Message m WHERE m.sentDate = :sentDate")})
+//@formatter:on
 public class Message implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
     @Basic(optional = false)
     @Column(name = "title")
     private String title;
+
+    @Basic(optional = false)
+    @Column(name = "sentDate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date sentDate;
+
+    @Basic(optional = false)
     @Lob
     @Column(name = "text", columnDefinition = "text")
     private String text;
-    @JoinColumn(name = "receiver", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private User receiver;
+
+    @JoinTable(name = "messageReceiver", joinColumns = {@JoinColumn(name = "message", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "receiver", referencedColumnName = "id")})
+    @ManyToMany
+    private List<User> userList;
+
     @JoinColumn(name = "sender", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User sender;
@@ -57,9 +89,11 @@ public class Message implements Serializable {
         this.id = id;
     }
 
-    public Message(Integer id, String title) {
+    public Message(Integer id, String title, Date sentDate, String text) {
         this.id = id;
         this.title = title;
+        this.sentDate = sentDate;
+        this.text = text;
     }
 
     public Integer getId() {
@@ -78,6 +112,14 @@ public class Message implements Serializable {
         this.title = title;
     }
 
+    public Date getSentDate() {
+        return sentDate;
+    }
+
+    public void setSentDate(Date sentDate) {
+        this.sentDate = sentDate;
+    }
+
     public String getText() {
         return text;
     }
@@ -86,12 +128,13 @@ public class Message implements Serializable {
         this.text = text;
     }
 
-    public User getReceiver() {
-        return receiver;
+    @XmlTransient
+    public List<User> getReceiver() {
+        return userList;
     }
 
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
+    public void setReceiver(List<User> receiver) {
+        this.userList = receiver;
     }
 
     public User getSender() {
@@ -111,7 +154,8 @@ public class Message implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
         if (!(object instanceof Message)) {
             return false;
         }
@@ -126,5 +170,5 @@ public class Message implements Serializable {
     public String toString() {
         return "de.phoenix.database.entity.Message[ id=" + id + " ]";
     }
-    
+
 }

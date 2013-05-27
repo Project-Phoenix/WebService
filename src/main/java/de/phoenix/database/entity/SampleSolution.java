@@ -1,11 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -22,35 +37,39 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Meldanor
- */
 @Entity
-@Table(name = "sample_solution")
+@Table(name = "sampleSolution")
 @XmlRootElement
+//@formatter:off
 @NamedQueries({
     @NamedQuery(name = "SampleSolution.findAll", query = "SELECT s FROM SampleSolution s"),
     @NamedQuery(name = "SampleSolution.findById", query = "SELECT s FROM SampleSolution s WHERE s.id = :id"),
     @NamedQuery(name = "SampleSolution.findByAuthor", query = "SELECT s FROM SampleSolution s WHERE s.author = :author")})
+//@formatter:on
 public class SampleSolution implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
     @Basic(optional = false)
     @Column(name = "author")
     private String author;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sampleSolutionId")
-    private Collection<SampleSolutionFile> sampleSolutionFileCollection;
-    @JoinColumn(name = "task_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Task taskId;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sampleSolutionid")
+    private List<SampleSolutionFile> sampleSolutionFileList;
+
     @JoinColumn(name = "lecture_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Lecture lectureId;
+
+    @JoinColumns({@JoinColumn(name = "task_exercise_sheet_pool_id", referencedColumnName = "exercise_sheet_pool_id"), @JoinColumn(name = "task_task_id", referencedColumnName = "task_id")})
+    @ManyToOne(optional = false)
+    private Task task;
 
     public SampleSolution() {
     }
@@ -81,28 +100,28 @@ public class SampleSolution implements Serializable {
     }
 
     @XmlTransient
-    public Collection<SampleSolutionFile> getSampleSolutionFileCollection() {
-        return sampleSolutionFileCollection;
+    public List<SampleSolutionFile> getFiles() {
+        return sampleSolutionFileList;
     }
 
-    public void setSampleSolutionFileCollection(Collection<SampleSolutionFile> sampleSolutionFileCollection) {
-        this.sampleSolutionFileCollection = sampleSolutionFileCollection;
+    public void setFiles(List<SampleSolutionFile> files) {
+        this.sampleSolutionFileList = files;
     }
 
-    public Task getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Task taskId) {
-        this.taskId = taskId;
-    }
-
-    public Lecture getLectureId() {
+    public Lecture getLecture() {
         return lectureId;
     }
 
-    public void setLectureId(Lecture lectureId) {
-        this.lectureId = lectureId;
+    public void setLectureId(Lecture lecture) {
+        this.lectureId = lecture;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     @Override
@@ -114,7 +133,8 @@ public class SampleSolution implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
         if (!(object instanceof SampleSolution)) {
             return false;
         }
@@ -129,5 +149,5 @@ public class SampleSolution implements Serializable {
     public String toString() {
         return "de.phoenix.database.entity.SampleSolution[ id=" + id + " ]";
     }
-    
+
 }

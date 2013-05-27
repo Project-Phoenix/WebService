@@ -27,8 +27,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -37,15 +35,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
-@Table(name = "automaticTask")
+@Table(name = "defaultRole")
 @XmlRootElement
 //@formatter:off
 @NamedQueries({
-    @NamedQuery(name = "AutomaticTask.findAll", query = "SELECT a FROM AutomaticTask a"),
-    @NamedQuery(name = "AutomaticTask.findById", query = "SELECT a FROM AutomaticTask a WHERE a.id = :id"),
-    @NamedQuery(name = "AutomaticTask.findByBackend", query = "SELECT a FROM AutomaticTask a WHERE a.backend = :backend")})
+    @NamedQuery(name = "DefaultRole.findAll", query = "SELECT d FROM DefaultRole d"),
+    @NamedQuery(name = "DefaultRole.findById", query = "SELECT d FROM DefaultRole d WHERE d.id = :id"),
+    @NamedQuery(name = "DefaultRole.findByName", query = "SELECT d FROM DefaultRole d WHERE d.name = :name"),
+    @NamedQuery(name = "DefaultRole.findByInheritatedRole", query = "SELECT d FROM DefaultRole d WHERE d.inheritatedRole = :inheritatedRole")})
 //@formatter:on
-public class AutomaticTask implements Serializable {
+public class DefaultRole implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,26 +55,27 @@ public class AutomaticTask implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "backend")
-    private String backend;
+    @Column(name = "name")
+    private String name;
 
-    @JoinColumn(name = "taskPool_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private TaskPool taskPoolid;
+    @Basic(optional = false)
+    @Column(name = "inheritatedRole")
+    private int inheritatedRole;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "automaticTaskid")
-    private List<AutomaticTaskFiles> automaticTaskFilesList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "defaultRoleId")
+    private List<DefaultPermission> defaultPermissionList;
 
-    public AutomaticTask() {
+    public DefaultRole() {
     }
 
-    public AutomaticTask(Integer id) {
+    public DefaultRole(Integer id) {
         this.id = id;
     }
 
-    public AutomaticTask(Integer id, String backend) {
+    public DefaultRole(Integer id, String name, int inheritatedRole) {
         this.id = id;
-        this.backend = backend;
+        this.name = name;
+        this.inheritatedRole = inheritatedRole;
     }
 
     public Integer getId() {
@@ -86,29 +86,29 @@ public class AutomaticTask implements Serializable {
         this.id = id;
     }
 
-    public String getBackend() {
-        return backend;
+    public String getName() {
+        return name;
     }
 
-    public void setBackend(String backend) {
-        this.backend = backend;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public TaskPool getTaskPool() {
-        return taskPoolid;
+    public int getInheritatedRole() {
+        return inheritatedRole;
     }
 
-    public void setTaskPool(TaskPool taskPool) {
-        this.taskPoolid = taskPool;
+    public void setInheritatedRole(int inheritatedRole) {
+        this.inheritatedRole = inheritatedRole;
     }
 
     @XmlTransient
-    public List<AutomaticTaskFiles> getAutomaticTaskFiles() {
-        return automaticTaskFilesList;
+    public List<DefaultPermission> getDefaultPermissions() {
+        return defaultPermissionList;
     }
 
-    public void setAutomaticTaskFiles(List<AutomaticTaskFiles> automaticTaskFiles) {
-        this.automaticTaskFilesList = automaticTaskFiles;
+    public void setDefaultPermissions(List<DefaultPermission> defaultPermissions) {
+        this.defaultPermissionList = defaultPermissions;
     }
 
     @Override
@@ -122,10 +122,10 @@ public class AutomaticTask implements Serializable {
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are
         // not set
-        if (!(object instanceof AutomaticTask)) {
+        if (!(object instanceof DefaultRole)) {
             return false;
         }
-        AutomaticTask other = (AutomaticTask) object;
+        DefaultRole other = (DefaultRole) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,7 +134,7 @@ public class AutomaticTask implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entity.AutomaticTask[ id=" + id + " ]";
+        return "de.phoenix.database.entity.DefaultRole[ id=" + id + " ]";
     }
 
 }

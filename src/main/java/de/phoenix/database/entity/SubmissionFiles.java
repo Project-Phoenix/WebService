@@ -1,7 +1,21 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
@@ -19,46 +33,49 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author Meldanor
- */
 @Entity
-@Table(name = "files")
+@Table(name = "submissionFiles")
 @XmlRootElement
+//@formatter:off
 @NamedQueries({
-    @NamedQuery(name = "Files.findAll", query = "SELECT f FROM Files f"),
-    @NamedQuery(name = "Files.findById", query = "SELECT f FROM Files f WHERE f.id = :id"),
-    @NamedQuery(name = "Files.findByType", query = "SELECT f FROM Files f WHERE f.type = :type")})
-public class Files implements Serializable {
+    @NamedQuery(name = "SubmissionFiles.findAll", query = "SELECT s FROM SubmissionFiles s"),
+    @NamedQuery(name = "SubmissionFiles.findById", query = "SELECT s FROM SubmissionFiles s WHERE s.id = :id"),
+    @NamedQuery(name = "SubmissionFiles.findByFilename", query = "SELECT s FROM SubmissionFiles s WHERE s.filename = :filename")})
+//@formatter:on
+public class SubmissionFiles implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
     @Basic(optional = false)
     @Lob
     @Column(name = "content", columnDefinition = "text")
     private String content;
+
     @Basic(optional = false)
-    @Column(name = "type")
-    private String type;
+    @Column(name = "filename")
+    private String filename;
+
     @JoinColumn(name = "submission_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Submission submissionId;
 
-    public Files() {
+    public SubmissionFiles() {
     }
 
-    public Files(Integer id) {
+    public SubmissionFiles(Integer id) {
         this.id = id;
     }
 
-    public Files(Integer id, String content, String type) {
+    public SubmissionFiles(Integer id, String content, String filename) {
         this.id = id;
         this.content = content;
-        this.type = type;
+        this.filename = filename;
     }
 
     public Integer getId() {
@@ -77,20 +94,20 @@ public class Files implements Serializable {
         this.content = content;
     }
 
-    public String getType() {
-        return type;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
-    public Submission getSubmissionId() {
+    public Submission getSubmission() {
         return submissionId;
     }
 
-    public void setSubmissionId(Submission submissionId) {
-        this.submissionId = submissionId;
+    public void setSubmission(Submission submission) {
+        this.submissionId = submission;
     }
 
     @Override
@@ -102,11 +119,12 @@ public class Files implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Files)) {
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
+        if (!(object instanceof SubmissionFiles)) {
             return false;
         }
-        Files other = (Files) object;
+        SubmissionFiles other = (SubmissionFiles) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -115,7 +133,7 @@ public class Files implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entity.Files[ id=" + id + " ]";
+        return "de.phoenix.database.entity.SubmissionFiles[ id=" + id + " ]";
     }
-    
+
 }

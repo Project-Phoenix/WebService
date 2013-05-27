@@ -27,8 +27,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -37,15 +35,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
-@Table(name = "automaticTask")
+@Table(name = "exerciseSheetPool")
 @XmlRootElement
 //@formatter:off
 @NamedQueries({
-    @NamedQuery(name = "AutomaticTask.findAll", query = "SELECT a FROM AutomaticTask a"),
-    @NamedQuery(name = "AutomaticTask.findById", query = "SELECT a FROM AutomaticTask a WHERE a.id = :id"),
-    @NamedQuery(name = "AutomaticTask.findByBackend", query = "SELECT a FROM AutomaticTask a WHERE a.backend = :backend")})
+    @NamedQuery(name = "ExerciseSheetPool.findAll", query = "SELECT e FROM ExerciseSheetPool e"),
+    @NamedQuery(name = "ExerciseSheetPool.findById", query = "SELECT e FROM ExerciseSheetPool e WHERE e.id = :id"),
+    @NamedQuery(name = "ExerciseSheetPool.findByName", query = "SELECT e FROM ExerciseSheetPool e WHERE e.name = :name")})
 //@formatter:on
-public class AutomaticTask implements Serializable {
+public class ExerciseSheetPool implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,26 +54,25 @@ public class AutomaticTask implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "backend")
-    private String backend;
+    @Column(name = "name")
+    private String name;
 
-    @JoinColumn(name = "taskPool_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private TaskPool taskPoolid;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "exerciseSheetPool")
+    private List<Task> taskList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "automaticTaskid")
-    private List<AutomaticTaskFiles> automaticTaskFilesList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "exerciseSheetPool")
+    private List<ExerciseSheet> exerciseSheetList;
 
-    public AutomaticTask() {
+    public ExerciseSheetPool() {
     }
 
-    public AutomaticTask(Integer id) {
+    public ExerciseSheetPool(Integer id) {
         this.id = id;
     }
 
-    public AutomaticTask(Integer id, String backend) {
+    public ExerciseSheetPool(Integer id, String name) {
         this.id = id;
-        this.backend = backend;
+        this.name = name;
     }
 
     public Integer getId() {
@@ -86,29 +83,30 @@ public class AutomaticTask implements Serializable {
         this.id = id;
     }
 
-    public String getBackend() {
-        return backend;
+    public String getName() {
+        return name;
     }
 
-    public void setBackend(String backend) {
-        this.backend = backend;
-    }
-
-    public TaskPool getTaskPool() {
-        return taskPoolid;
-    }
-
-    public void setTaskPool(TaskPool taskPool) {
-        this.taskPoolid = taskPool;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @XmlTransient
-    public List<AutomaticTaskFiles> getAutomaticTaskFiles() {
-        return automaticTaskFilesList;
+    public List<Task> getTaskList() {
+        return taskList;
     }
 
-    public void setAutomaticTaskFiles(List<AutomaticTaskFiles> automaticTaskFiles) {
-        this.automaticTaskFilesList = automaticTaskFiles;
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
+
+    @XmlTransient
+    public List<ExerciseSheet> getExerciseSheetList() {
+        return exerciseSheetList;
+    }
+
+    public void setExerciseSheetList(List<ExerciseSheet> exerciseSheetList) {
+        this.exerciseSheetList = exerciseSheetList;
     }
 
     @Override
@@ -122,10 +120,10 @@ public class AutomaticTask implements Serializable {
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are
         // not set
-        if (!(object instanceof AutomaticTask)) {
+        if (!(object instanceof ExerciseSheetPool)) {
             return false;
         }
-        AutomaticTask other = (AutomaticTask) object;
+        ExerciseSheetPool other = (ExerciseSheetPool) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,7 +132,7 @@ public class AutomaticTask implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entity.AutomaticTask[ id=" + id + " ]";
+        return "de.phoenix.database.entity.ExerciseSheetPool[ id=" + id + " ]";
     }
 
 }

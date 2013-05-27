@@ -21,31 +21,28 @@ package de.phoenix.database.entity;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
-@Table(name = "automaticTask")
+@Table(name = "tag")
 @XmlRootElement
 //@formatter:off
 @NamedQueries({
-    @NamedQuery(name = "AutomaticTask.findAll", query = "SELECT a FROM AutomaticTask a"),
-    @NamedQuery(name = "AutomaticTask.findById", query = "SELECT a FROM AutomaticTask a WHERE a.id = :id"),
-    @NamedQuery(name = "AutomaticTask.findByBackend", query = "SELECT a FROM AutomaticTask a WHERE a.backend = :backend")})
+    @NamedQuery(name = "Tag.findAll", query = "SELECT t FROM Tag t"),
+    @NamedQuery(name = "Tag.findById", query = "SELECT t FROM Tag t WHERE t.id = :id"),
+    @NamedQuery(name = "Tag.findByTag", query = "SELECT t FROM Tag t WHERE t.tag = :tag")})
 //@formatter:on
-public class AutomaticTask implements Serializable {
+public class Tag implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,26 +53,22 @@ public class AutomaticTask implements Serializable {
     private Integer id;
 
     @Basic(optional = false)
-    @Column(name = "backend")
-    private String backend;
+    @Column(name = "tag")
+    private String tag;
 
-    @JoinColumn(name = "taskPool_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private TaskPool taskPoolid;
+    @ManyToMany(mappedBy = "tagList")
+    private List<TaskPool> taskPoolList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "automaticTaskid")
-    private List<AutomaticTaskFiles> automaticTaskFilesList;
-
-    public AutomaticTask() {
+    public Tag() {
     }
 
-    public AutomaticTask(Integer id) {
+    public Tag(Integer id) {
         this.id = id;
     }
 
-    public AutomaticTask(Integer id, String backend) {
+    public Tag(Integer id, String tag) {
         this.id = id;
-        this.backend = backend;
+        this.tag = tag;
     }
 
     public Integer getId() {
@@ -86,29 +79,21 @@ public class AutomaticTask implements Serializable {
         this.id = id;
     }
 
-    public String getBackend() {
-        return backend;
+    public String getTag() {
+        return tag;
     }
 
-    public void setBackend(String backend) {
-        this.backend = backend;
-    }
-
-    public TaskPool getTaskPool() {
-        return taskPoolid;
-    }
-
-    public void setTaskPool(TaskPool taskPool) {
-        this.taskPoolid = taskPool;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     @XmlTransient
-    public List<AutomaticTaskFiles> getAutomaticTaskFiles() {
-        return automaticTaskFilesList;
+    public List<TaskPool> getTaskPool() {
+        return taskPoolList;
     }
 
-    public void setAutomaticTaskFiles(List<AutomaticTaskFiles> automaticTaskFiles) {
-        this.automaticTaskFilesList = automaticTaskFiles;
+    public void setTaskPool(List<TaskPool> taskPool) {
+        this.taskPoolList = taskPool;
     }
 
     @Override
@@ -122,10 +107,10 @@ public class AutomaticTask implements Serializable {
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are
         // not set
-        if (!(object instanceof AutomaticTask)) {
+        if (!(object instanceof Tag)) {
             return false;
         }
-        AutomaticTask other = (AutomaticTask) object;
+        Tag other = (Tag) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,7 +119,7 @@ public class AutomaticTask implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entity.AutomaticTask[ id=" + id + " ]";
+        return "de.phoenix.database.entity.Tag[ id=" + id + " ]";
     }
 
 }

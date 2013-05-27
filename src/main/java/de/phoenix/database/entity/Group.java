@@ -1,13 +1,28 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,19 +34,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Meldanor
- */
 @Entity
 @Table(name = "group")
 @XmlRootElement
+//@formatter:off
 @NamedQueries({
     @NamedQuery(name = "Group.findAll", query = "SELECT g FROM Group g"),
     @NamedQuery(name = "Group.findById", query = "SELECT g FROM Group g WHERE g.id = :id"),
@@ -41,45 +54,60 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Group.findBySubmissionExpireDate", query = "SELECT g FROM Group g WHERE g.submissionExpireDate = :submissionExpireDate"),
     @NamedQuery(name = "Group.findByRegistrationStartDate", query = "SELECT g FROM Group g WHERE g.registrationStartDate = :registrationStartDate"),
     @NamedQuery(name = "Group.findByRegistrationEndDate", query = "SELECT g FROM Group g WHERE g.registrationEndDate = :registrationEndDate")})
+//@formatter:on
 public class Group implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
+
     @Basic(optional = false)
     @Column(name = "room")
     private String room;
+
     @Basic(optional = false)
     @Column(name = "turnus")
     private String turnus;
+
     @Column(name = "submission_expire_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date submissionExpireDate;
+
     @Basic(optional = false)
     @Column(name = "registration_start_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date registrationStartDate;
+
     @Basic(optional = false)
     @Column(name = "registration_end_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date registrationEndDate;
-    @ManyToMany(mappedBy = "joinedGroups")
-    private Collection<User> groupLeader;
-    @ManyToMany(mappedBy = "leadingGroups")
-    private Collection<User> groupMember;
-    @JoinTable(name = "group_has_exercise_sheet", joinColumns = {
-        @JoinColumn(name = "group_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "exercise_sheet_id", referencedColumnName = "id")})
+
+    @ManyToMany(mappedBy = "groupList")
+    private List<User> userList;
+
+    @JoinTable(name = "groupMaterial", joinColumns = {@JoinColumn(name = "group_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "material_id", referencedColumnName = "id")})
     @ManyToMany
-    private Collection<ExerciseSheet> exerciseSheetCollection;
-    @JoinColumn(name = "lecture_id", referencedColumnName = "id")
+    private List<Material> materialList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group")
+    private List<ExerciseSheet> exerciseSheetList;
+
+    @JoinColumn(name = "exerciseLeader", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Lecture lectureId;
+    private User exerciseLeader;
+
+    @JoinColumn(name = "lecture", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Lecture lecture;
 
     public Group() {
     }
@@ -154,38 +182,46 @@ public class Group implements Serializable {
     }
 
     @XmlTransient
-    public Collection<User> getGroupLeader() {
-        return groupLeader;
+    public List<User> getMember() {
+        return userList;
     }
 
-    public void setGroupLeader(Collection<User> groupLeader) {
-        this.groupLeader = groupLeader;
-    }
-
-    @XmlTransient
-    public Collection<User> getGroupMember() {
-        return groupMember;
-    }
-
-    public void GroupMember(Collection<User> groupMember) {
-        this.groupMember = groupMember;
+    public void setMember(List<User> member) {
+        this.userList = member;
     }
 
     @XmlTransient
-    public Collection<ExerciseSheet> getExerciseSheetCollection() {
-        return exerciseSheetCollection;
+    public List<Material> getMaterials() {
+        return materialList;
     }
 
-    public void setExerciseSheetCollection(Collection<ExerciseSheet> exerciseSheetCollection) {
-        this.exerciseSheetCollection = exerciseSheetCollection;
+    public void setMaterials(List<Material> materials) {
+        this.materialList = materials;
     }
 
-    public Lecture getLectureId() {
-        return lectureId;
+    @XmlTransient
+    public List<ExerciseSheet> getExerciseSheets() {
+        return exerciseSheetList;
     }
 
-    public void setLectureId(Lecture lectureId) {
-        this.lectureId = lectureId;
+    public void setExerciseSheets(List<ExerciseSheet> exerciseSheets) {
+        this.exerciseSheetList = exerciseSheets;
+    }
+
+    public User getExerciseLeader() {
+        return exerciseLeader;
+    }
+
+    public void setExerciseLeader(User exerciseLeader) {
+        this.exerciseLeader = exerciseLeader;
+    }
+
+    public Lecture getLecture() {
+        return lecture;
+    }
+
+    public void setLecture(Lecture lecture) {
+        this.lecture = lecture;
     }
 
     @Override
@@ -197,7 +233,8 @@ public class Group implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
         if (!(object instanceof Group)) {
             return false;
         }
@@ -212,5 +249,5 @@ public class Group implements Serializable {
     public String toString() {
         return "de.phoenix.database.entity.Group[ id=" + id + " ]";
     }
-    
+
 }

@@ -1,11 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,54 +29,66 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumns;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author Meldanor
- */
 @Entity
 @Table(name = "submission")
 @XmlRootElement
+//@formatter:off
 @NamedQueries({
     @NamedQuery(name = "Submission.findAll", query = "SELECT s FROM Submission s"),
     @NamedQuery(name = "Submission.findById", query = "SELECT s FROM Submission s WHERE s.id = :id"),
+    @NamedQuery(name = "Submission.findBySubmissionDate", query = "SELECT s FROM Submission s WHERE s.submissionDate = :submissionDate"),
     @NamedQuery(name = "Submission.findByStatus", query = "SELECT s FROM Submission s WHERE s.status = :status"),
-    @NamedQuery(name = "Submission.findByControlStatus", query = "SELECT s FROM Submission s WHERE s.controlStatus = :controlStatus")})
+    @NamedQuery(name = "Submission.findByControllStatus", query = "SELECT s FROM Submission s WHERE s.controllStatus = :controllStatus")})
+//@formatter:on
 public class Submission implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
+    @Basic(optional = false)
+    @Column(name = "submissionDate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date submissionDate;
+
     @Basic(optional = false)
     @Column(name = "status")
     private int status;
+
     @Basic(optional = false)
-    @Column(name = "controlStatus")
-    private int controlStatus;
-    @JoinTable(name = "submission_for_task", joinColumns = {
-        @JoinColumn(name = "submission_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "exercise_sheet_has_task_exercise_sheet_id", referencedColumnName = "exercise_sheet_id"),
-        @JoinColumn(name = "exercise_sheet_has_task_task_id", referencedColumnName = "task_id")})
-    @ManyToMany
-    private Collection<ExerciseSheetHasTask> exerciseSheetHasTaskCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "submissionId")
-    private Collection<Files> filesCollection;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @Column(name = "controllStatus")
+    private int controllStatus;
+
+    @Lob
+    @Column(name = "controllMessage", columnDefinition = "text")
+    private String controllMessage;
+
+    @JoinColumns({@JoinColumn(name = "exercise_sheet_exercise_sheet_id", referencedColumnName = "exercise_sheet_id"), @JoinColumn(name = "exercise_sheet_group_id", referencedColumnName = "group_id")})
     @ManyToOne(optional = false)
-    private User userId;
+    private ExerciseSheet exerciseSheet;
+
+    @JoinColumns({@JoinColumn(name = "task_exercise_sheet_pool_id", referencedColumnName = "exercise_sheet_pool_id"), @JoinColumn(name = "task_task_id", referencedColumnName = "task_id")})
+    @ManyToOne(optional = false)
+    private Task task;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "submissionId")
-    private Collection<SubmissionFile> submissionFileCollection;
+    private List<SubmissionFiles> submissionFilesList;
 
     public Submission() {
     }
@@ -70,10 +97,11 @@ public class Submission implements Serializable {
         this.id = id;
     }
 
-    public Submission(Integer id, int status, int controlStatus) {
+    public Submission(Integer id, Date submissionDate, int status, int controllStatus) {
         this.id = id;
+        this.submissionDate = submissionDate;
         this.status = status;
-        this.controlStatus = controlStatus;
+        this.controllStatus = controllStatus;
     }
 
     public Integer getId() {
@@ -84,6 +112,14 @@ public class Submission implements Serializable {
         this.id = id;
     }
 
+    public Date getSubmissionDate() {
+        return submissionDate;
+    }
+
+    public void setSubmissionDate(Date submissionDate) {
+        this.submissionDate = submissionDate;
+    }
+
     public int getStatus() {
         return status;
     }
@@ -92,47 +128,45 @@ public class Submission implements Serializable {
         this.status = status;
     }
 
-    public int getControlStatus() {
-        return controlStatus;
+    public int getControllStatus() {
+        return controllStatus;
     }
 
-    public void setControlStatus(int controlStatus) {
-        this.controlStatus = controlStatus;
+    public void setControllStatus(int controllStatus) {
+        this.controllStatus = controllStatus;
+    }
+
+    public String getControllMessage() {
+        return controllMessage;
+    }
+
+    public void setControllMessage(String controllMessage) {
+        this.controllMessage = controllMessage;
+    }
+
+    public ExerciseSheet getExerciseSheet() {
+        return exerciseSheet;
+    }
+
+    public void setExerciseSheet(ExerciseSheet exerciseSheet) {
+        this.exerciseSheet = exerciseSheet;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     @XmlTransient
-    public Collection<ExerciseSheetHasTask> getExerciseSheetHasTaskCollection() {
-        return exerciseSheetHasTaskCollection;
+    public List<SubmissionFiles> getSubmissionFilesList() {
+        return submissionFilesList;
     }
 
-    public void setExerciseSheetHasTaskCollection(Collection<ExerciseSheetHasTask> exerciseSheetHasTaskCollection) {
-        this.exerciseSheetHasTaskCollection = exerciseSheetHasTaskCollection;
-    }
-
-    @XmlTransient
-    public Collection<Files> getFilesCollection() {
-        return filesCollection;
-    }
-
-    public void setFilesCollection(Collection<Files> filesCollection) {
-        this.filesCollection = filesCollection;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    @XmlTransient
-    public Collection<SubmissionFile> getSubmissionFileCollection() {
-        return submissionFileCollection;
-    }
-
-    public void setSubmissionFileCollection(Collection<SubmissionFile> submissionFileCollection) {
-        this.submissionFileCollection = submissionFileCollection;
+    public void setSubmissionFilesList(List<SubmissionFiles> submissionFilesList) {
+        this.submissionFilesList = submissionFilesList;
     }
 
     @Override
@@ -144,7 +178,8 @@ public class Submission implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
         if (!(object instanceof Submission)) {
             return false;
         }
@@ -159,5 +194,5 @@ public class Submission implements Serializable {
     public String toString() {
         return "de.phoenix.database.entity.Submission[ id=" + id + " ]";
     }
-    
+
 }
