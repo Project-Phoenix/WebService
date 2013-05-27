@@ -25,8 +25,6 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import de.phoenix.database.DatabaseManager;
-import de.phoenix.security.AccountManager;
-import de.phoenix.security.TokenManager;
 import de.phoenix.webresource.AccountResource;
 import de.phoenix.webresource.SubmissionResource;
 import de.phoenix.webresource.TokenResource;
@@ -34,8 +32,6 @@ import de.phoenix.webresource.TokenResource;
 @ApplicationPath("/rest")
 public class PhoenixApplication extends Application {
 
-    public static final TokenManager tokenManager = new TokenManager();
-    public static final AccountManager accountManager = new AccountManager();
     public static final DatabaseManager databaseManager = new DatabaseManager();
 
     public PhoenixApplication() {

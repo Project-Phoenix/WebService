@@ -23,12 +23,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.sun.jersey.core.util.Base64;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import de.phoenix.PhoenixApplication;
+import de.phoenix.database.entity.User;
+import de.phoenix.security.Encrypter;
+import de.phoenix.security.LoginFilter;
+import de.phoenix.security.SaltedPassword;
 
 @Path("/account")
 public class AccountResource {
@@ -37,40 +43,34 @@ public class AccountResource {
     @GET
     @Path("/create/{username}/{password}")
     public Response createAccountOld(@PathParam("username") String username, @PathParam("password") String password) {
-        PhoenixApplication.accountManager.createUser(username, password);
+//        PhoenixApplication.accountManager.createUser(username, password);
         return Response.ok().build();
     }
 
+    // TODO: Depecrated after 31.05.2013
+    // Just a method for simple tests
     @GET
     @Path("/create")
     public Response createAccount(@Context HttpHeaders headers) {
-        String[] info = extractInformation(headers);
-        if (info == null)
+
+        // Extract username and sha512 encoded password from head
+        MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
+        String username = requestHeaders.getFirst(LoginFilter.NAME_HEAD);
+        String password = requestHeaders.getFirst(LoginFilter.PASS_HEAD);
+        // Heads are missing - invalid request
+        if (username == null || password == null)
             return Response.status(Status.BAD_REQUEST).build();
 
-        PhoenixApplication.accountManager.createUser(info[0], info[1]);
+        // Persist user in database
+        Session session = PhoenixApplication.databaseManager.openSession();
+        Transaction transaction = session.beginTransaction();
+        // Generate salted password
+        SaltedPassword pw = Encrypter.getInstance().encryptPassword(password);
+        User user = new User(username, pw.getHash(), pw.getSalt());
+
+        session.save(user);
+        transaction.commit();
+
         return Response.ok().build();
     }
-
-    private String[] extractInformation(HttpHeaders headers) {
-        String[] res = new String[2];
-        String base64String = headers.getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        // Not authorization head in the request
-        if (base64String == null)
-            return null;
-
-        // decode base64 string
-        base64String = base64String.substring("Basic ".length());
-        base64String = Base64.base64Decode(base64String);
-        // Split at ':' as defined for HTTPBasicAuthentification
-        int pos = base64String.indexOf(':');
-        // Not found
-        if (pos == -1)
-            return null;;
-        // extract values
-        res[0] = base64String.substring(0, pos);
-        res[1] = base64String.substring(pos + 1);
-        return res;
-    }
-
 }

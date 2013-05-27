@@ -25,23 +25,31 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import de.phoenix.PhoenixApplication;
-
 /**
  * Manages the token by holding them in maps and generating new ones
  * 
  */
 public class TokenManager {
 
+    /* Singletone Start */
+    private static final TokenManager INSTANCE = new TokenManager();
+
+    private TokenManager() {
+        tokenmapByID = new HashMap<String, Token>();
+
+    }
+
+    public final static TokenManager getInstance() {
+        return INSTANCE;
+    }
+
+    /* Singletone End */
+
     // Maps for fast access to tokens
     private Map<String, Token> tokenmapByID;
 
     // Time for token before it exeeds
     private final static long TOKEN_DURATION = TimeUnit.HOURS.toMillis(1);
-
-    public TokenManager() {
-        tokenmapByID = new HashMap<String, Token>();
-    }
 
     /**
      * Generates a token for the user by using {@link UUID#randomUUID()}
@@ -60,8 +68,6 @@ public class TokenManager {
 
         // save temponary
         tokenmapByID.put(token.getID(), token);
-
-        PhoenixApplication.accountManager.getUser(owner).setToken(token);
         return token;
     }
 

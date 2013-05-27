@@ -98,7 +98,7 @@ public class SecurityTest {
     public void createAccountTest() {
         // User information
         String user = "account";
-        String password = "password";
+        String password = "heiligeScheiﬂe";
 
         Client client = Client.create();
 

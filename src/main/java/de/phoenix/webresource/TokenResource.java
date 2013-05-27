@@ -24,12 +24,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.sun.jersey.core.util.Base64;
+import org.hibernate.Session;
 
 import de.phoenix.PhoenixApplication;
+import de.phoenix.database.entity.User;
+import de.phoenix.security.Encrypter;
+import de.phoenix.security.LoginFilter;
+import de.phoenix.security.Token;
+import de.phoenix.security.TokenManager;
 
 /**
  * A webresource for requesting tokens
@@ -49,12 +55,35 @@ public class TokenResource {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/request")
     public Response requestToken(@Context HttpHeaders headers) {
-        // Check if the user is valid
-        if (PhoenixApplication.accountManager.validateUser(headers)) {
-            return Response.ok(PhoenixApplication.tokenManager.generateToken(extractUsername(headers))).build();
-        } else {
-            return Response.status(Status.UNAUTHORIZED).build();
+
+        // Extract username and sha512 encoded password from head
+        MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
+        String username = requestHeaders.getFirst(LoginFilter.NAME_HEAD);
+        String password = requestHeaders.getFirst(LoginFilter.PASS_HEAD);
+        // Heads are missing - invalid request
+        if (username == null || password == null)
+            return Response.status(Status.BAD_REQUEST).build();
+
+        // Check if password in database the same as in the request
+        Session session = PhoenixApplication.databaseManager.openSession();
+        User user = (User) session.getNamedQuery("User.findByUsername").setString("username", username).iterate().next();
+        session.close();
+        // Passwords don't match
+        if (!Encrypter.getInstance().validatePassword(password, user.getPassword(), user.getSalt())) {
+            return Response.status(Status.FORBIDDEN).build();
         }
+
+        // Generate token
+        TokenManager tM = TokenManager.getInstance();
+        if (tM == null) {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+        Token token = tM.generateToken(user.getUsername());
+        if (token == null) {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return Response.ok(token).build();
     }
 
     /**
@@ -67,21 +96,13 @@ public class TokenResource {
     @GET
     @Path("validate")
     public Response validateToken(@Context HttpHeaders headers) {
-        if (PhoenixApplication.tokenManager.isValidToken(headers))
+        TokenManager tM = TokenManager.getInstance();
+        if (tM == null) {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+        if (tM.isValidToken(headers))
             return Response.ok().build();
         else
             return Response.status(Status.UNAUTHORIZED).build();
     }
-
-    private String extractUsername(HttpHeaders headers) {
-        // extract Value behind Authorization head from request
-        String base64String = headers.getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-
-        // decode base64 string
-        base64String = base64String.substring("Basic ".length());
-        base64String = Base64.base64Decode(base64String);
-
-        return base64String.substring(0, base64String.indexOf(':'));
-    }
-
 }

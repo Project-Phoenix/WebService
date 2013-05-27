@@ -21,6 +21,7 @@ package de.phoenix.database.entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,6 +41,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import de.phoenix.PhoenixApplication;
 
 @Entity
 @Table(name = "user")
@@ -146,6 +152,22 @@ public class User implements Serializable {
 
     public User(Integer id) {
         this.id = id;
+    }
+    
+    // TODO: Test constructor
+    public User(String username, String password, String salt) {
+        this.username = username;
+        this.password = password;
+        this.salt = salt;
+        this.surname = "Hans";
+        this.name = "Meier";
+        this.title = "Herr";
+        this.email = "Test@lol.de";
+        this.regdate = new Date();
+        this.isActive = true;
+        Session session = PhoenixApplication.databaseManager.openSession();
+        Query query = session.getNamedQuery("Role.findById").setInteger("id", 1);
+        this.roleId = (Role)query.iterate().next();
     }
 
     public User(Integer id, String surname, String name, String title, String username, String password, String salt, String email, Date regdate, boolean isActive) {
