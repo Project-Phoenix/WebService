@@ -617,6 +617,45 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`sampleSolutionFile` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`automaticTask`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`automaticTask` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`automaticTask` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `backend` VARCHAR(45) NOT NULL ,
+  `taskPool_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_automaticTask_taskPool1_idx` (`taskPool_id` ASC) ,
+  CONSTRAINT `fk_automaticTask_taskPool1`
+    FOREIGN KEY (`taskPool_id` )
+    REFERENCES `phoenix`.`taskPool` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`automaticTaskFiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `phoenix`.`automaticTaskFiles` ;
+
+CREATE  TABLE IF NOT EXISTS `phoenix`.`automaticTaskFiles` (
+  `id` INT NOT NULL ,
+  `text` TEXT NOT NULL ,
+  `unitTest` TEXT NULL ,
+  `automaticTask_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_automaticTaskFiles_automaticTask1_idx` (`automaticTask_id` ASC) ,
+  CONSTRAINT `fk_automaticTaskFiles_automaticTask1`
+    FOREIGN KEY (`automaticTask_id` )
+    REFERENCES `phoenix`.`automaticTask` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
 USE `phoenix` ;
 
 
