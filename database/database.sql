@@ -533,19 +533,11 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`submission` (
   `controllMessage` TEXT NULL ,
   `task_exercise_sheet_pool_id` INT NOT NULL ,
   `task_task_id` INT UNSIGNED NOT NULL ,
-  `exercise_sheet_exercise_sheet_id` INT NOT NULL ,
-  `exercise_sheet_group_id` INT NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_submission_task1_idx` (`task_exercise_sheet_pool_id` ASC, `task_task_id` ASC) ,
-  INDEX `fk_submission_exercise_sheet1_idx` (`exercise_sheet_exercise_sheet_id` ASC, `exercise_sheet_group_id` ASC) ,
   CONSTRAINT `fk_submission_task1`
     FOREIGN KEY (`task_exercise_sheet_pool_id` , `task_task_id` )
     REFERENCES `phoenix`.`task` (`exercise_sheet_pool_id` , `task_id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_submission_exercise_sheet1`
-    FOREIGN KEY (`exercise_sheet_exercise_sheet_id` , `exercise_sheet_group_id` )
-    REFERENCES `phoenix`.`exerciseSheet` (`exercise_sheet_id` , `group_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

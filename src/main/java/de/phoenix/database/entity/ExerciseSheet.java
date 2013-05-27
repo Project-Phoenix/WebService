@@ -20,8 +20,7 @@ package de.phoenix.database.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import javax.persistence.CascadeType;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -29,12 +28,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "exerciseSheet")
@@ -65,9 +62,6 @@ public class ExerciseSheet implements Serializable {
 
     @Column(name = "visible")
     private Boolean visible;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "exerciseSheet")
-    private List<Submission> submissionList;
 
     @JoinColumn(name = "exercise_sheet_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -122,15 +116,6 @@ public class ExerciseSheet implements Serializable {
 
     public void hide() {
         this.visible = false;
-    }
-
-    @XmlTransient
-    public List<Submission> getSubmissions() {
-        return submissionList;
-    }
-
-    public void setSubmissionList(List<Submission> submissions) {
-        this.submissionList = submissions;
     }
 
     public ExerciseSheetPool getExerciseSheetPool() {

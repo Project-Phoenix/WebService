@@ -79,10 +79,6 @@ public class Submission implements Serializable {
     @Column(name = "controllMessage", columnDefinition = "text")
     private String controllMessage;
 
-    @JoinColumns({@JoinColumn(name = "exercise_sheet_exercise_sheet_id", referencedColumnName = "exercise_sheet_id"), @JoinColumn(name = "exercise_sheet_group_id", referencedColumnName = "group_id")})
-    @ManyToOne(optional = false)
-    private ExerciseSheet exerciseSheet;
-
     @JoinColumns({@JoinColumn(name = "task_exercise_sheet_pool_id", referencedColumnName = "exercise_sheet_pool_id"), @JoinColumn(name = "task_task_id", referencedColumnName = "task_id")})
     @ManyToOne(optional = false)
     private Task task;
@@ -142,14 +138,6 @@ public class Submission implements Serializable {
 
     public void setControllMessage(String controllMessage) {
         this.controllMessage = controllMessage;
-    }
-
-    public ExerciseSheet getExerciseSheet() {
-        return exerciseSheet;
-    }
-
-    public void setExerciseSheet(ExerciseSheet exerciseSheet) {
-        this.exerciseSheet = exerciseSheet;
     }
 
     public Task getTask() {
