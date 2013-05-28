@@ -22,7 +22,6 @@ import java.util.Date;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -41,14 +40,6 @@ import de.phoenix.security.SaltedPassword;
 
 @Path("/account")
 public class AccountResource {
-
-    @Deprecated
-    @GET
-    @Path("/create/{username}/{password}")
-    public Response createAccountOld(@PathParam("username") String username, @PathParam("password") String password) {
-//        PhoenixApplication.accountManager.createUser(username, password);
-        return Response.ok().build();
-    }
 
     // TODO: Depecrated after 31.05.2013
     // Just a method for simple tests

@@ -154,7 +154,6 @@ public class SubmissionResource {
     @Path("/getFiles/{id}")
     @GET
     @Produces({MediaType.APPLICATION_XML})
-//    @SuppressWarnings("unchecked")
     public Response getAllSubmissions(@PathParam("id") int submissionID) {
 
         Session session = DatabaseManager.getInstance().openSession();
@@ -167,19 +166,5 @@ public class SubmissionResource {
         };
 
         return Response.ok(entity).build();
-//
-//        List<SubmissionFiles> result = new Vector<SubmissionFiles>();
-//
-//        Session session = PhoenixApplication.databaseManager.openSession();
-//        Iterator<Submission> iter = session.getNamedQuery("Submission.findById").set.iterate();
-//
-//        while (iter.hasNext()) {
-//            result.add(iter.next());
-//        }
-//
-//        final GenericEntity<List<Submission>> entity = new GenericEntity<List<Submission>>(result) {
-//        };
-//
-//        return Response.ok(entity).build();
     }
 }
