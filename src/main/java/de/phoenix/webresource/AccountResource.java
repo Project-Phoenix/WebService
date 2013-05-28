@@ -18,6 +18,8 @@
 
 package de.phoenix.webresource;
 
+import java.util.Date;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -31,6 +33,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import de.phoenix.PhoenixApplication;
+import de.phoenix.database.entity.Role;
 import de.phoenix.database.entity.User;
 import de.phoenix.security.Encrypter;
 import de.phoenix.security.LoginFilter;
@@ -66,7 +69,22 @@ public class AccountResource {
         Transaction transaction = session.beginTransaction();
         // Generate salted password
         SaltedPassword pw = Encrypter.getInstance().encryptPassword(password);
-        User user = new User(username, pw.getHash(), pw.getSalt());
+        User user = new User();
+
+        // TODO: Outdated code after 31.05.2013
+        user.setUsername(username);
+        user.setPassword(pw.getHash());
+        user.setSalt(pw.getSalt());
+        user.setSurname("Hans");
+        user.setName("Maier");
+        user.setTitle("Herr");
+        user.setEmail("Test@lol.de");
+        user.setRegdate(new Date());
+        user.setIsActive(true);
+        // TODO: / Outdated code after 31.05.2013
+
+        Role role = (Role) session.getNamedQuery("Role.findById").setInteger("id", 1).uniqueResult();
+        user.setRole(role);
 
         session.save(user);
         transaction.commit();

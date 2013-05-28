@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -46,6 +47,8 @@ import com.sun.jersey.multipart.MultiPart;
 import de.phoenix.PhoenixApplication;
 import de.phoenix.database.entity.Submission;
 import de.phoenix.database.entity.SubmissionFiles;
+import de.phoenix.database.entity.Task;
+import de.phoenix.database.entity.User;
 
 /**
  * Webresource for uploading and getting submissions from user.
@@ -63,7 +66,21 @@ public class SubmissionResource {
         Session session = PhoenixApplication.databaseManager.openSession();
         Transaction tx = session.beginTransaction();
 
+        // TODO: Outdated code after 31.05.2013
         Submission sub = new Submission(true);
+        sub.setSubmissionDate(new Date());
+        sub.setStatus(1);
+        sub.setControllStatus(1);
+        sub.setControllMessage("Akzeptiert");
+
+        User user = (User) session.getNamedQuery("User.findById").setInteger("id", 1).uniqueResult();
+        sub.setAuthor(user);
+
+        Task task = (Task) session.getNamedQuery("Task.findByTaskId").setInteger("taskId", 1).uniqueResult();;
+        sub.setTask(task);
+
+        // TODO: / Outdated code after 31.05.2013
+
         int id = (Integer) session.save(sub);
         sub.setId(id);
 
@@ -73,6 +90,7 @@ public class SubmissionResource {
         }
 
         tx.commit();
+        session.close();
 
         return Response.ok().build();
     }
