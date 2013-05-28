@@ -24,13 +24,21 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 public class DatabaseManager {
 
-    private final SessionFactory sessionFactory;
+    /* Singletone Start */
+    private static final DatabaseManager INSTANCE = new DatabaseManager();
 
-    public DatabaseManager() {
+    private DatabaseManager() {
         Configuration config = new AnnotationConfiguration().configure("hibernate.cfg.xml");
-//        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(config.getProperties()).buildServiceRegistry();
         this.sessionFactory = config.buildSessionFactory();
     }
+
+    public final static DatabaseManager getInstance() {
+        return INSTANCE;
+    }
+
+    /* Singletone End */
+
+    private final SessionFactory sessionFactory;
 
     public void close() {
         this.sessionFactory.close();

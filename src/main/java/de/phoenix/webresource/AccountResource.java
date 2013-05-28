@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response.Status;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import de.phoenix.PhoenixApplication;
+import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Role;
 import de.phoenix.database.entity.User;
 import de.phoenix.security.Encrypter;
@@ -65,7 +65,7 @@ public class AccountResource {
             return Response.status(Status.BAD_REQUEST).build();
 
         // Persist user in database
-        Session session = PhoenixApplication.databaseManager.openSession();
+        Session session = DatabaseManager.getInstance().openSession();
         Transaction transaction = session.beginTransaction();
         // Generate salted password
         SaltedPassword pw = Encrypter.getInstance().encryptPassword(password);

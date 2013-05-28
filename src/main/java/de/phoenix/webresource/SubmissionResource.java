@@ -44,7 +44,7 @@ import org.hibernate.Transaction;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
 
-import de.phoenix.PhoenixApplication;
+import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Submission;
 import de.phoenix.database.entity.SubmissionFiles;
 import de.phoenix.database.entity.Task;
@@ -63,7 +63,7 @@ public class SubmissionResource {
     public Response submit(MultiPart multiPart) {
         List<SubmissionFiles> files = readFiles(multiPart.getBodyParts());
 
-        Session session = PhoenixApplication.databaseManager.openSession();
+        Session session = DatabaseManager.getInstance().openSession();
         Transaction tx = session.beginTransaction();
 
         // TODO: Outdated code after 31.05.2013
@@ -138,7 +138,7 @@ public class SubmissionResource {
 
         List<Submission> result = new Vector<Submission>();
 
-        Session session = PhoenixApplication.databaseManager.openSession();
+        Session session = DatabaseManager.getInstance().openSession();
         Iterator<Submission> iter = session.getNamedQuery("Submission.findAll").iterate();
 
         while (iter.hasNext()) {
@@ -157,7 +157,7 @@ public class SubmissionResource {
 //    @SuppressWarnings("unchecked")
     public Response getAllSubmissions(@PathParam("id") int submissionID) {
 
-        Session session = PhoenixApplication.databaseManager.openSession();
+        Session session = DatabaseManager.getInstance().openSession();
         Query query = session.getNamedQuery("Submission.findById").setInteger("id", submissionID);
         Submission submission = (Submission) query.uniqueResult();
 

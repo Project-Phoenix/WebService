@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Session;
 
-import de.phoenix.PhoenixApplication;
+import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.User;
 import de.phoenix.security.Encrypter;
 import de.phoenix.security.LoginFilter;
@@ -65,7 +65,7 @@ public class TokenResource {
             return Response.status(Status.BAD_REQUEST).build();
 
         // Check if password in database the same as in the request
-        Session session = PhoenixApplication.databaseManager.openSession();
+        Session session = DatabaseManager.getInstance().openSession();
         User user = (User) session.getNamedQuery("User.findByUsername").setString("username", username).iterate().next();
         session.close();
         // Passwords don't match

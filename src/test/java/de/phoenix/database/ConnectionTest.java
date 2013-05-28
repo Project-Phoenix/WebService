@@ -28,7 +28,7 @@ public class ConnectionTest {
     @Test
     public void test() {
         // Start hibernate
-        DatabaseManager dbManager = new DatabaseManager();
+        DatabaseManager dbManager = DatabaseManager.getInstance();
         Session session = dbManager.openSession();
 
         session.beginTransaction();
