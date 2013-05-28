@@ -22,14 +22,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -47,7 +54,7 @@ import de.phoenix.database.entity.SubmissionFiles;
 @Path("/submission")
 public class SubmissionResource {
 
-    @Path("/submit/")
+    @Path("/submit")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response submit(MultiPart multiPart) {
@@ -103,5 +110,58 @@ public class SubmissionResource {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Path("/getAll")
+    @GET
+    @Produces({MediaType.APPLICATION_XML})
+    @SuppressWarnings("unchecked")
+    public Response getAllSubmissions() {
+
+        List<Submission> result = new Vector<Submission>();
+
+        Session session = PhoenixApplication.databaseManager.openSession();
+        Iterator<Submission> iter = session.getNamedQuery("Submission.findAll").iterate();
+
+        while (iter.hasNext()) {
+            result.add(iter.next());
+        }
+
+        final GenericEntity<List<Submission>> entity = new GenericEntity<List<Submission>>(result) {
+        };
+
+        return Response.ok(entity).build();
+    }
+
+    @Path("/getFiles/{id}")
+    @GET
+    @Produces({MediaType.APPLICATION_XML})
+//    @SuppressWarnings("unchecked")
+    public Response getAllSubmissions(@PathParam("id") int submissionID) {
+
+        Session session = PhoenixApplication.databaseManager.openSession();
+        Query query = session.getNamedQuery("Submission.findById").setInteger("id", submissionID);
+        Submission submission = (Submission) query.uniqueResult();
+
+        List<SubmissionFiles> files = submission.getSubmissionFilesList();
+
+        final GenericEntity<List<SubmissionFiles>> entity = new GenericEntity<List<SubmissionFiles>>(files) {
+        };
+
+        return Response.ok(entity).build();
+//
+//        List<SubmissionFiles> result = new Vector<SubmissionFiles>();
+//
+//        Session session = PhoenixApplication.databaseManager.openSession();
+//        Iterator<Submission> iter = session.getNamedQuery("Submission.findById").set.iterate();
+//
+//        while (iter.hasNext()) {
+//            result.add(iter.next());
+//        }
+//
+//        final GenericEntity<List<Submission>> entity = new GenericEntity<List<Submission>>(result) {
+//        };
+//
+//        return Response.ok(entity).build();
     }
 }

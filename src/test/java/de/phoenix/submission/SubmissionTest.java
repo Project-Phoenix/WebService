@@ -21,6 +21,9 @@ package de.phoenix.submission;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,10 +31,14 @@ import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
 
+import de.phoenix.database.entity.Submission;
+import de.phoenix.database.entity.SubmissionFiles;
 import de.phoenix.util.UploadHelper;
 
 public class SubmissionTest {
@@ -52,7 +59,7 @@ public class SubmissionTest {
         httpServer.stop(0);
     }
 
-    @Test
+//    @Test
     public void uploadTest() {
 
         File[] files = {new File(".classpath"), new File("pom.xml")};
@@ -62,10 +69,36 @@ public class SubmissionTest {
         ClientResponse response = UploadHelper.uploadFile(resource, files);
         assertTrue(response.getStatus() == 200);
     }
-    
+
     @Test
     public void getSubmission() {
-        
-        
+        // Get all submissions
+        Client c = Client.create();
+        WebResource resource = c.resource(BASE_URL).path("/submission").path("/getAll");
+        Builder builder = resource.accept(MediaType.APPLICATION_XML);
+        GenericType<List<Submission>> genericType = new GenericType<List<Submission>>() {
+        };
+
+        List<Submission> result = builder.get(genericType);
+
+        // Print information about the submission
+        for (Submission submission : result) {
+            System.out.println(submission.getControllMessage());
+            System.out.println(submission.getSubmissionDate());
+
+            // Get the files assoziated with the submission
+            WebResource resource2 = c.resource(BASE_URL).path("/submission").path("/getFiles").path(submission.getId().toString());
+
+            Builder builder2 = resource2.accept(MediaType.APPLICATION_XML);
+            GenericType<List<SubmissionFiles>> genericType2 = new GenericType<List<SubmissionFiles>>() {
+            };
+
+            List<SubmissionFiles> files = builder2.get(genericType2);
+            // Print content of the files
+            for (SubmissionFiles file : files) {
+                System.out.println(file.getFilename());
+                System.out.println(file.getContent());
+            }
+        }
     }
 }
