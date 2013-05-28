@@ -136,6 +136,9 @@ public class User implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
     private List<News> newsList;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private List<Submission> submissionList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender")
     private List<Message> messageList1;
@@ -330,6 +333,15 @@ public class User implements Serializable {
 
     public void setWrittenNews(List<News> writtenNews) {
         this.newsList = writtenNews;
+    }
+    
+    @XmlTransient
+    public List<Submission> getSubmissions() {
+        return submissionList;
+    }
+
+    public void setSubmissions(List<Submission> submissions) {
+        this.submissionList = submissions;
     }
 
     @XmlTransient

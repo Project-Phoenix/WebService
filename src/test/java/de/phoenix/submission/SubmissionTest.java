@@ -62,4 +62,10 @@ public class SubmissionTest {
         ClientResponse response = UploadHelper.uploadFile(resource, files);
         assertTrue(response.getStatus() == 200);
     }
+    
+    @Test
+    public void getSubmission() {
+        
+        
+    }
 }

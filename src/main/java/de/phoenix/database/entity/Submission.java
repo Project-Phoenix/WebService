@@ -84,6 +84,10 @@ public class Submission implements Serializable {
     @Column(name = "controllMessage", columnDefinition = "text")
     private String controllMessage;
 
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private User userId;
+
     @JoinColumns({@JoinColumn(name = "task_exercise_sheet_pool_id", referencedColumnName = "exercise_sheet_pool_id"), @JoinColumn(name = "task_task_id", referencedColumnName = "task_id")})
     @ManyToOne(optional = false)
     private Task task;
@@ -111,11 +115,17 @@ public class Submission implements Serializable {
         this.status = 1;
         this.controllStatus = 1;
         this.controllMessage = "Akzeptiert";
-        
+
         Session ses = PhoenixApplication.databaseManager.openSession();
-        Task task = (Task)ses.getNamedQuery("Task.findByTaskId").setInteger("taskId", 1).iterate().next();
-        ses.close();
+
+        User user = (User) ses.getNamedQuery("User.findById").setInteger("id", 1).iterate().next();
+        this.userId = user;
+
+        Task task = (Task) ses.getNamedQuery("Task.findByTaskId").setInteger("taskId", 1).iterate().next();
         this.task = task;
+
+        ses.close();
+
     }
 
     public Integer getId() {
@@ -156,6 +166,14 @@ public class Submission implements Serializable {
 
     public void setControllMessage(String controllMessage) {
         this.controllMessage = controllMessage;
+    }
+
+    public User getAuthor() {
+        return userId;
+    }
+
+    public void setAuthor(User author) {
+        this.userId = author;
     }
 
     public Task getTask() {
