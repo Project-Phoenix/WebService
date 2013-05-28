@@ -18,6 +18,7 @@
 
 package de.phoenix.submission;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -59,8 +60,8 @@ public class SubmissionTest {
         httpServer.stop(0);
     }
 
-//    @Test
-    public void uploadTest() {
+    @Test
+    public void uploadSubmission() {
 
         File[] files = {new File(".classpath"), new File("pom.xml")};
 
@@ -83,8 +84,8 @@ public class SubmissionTest {
 
         // Print information about the submission
         for (Submission submission : result) {
-            System.out.println(submission.getControllMessage());
-            System.out.println(submission.getSubmissionDate());
+            assertFalse(submission.getControllMessage().isEmpty());
+            assertTrue(submission.getSubmissionDate() != null);
 
             // Get the files assoziated with the submission
             WebResource resource2 = c.resource(BASE_URL).path("/submission").path("/getFiles").path(submission.getId().toString());
@@ -96,8 +97,8 @@ public class SubmissionTest {
             List<SubmissionFiles> files = builder2.get(genericType2);
             // Print content of the files
             for (SubmissionFiles file : files) {
-                System.out.println(file.getFilename());
-                System.out.println(file.getContent());
+                assertFalse(file.getFilename().isEmpty());
+                assertFalse(file.getContent().isEmpty());
             }
         }
     }

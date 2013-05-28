@@ -25,17 +25,19 @@ import org.junit.Test;
 
 public class ConnectionTest {
 
-
     @Test
     public void test() {
+        // Start hibernate
         DatabaseManager dbManager = new DatabaseManager();
         Session session = dbManager.openSession();
-        
+
         session.beginTransaction();
-        
+
         assertTrue(session.isConnected());
-        
+
         session.close();
+
+        // Finishe hibernate
     }
 
 }

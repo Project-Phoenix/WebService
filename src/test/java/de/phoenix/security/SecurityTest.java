@@ -22,7 +22,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,7 +41,6 @@ public class SecurityTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        // Start Http Server
         httpServer = HttpServerFactory.create(BASE_URL);
         httpServer.start();
     }
@@ -52,50 +50,8 @@ public class SecurityTest {
         httpServer.stop(0);
     }
 
-//    @Test
-    public void APITest() {
-
-        // User information
-        String user = "account";
-        String password = "password";
-
-        Client client = Client.create();
-
-        /* ***************************
-         * !!!!!!!! IMPORTANT !!!!!!!!
-         * 
-         * DO NOT USE THIS CODE SNIPPET FOR ACCOUNT CREATION!
-         * 
-         * See createAccountTest for the new API!
-         */
-
-        // Create a new account
-        WebResource createAccountRes = client.resource(BASE_URL).path("account").path("create");
-
-        ClientResponse response = createAccountRes.path(user).path(DigestUtils.sha512Hex(password)).get(ClientResponse.class);
-
-        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-
-        // Request a token - also check if the account is valid
-        WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
-        requestTokenRes.addFilter(new LoginFilter(user, password));
-        response = requestTokenRes.get(ClientResponse.class);
-        requestTokenRes.removeAllFilters();
-
-        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-
-        // Validate the given token
-        Token token = response.getEntity(Token.class);
-        WebResource validateTokenRes = client.resource(BASE_URL).path("token").path("validate");
-        client.addFilter(new TokenFilter(token));
-
-        response = validateTokenRes.get(ClientResponse.class);
-
-        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-    }
-
     @Test
-    public void createAccountTest() {
+    public void accountTest() {
         // User information
         String user = "account";
         String password = "password";
@@ -130,6 +86,16 @@ public class SecurityTest {
         requestTokenRes.addFilter(new LoginFilter(user, password));
         response = requestTokenRes.get(ClientResponse.class);
         requestTokenRes.removeAllFilters();
+
+        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+
+        Token token = response.getEntity(Token.class);
+
+        // Check if token is valid
+        WebResource validateTokenRes = client.resource(BASE_URL).path("token").path("validate");
+        client.addFilter(new TokenFilter(token));
+
+        response = validateTokenRes.get(ClientResponse.class);
 
         assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
 
