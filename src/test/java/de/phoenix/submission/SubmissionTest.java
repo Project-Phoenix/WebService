@@ -24,8 +24,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +32,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
 
@@ -73,28 +70,30 @@ public class SubmissionTest {
 
     @Test
     public void getSubmission() {
-        // Get all submissions
+
         Client c = Client.create();
-        WebResource resource = c.resource(BASE_URL).path("/submission").path("/getAll");
-        Builder builder = resource.accept(MediaType.APPLICATION_XML);
-        GenericType<List<Submission>> genericType = new GenericType<List<Submission>>() {
+        // Webresource to get all submission
+        WebResource submissionResource = c.resource(BASE_URL).path("/submission").path("/getAll");
+        // Webresource to get all files attached to one submission
+        WebResource submissionFileResource = c.resource(BASE_URL).path("/submission").path("/getFiles");
+
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<Submission>> submissionType = new GenericType<List<Submission>>() {
+        };
+        GenericType<List<SubmissionFiles>> submissionFileType = new GenericType<List<SubmissionFiles>>() {
         };
 
-        List<Submission> result = builder.get(genericType);
+        // Get all submission
+        List<Submission> result = submissionResource.get(submissionType);
 
         // Print information about the submission
         for (Submission submission : result) {
             assertFalse(submission.getControllMessage().isEmpty());
             assertTrue(submission.getSubmissionDate() != null);
 
-            // Get the files assoziated with the submission
-            WebResource resource2 = c.resource(BASE_URL).path("/submission").path("/getFiles").path(submission.getId().toString());
-
-            Builder builder2 = resource2.accept(MediaType.APPLICATION_XML);
-            GenericType<List<SubmissionFiles>> genericType2 = new GenericType<List<SubmissionFiles>>() {
-            };
-
-            List<SubmissionFiles> files = builder2.get(genericType2);
+            // Get all files attached to one submission
+            List<SubmissionFiles> files = submissionFileResource.path(submission.getId().toString()).get(submissionFileType);
             // Print content of the files
             for (SubmissionFiles file : files) {
                 assertFalse(file.getFilename().isEmpty());

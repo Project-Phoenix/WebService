@@ -23,9 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -136,14 +134,8 @@ public class SubmissionResource {
     @SuppressWarnings("unchecked")
     public Response getAllSubmissions() {
 
-        List<Submission> result = new Vector<Submission>();
-
         Session session = DatabaseManager.getInstance().openSession();
-        Iterator<Submission> iter = session.getNamedQuery("Submission.findAll").iterate();
-
-        while (iter.hasNext()) {
-            result.add(iter.next());
-        }
+        List<Submission> result = session.getNamedQuery("Submission.findAll").list();
 
         final GenericEntity<List<Submission>> entity = new GenericEntity<List<Submission>>(result) {
         };
