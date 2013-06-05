@@ -19,6 +19,7 @@
 package de.phoenix.webresource;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -38,7 +39,7 @@ import de.phoenix.security.SaltedPassword;
 
 @Path("/account")
 public class AccountResource {
- 
+
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_XML)
@@ -59,7 +60,7 @@ public class AccountResource {
         // Set password data
         user.setPassword(pw.getHash());
         user.setSalt(pw.getSalt());
-        
+
         // Set automatic values manually - override things set by client
         user.setRegdate(new Date());
         user.setId(null);
@@ -67,7 +68,13 @@ public class AccountResource {
         // Save user in database
         Session session = DatabaseManager.getInstance().openSession();
         Transaction transaction = session.beginTransaction();
- 
+
+        // Check if username is duplicate
+        @SuppressWarnings("rawtypes")
+        List res = session.getNamedQuery("User.findByUsername").setString("username", user.getUsername()).list();
+        if (!res.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).entity("Duplicate username").build();
+        }
         // TODO: Get standard role from database
         Role role = (Role) session.getNamedQuery("Role.findById").setInteger("id", 1).uniqueResult();
         user.setRole(role);
@@ -77,5 +84,5 @@ public class AccountResource {
 
         return Response.ok().build();
     }
-    
+
 }
