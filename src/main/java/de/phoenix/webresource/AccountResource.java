@@ -20,11 +20,10 @@ package de.phoenix.webresource;
 
 import java.util.Date;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -35,45 +34,41 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Role;
 import de.phoenix.database.entity.User;
 import de.phoenix.security.Encrypter;
-import de.phoenix.security.LoginFilter;
 import de.phoenix.security.SaltedPassword;
 
 @Path("/account")
 public class AccountResource {
+ 
+    @POST
+    @Path("/register")
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response register(User user) {
 
-    // TODO: Depecrated after 31.05.2013
-    // Just a method for simple tests
-    @GET
-    @Path("/create")
-    public Response createAccount(@Context HttpHeaders headers) {
-
-        // Extract username and sha512 encoded password from head
-        MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
-        String username = requestHeaders.getFirst(LoginFilter.NAME_HEAD);
-        String password = requestHeaders.getFirst(LoginFilter.PASS_HEAD);
-        // Heads are missing - invalid request
-        if (username == null || password == null)
+        // User cannot be null
+        if (user == null) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
 
-        // Persist user in database
-        Session session = DatabaseManager.getInstance().openSession();
-        Transaction transaction = session.beginTransaction();
-        // Generate salted password
+        String password = user.getPassword();
+        // Invalid password
+        if (password == null) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        // Salt the password
         SaltedPassword pw = Encrypter.getInstance().encryptPassword(password);
-        User user = new User();
-
-        // TODO: Outdated code after 31.05.2013
-        user.setUsername(username);
+        // Set password data
         user.setPassword(pw.getHash());
         user.setSalt(pw.getSalt());
-        user.setSurname("Hans");
-        user.setName("Maier");
-        user.setTitle("Herr");
-        user.setEmail("Test@lol.de");
+        
+        // Set automatic values manually - override things set by client
         user.setRegdate(new Date());
+        user.setId(null);
         user.setIsActive(true);
-        // TODO: / Outdated code after 31.05.2013
-
+        // Save user in database
+        Session session = DatabaseManager.getInstance().openSession();
+        Transaction transaction = session.beginTransaction();
+ 
+        // TODO: Get standard role from database
         Role role = (Role) session.getNamedQuery("Role.findById").setInteger("id", 1).uniqueResult();
         user.setRole(role);
 
@@ -82,4 +77,5 @@ public class AccountResource {
 
         return Response.ok().build();
     }
+    
 }

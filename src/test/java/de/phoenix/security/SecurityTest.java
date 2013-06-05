@@ -18,9 +18,7 @@
 
 package de.phoenix.security;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,6 +30,8 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
+
+import de.phoenix.database.entity.User;
 
 public class SecurityTest {
 
@@ -51,44 +51,35 @@ public class SecurityTest {
     }
 
     @Test
-    public void accountTest() {
-        // User information
-        String user = "account";
-        String password = "password";
+    public void registerAccount() {
+        
+        String password = "TestPassword";
+        
+        // Create user container
+        User user = new User(password);
+        // Set values
+        user.setUsername("Phoenix");
+        user.setName("Gaertner");
+        user.setSurname("Kilian");
+        user.setEmail("Test@phoenix.de");
+        user.setTitle("Herr");
 
+        // Create client to connect to jersey webservice
         Client client = Client.create();
+        // Get resource for registering account
+        WebResource wr = client.resource(BASE_URL).path("account").path("register");
 
-        // Create a new account
-        WebResource createAccountRes = client.resource(BASE_URL).path("account").path("create");
-        // Use temponary filter for the password encription
-        createAccountRes.addFilter(new CreateAccountFilter(user, password));
-
-        ClientResponse response = createAccountRes.get(ClientResponse.class);
-
-        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-
-        try {
-            createAccountRes.get(ClientResponse.class); // Fly exception - fly!
-            fail();
-        } catch (Exception e) {
-            // Everything went fine
-        }
-
-        // Remove temponary filter
-        createAccountRes.removeAllFilters();
-        // test without the filter
-        response = createAccountRes.get(ClientResponse.class);
-
-        assertFalse(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+        // Call webresource and upload user information
+        ClientResponse response = wr.post(ClientResponse.class, user);
+        // True when the response was OK ( ResponseCode OK: 200)
+        assertTrue(response.toString(), response.getStatus() == 200);
 
         // Request a token - also check if the account is valid
         WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
-        requestTokenRes.addFilter(new LoginFilter(user, password));
+        requestTokenRes.addFilter(new LoginFilter(user.getUsername(), password));
         response = requestTokenRes.get(ClientResponse.class);
-        requestTokenRes.removeAllFilters();
 
         assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-
         Token token = response.getEntity(Token.class);
 
         // Check if token is valid
@@ -98,6 +89,56 @@ public class SecurityTest {
         response = validateTokenRes.get(ClientResponse.class);
 
         assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
-
     }
+//
+//    @Test
+//    public void accountTest() {
+//        // User information
+//        String user = "account";
+//        String password = "password";
+//
+//        Client client = Client.create();
+//
+//        // Create a new account
+//        WebResource createAccountRes = client.resource(BASE_URL).path("account").path("create");
+//        // Use temponary filter for the password encription
+//        createAccountRes.addFilter(new CreateAccountFilter(user, password));
+//
+//        ClientResponse response = createAccountRes.get(ClientResponse.class);
+//
+//        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+//
+//        try {
+//            createAccountRes.get(ClientResponse.class); // Fly exception - fly!
+//            fail();
+//        } catch (Exception e) {
+//            // Everything went fine
+//        }
+//
+//        // Remove temponary filter
+//        createAccountRes.removeAllFilters();
+//        // test without the filter
+//        response = createAccountRes.get(ClientResponse.class);
+//
+//        assertFalse(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+//
+//        // Request a token - also check if the account is valid
+//        WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
+//        requestTokenRes.addFilter(new LoginFilter(user, password));
+//        response = requestTokenRes.get(ClientResponse.class);
+//        requestTokenRes.removeAllFilters();
+//
+//        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+//
+//        Token token = response.getEntity(Token.class);
+//
+//        // Check if token is valid
+//        WebResource validateTokenRes = client.resource(BASE_URL).path("token").path("validate");
+//        client.addFilter(new TokenFilter(token));
+//
+//        response = validateTokenRes.get(ClientResponse.class);
+//
+//        assertTrue(response.toString(), response.getClientResponseStatus().equals(Status.OK));
+//
+//    }
 }
