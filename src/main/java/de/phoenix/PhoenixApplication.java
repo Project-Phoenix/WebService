@@ -29,11 +29,11 @@ import de.phoenix.webresource.SubmissionResource;
 import de.phoenix.webresource.TokenResource;
 
 @ApplicationPath("/rest")
-public class MyApplication extends Application {
+public class PhoenixApplication extends Application {
 
     public static final TokenManager tokenManager = new TokenManager();
 
-    public MyApplication() {
+    public PhoenixApplication() {
         // Main Constructor - called once in the application lifecycle
     }
 

@@ -26,7 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import de.phoenix.MyApplication;
+import de.phoenix.PhoenixApplication;
 import de.phoenix.security.Token;
 
 /**
@@ -40,7 +40,7 @@ public class TokenResource {
     @Path("/request/{username}")
     public Token requestToken(@Context HttpHeaders headers, @PathParam("username") String username) {
         // TODO: Validate the user
-        return MyApplication.tokenManager.generateToken(username);
+        return PhoenixApplication.tokenManager.generateToken(username);
     }
 
 }
