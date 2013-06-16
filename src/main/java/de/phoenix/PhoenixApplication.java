@@ -24,7 +24,9 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import de.phoenix.security.AccountManager;
 import de.phoenix.security.TokenManager;
+import de.phoenix.webresource.AccountResource;
 import de.phoenix.webresource.SubmissionResource;
 import de.phoenix.webresource.TokenResource;
 
@@ -32,6 +34,7 @@ import de.phoenix.webresource.TokenResource;
 public class PhoenixApplication extends Application {
 
     public static final TokenManager tokenManager = new TokenManager();
+    public static final AccountManager accountManager = new AccountManager();
 
     public PhoenixApplication() {
         // Main Constructor - called once in the application lifecycle
@@ -45,6 +48,7 @@ public class PhoenixApplication extends Application {
         classSet.add(HelloWorld.class);
         classSet.add(SubmissionResource.class);
         classSet.add(TokenResource.class);
+        classSet.add(AccountResource.class);
 
         return classSet;
     }

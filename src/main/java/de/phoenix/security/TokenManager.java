@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.HttpHeaders;
+
 /**
  * Manages the token by holding them in maps and generating new ones
  * 
@@ -61,5 +63,31 @@ public class TokenManager {
         tokenmapByOwner.put(owner, token);
 
         return token;
+    }
+
+    /**
+     * Checks if the token attached to every webresource call is valid by
+     * checking the existence of the ID and then if the token is maybe expired.
+     * Expired tokens or not existing tokes are invalid and denied
+     * 
+     * @param headers
+     *            The headers directly from the http request
+     * @return True, when the token is valid and not expired
+     */
+    public boolean isValidToken(HttpHeaders headers) {
+        return isValidToken(headers.getRequestHeaders().getFirst(TokenFilter.TOKEN_HEAD));
+    }
+
+    public boolean isValidToken(String tokenID) {
+        if (tokenID == null)
+            return false;
+        Token token = tokenmapByID.get(tokenID);
+        if (token == null)
+            return false;
+        if (token.isExpired()) {
+            // TODO: What to do with expired tokens?
+            return false;
+        } else
+            return true;
     }
 }
