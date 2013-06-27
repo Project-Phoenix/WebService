@@ -42,17 +42,19 @@ public class AccountResource {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response register(User user) {
 
         // User cannot be null
         if (user == null) {
+            System.out.println("User is null");
             return Response.status(Status.BAD_REQUEST).build();
         }
 
         String password = user.getPassword();
         // Invalid password
         if (password == null) {
+            System.out.println("Password is null");
             return Response.status(Status.BAD_REQUEST).build();
         }
         // Salt the password
@@ -73,6 +75,7 @@ public class AccountResource {
         @SuppressWarnings("rawtypes")
         List res = session.getNamedQuery("User.findByUsername").setString("username", user.getUsername()).list();
         if (!res.isEmpty()) {
+            System.out.println("Double");
             return Response.status(Status.BAD_REQUEST).entity("Duplicate username").build();
         }
         // TODO: Get standard role from database

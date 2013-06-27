@@ -29,13 +29,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -130,7 +128,7 @@ public class SubmissionResource {
 
     @Path("/getAll")
     @GET
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
     public Response getAllSubmissions() {
 
@@ -138,23 +136,6 @@ public class SubmissionResource {
         List<Submission> result = session.getNamedQuery("Submission.findAll").list();
 
         final GenericEntity<List<Submission>> entity = new GenericEntity<List<Submission>>(result) {
-        };
-
-        return Response.ok(entity).build();
-    }
-
-    @Path("/getFiles/{id}")
-    @GET
-    @Produces({MediaType.APPLICATION_XML})
-    public Response getAllSubmissions(@PathParam("id") int submissionID) {
-
-        Session session = DatabaseManager.getInstance().openSession();
-        Query query = session.getNamedQuery("Submission.findById").setInteger("id", submissionID);
-        Submission submission = (Submission) query.uniqueResult();
-
-        List<SubmissionFiles> files = submission.getSubmissionFilesList();
-
-        final GenericEntity<List<SubmissionFiles>> entity = new GenericEntity<List<SubmissionFiles>>(files) {
         };
 
         return Response.ok(entity).build();

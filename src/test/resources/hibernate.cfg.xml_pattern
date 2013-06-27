@@ -32,9 +32,9 @@
 		<mapping class="de.phoenix.database.entity.AutomaticTaskFiles" />
 		<mapping class="de.phoenix.database.entity.DefaultPermission" />
 		<mapping class="de.phoenix.database.entity.DefaultRole" />
+		<mapping class="de.phoenix.database.entity.ExerciseGroup" />
 		<mapping class="de.phoenix.database.entity.ExerciseSheet" />
 		<mapping class="de.phoenix.database.entity.ExerciseSheetPool" />
-		<mapping class="de.phoenix.database.entity.Group" />
 		<mapping class="de.phoenix.database.entity.Instance" />
 		<mapping class="de.phoenix.database.entity.Lecture" />
 		<mapping class="de.phoenix.database.entity.Material" />

@@ -235,11 +235,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`group`
+-- Table `phoenix`.`exerciseGroup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `phoenix`.`group` ;
+DROP TABLE IF EXISTS `phoenix`.`exerciseGroup` ;
 
-CREATE  TABLE IF NOT EXISTS `phoenix`.`group` (
+CREATE  TABLE IF NOT EXISTS `phoenix`.`exerciseGroup` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `room` VARCHAR(45) NOT NULL ,
@@ -250,14 +250,14 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`group` (
   `lecture` INT NOT NULL ,
   `exerciseLeader` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_group_lecture1_idx` (`lecture` ASC) ,
-  INDEX `fk_group_user1_idx` (`exerciseLeader` ASC) ,
-  CONSTRAINT `fk_group_lecture1`
+  INDEX `fk_exercisegroup_lecture1_idx` (`lecture` ASC) ,
+  INDEX `fk_exercisegroup_user1_idx` (`exerciseLeader` ASC) ,
+  CONSTRAINT `fk_exercisegroup_lecture1`
     FOREIGN KEY (`lecture` )
     REFERENCES `phoenix`.`lecture` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `fk_group_user1`
+  CONSTRAINT `fk_exercisegroup_user1`
     FOREIGN KEY (`exerciseLeader` )
     REFERENCES `phoenix`.`user` (`id` )
     ON DELETE CASCADE
@@ -307,7 +307,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`groupMember` (
     ON UPDATE CASCADE,
   CONSTRAINT `fk_groupMember_group1`
     FOREIGN KEY (`group_id` )
-    REFERENCES `phoenix`.`group` (`id` )
+    REFERENCES `phoenix`.`exerciseGroup` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -420,7 +420,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`exerciseSheet` (
   INDEX `fk_group_has_exercise_sheet_group1_idx` (`group_id` ASC) ,
   CONSTRAINT `fk_group_has_exercise_sheet_group1`
     FOREIGN KEY (`group_id` )
-    REFERENCES `phoenix`.`group` (`id` )
+    REFERENCES `phoenix`.`exerciseGroup` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_group_has_exercise_sheet_exercise_sheet1`
@@ -508,7 +508,7 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`groupMaterial` (
   INDEX `fk_group_has_material_group1_idx` (`group_id` ASC) ,
   CONSTRAINT `fk_group_has_material_group1`
     FOREIGN KEY (`group_id` )
-    REFERENCES `phoenix`.`group` (`id` )
+    REFERENCES `phoenix`.`exerciseGroup` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_group_has_material_material1`

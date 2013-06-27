@@ -74,31 +74,23 @@ public class SubmissionTest {
         Client c = Client.create();
         // Webresource to get all submission
         WebResource submissionResource = c.resource(BASE_URL).path("/submission").path("/getAll");
-        // Webresource to get all files attached to one submission
-        WebResource submissionFileResource = c.resource(BASE_URL).path("/submission").path("/getFiles");
 
         // Ugly constructs to receive lists of generic types - no other way to
         // solve this
         GenericType<List<Submission>> submissionType = new GenericType<List<Submission>>() {
         };
-        GenericType<List<SubmissionFiles>> submissionFileType = new GenericType<List<SubmissionFiles>>() {
-        };
 
-        // Get all submission
         List<Submission> result = submissionResource.get(submissionType);
 
-        // Print information about the submission
         for (Submission submission : result) {
+
             assertFalse(submission.getControllMessage().isEmpty());
             assertTrue(submission.getSubmissionDate() != null);
-
-            // Get all files attached to one submission
-            List<SubmissionFiles> files = submissionFileResource.path(submission.getId().toString()).get(submissionFileType);
-            // Print content of the files
-            for (SubmissionFiles file : files) {
+            for (SubmissionFiles file : submission.getSubmissionFilesList()) {
                 assertFalse(file.getFilename().isEmpty());
                 assertFalse(file.getContent().isEmpty());
             }
         }
+
     }
 }
