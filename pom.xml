@@ -17,10 +17,12 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+				<version>3.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.glassfish</groupId>
 				<artifactId>maven-glassfish-plugin</artifactId>
+				<version>2.1</version>
 			</plugin>
 		</plugins>
 	</build>

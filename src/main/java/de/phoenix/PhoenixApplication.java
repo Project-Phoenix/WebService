@@ -24,8 +24,12 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.phoenix.webresource.AccountResource;
 import de.phoenix.webresource.SubmissionResource;
+import de.phoenix.webresource.TaskResource;
 import de.phoenix.webresource.TokenResource;
 
 @ApplicationPath("/rest")
@@ -33,6 +37,9 @@ public class PhoenixApplication extends Application {
 
     public PhoenixApplication() {
         // Main Constructor - called once in the application lifecycle
+        
+        ObjectMapper m = new ObjectMapper();
+        m.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
     }
 
     // Add all webresource to the set so jersey know what resources are existing
@@ -44,6 +51,7 @@ public class PhoenixApplication extends Application {
         classSet.add(SubmissionResource.class);
         classSet.add(TokenResource.class);
         classSet.add(AccountResource.class);
+        classSet.add(TaskResource.class);
 
         return classSet;
     }

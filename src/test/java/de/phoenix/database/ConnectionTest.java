@@ -37,7 +37,7 @@ public class ConnectionTest {
 
         session.close();
 
-        // Finishe hibernate
+        // Finish hibernate
     }
 
 }
