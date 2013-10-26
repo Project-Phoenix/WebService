@@ -21,9 +21,10 @@ package de.phoenix.security.permission.datastructure;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,11 +33,21 @@ import org.junit.Test;
 
 public class PermissionTreeTest {
 
+    private List<String> readAllLines(File f) throws Exception {
+        List<String> lines = new ArrayList<String>();
+        BufferedReader bReader = new BufferedReader(new FileReader(f));
+        String line = "";
+        while ((line = bReader.readLine()) != null)
+            lines.add(line);
+        bReader.close();
+        return lines;
+    }
+
     @Test
     public void createBigTree() {
         try {
             File f = new File("src/test/resources/permissions.txt");
-            List<String> lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
+            List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {
                 tree.addNode(line);
@@ -56,7 +67,7 @@ public class PermissionTreeTest {
     public void cloneTest() {
         try {
             File f = new File("src/test/resources/permissions.txt");
-            List<String> lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
+            List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {
                 tree.addNode(line);
@@ -118,7 +129,7 @@ public class PermissionTreeTest {
     public void toListTest() {
         try {
             File f = new File("src/test/resources/permissions.txt");
-            List<String> lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
+            List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {
                 tree.addNode(line);
