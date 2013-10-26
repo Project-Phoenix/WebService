@@ -20,7 +20,6 @@ package de.phoenix.webresource;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Date;
@@ -129,9 +128,7 @@ public class TaskResource {
             Transaction trans = session.beginTransaction();
 
             try {
-                File file = bodyPart.getEntityAs(File.class);
-
-                String context = new String(Files.readAllBytes(file.toPath()));
+                String context = bodyPart.getEntityAs(String.class);
 
                 String fileName = bodyPart.getContentDisposition().getFileName();
                 int fileSeperator = fileName.lastIndexOf('.');
