@@ -37,6 +37,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
+import de.phoenix.DatabaseCleaner;
 import de.phoenix.TestHttpServer;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
@@ -60,19 +61,7 @@ public class TaskTest {
     }
 
     private static void cleanupDatabase() {
-//        Session session = DatabaseManager.getInstance().openSession();
-//        Transaction trans = session.beginTransaction();
-//
-//        Query q1 = session.getNamedQuery("TaskPool.findByName").setString("name", "Test Task");
-//        TaskPool t = (TaskPool) q1.uniqueResult();
-//        if (t == null)
-//            fail("Object not inserted in database!");
-//        List<Tag> tags = t.getTags();
-//        for (Tag tag : tags) {
-//            session.delete(tag);
-//        }
-//        session.delete(t);
-//        trans.commit();
+        DatabaseCleaner.getInstance().run();
     }
 
     private static String TEST_TITLE = "TestAufgabe";

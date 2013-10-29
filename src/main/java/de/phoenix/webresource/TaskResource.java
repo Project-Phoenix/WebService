@@ -75,6 +75,7 @@ public class TaskResource {
         session.save(task);
 
         trans.commit();
+        session.disconnect();
 
         return Response.ok().build();
     }
@@ -87,22 +88,12 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
         List<Task> tasks = session.getNamedQuery("Task.findAll").list();
+        session.disconnect();
+
         List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
 
         for (Task task : tasks) {
-            List<Attachment> attachments = task.getAttachments();
-            List<PhoenixAttachment> pAttachments = new ArrayList<PhoenixAttachment>(attachments.size());
-            for (Attachment at : attachments) {
-                pAttachments.add(new PhoenixAttachment(at.getFile().getBytes(1, (int) at.getFile().length()), at.getCreationDate(), at.getName(), at.getName()));
-            }
-
-            List<Text> texts = task.getTexts();
-            List<PhoenixText> pTexts = new ArrayList<PhoenixText>(texts.size());
-            for (Text tx : texts) {
-                pTexts.add(new PhoenixText(tx.getContent(), tx.getCreationDate(), tx.getName(), tx.getType()));
-            }
-
-            result.add(new PhoenixTask(pAttachments, pTexts, task.getDescription(), task.getTitle()));
+            result.add(getPhoenixTask(task));
         }
 
         // Encapsulate the list to transform it via JXR-RS
@@ -110,5 +101,45 @@ public class TaskResource {
         };
 
         return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Path("/getByTitle")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByTitle(String title) throws SQLException {
+
+        Session session = DatabaseManager.getSession();
+
+        List<Task> tasks = session.getNamedQuery("Task.findByTitle").list();
+        session.disconnect();
+
+        List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
+
+        for (Task task : tasks) {
+            result.add(getPhoenixTask(task));
+        }
+
+        // Encapsulate the list to transform it via JXR-RS
+        final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
+        };
+
+        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+    }
+
+    private PhoenixTask getPhoenixTask(Task task) throws SQLException {
+        List<Attachment> attachments = task.getAttachments();
+        List<PhoenixAttachment> pAttachments = new ArrayList<PhoenixAttachment>(attachments.size());
+        for (Attachment at : attachments) {
+            pAttachments.add(new PhoenixAttachment(at.getFile().getBytes(1, (int) at.getFile().length()), at.getCreationDate(), at.getName(), at.getName()));
+        }
+
+        List<Text> texts = task.getTexts();
+        List<PhoenixText> pTexts = new ArrayList<PhoenixText>(texts.size());
+        for (Text tx : texts) {
+            pTexts.add(new PhoenixText(tx.getContent(), tx.getCreationDate(), tx.getName(), tx.getType()));
+        }
+
+        return new PhoenixTask(pAttachments, pTexts, task.getDescription(), task.getTitle());
     }
 }
