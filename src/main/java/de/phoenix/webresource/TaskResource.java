@@ -53,8 +53,6 @@ public class TaskResource {
         Session session = DatabaseManager.getSession();
         Transaction trans = session.beginTransaction();
 
-        Task task = new Task();
-        task.setDescription(phoenixTask.getDescription());
         List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
         for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
             Attachment at = new Attachment(attachment);
@@ -73,9 +71,7 @@ public class TaskResource {
             texts.add(text);
         }
 
-        task.setAttachments(attachments);
-        task.setTexts(texts);
-
+        Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);
         session.save(task);
 
         trans.commit();
@@ -92,6 +88,7 @@ public class TaskResource {
         Session session = DatabaseManager.getSession();
         List<Task> tasks = session.getNamedQuery("Task.findAll").list();
         List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
+
         for (Task task : tasks) {
             List<Attachment> attachments = task.getAttachments();
             List<PhoenixAttachment> pAttachments = new ArrayList<PhoenixAttachment>(attachments.size());
@@ -105,7 +102,7 @@ public class TaskResource {
                 pTexts.add(new PhoenixText(tx.getContent(), tx.getCreationDate(), tx.getName(), tx.getType()));
             }
 
-            result.add(new PhoenixTask(pAttachments, pTexts, task.getDescription()));
+            result.add(new PhoenixTask(pAttachments, pTexts, task.getDescription(), task.getTitle()));
         }
 
         // Encapsulate the list to transform it via JXR-RS
@@ -114,62 +111,4 @@ public class TaskResource {
 
         return Response.ok(entity, MediaType.APPLICATION_JSON).build();
     }
-//    @Path("/create")
-//    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response createTask(TaskPool task) {
-//
-//        // Open instance for the database
-//        Session session = DatabaseManager.getInstance().openSession();
-//        Transaction trans = session.beginTransaction();
-//
-//        // Store tags in database
-//        for (Tag tag : task.getTags()) {
-//            // Check if task is already existing (avoid duplicate tags in
-//            // database)
-//            Query q = session.getNamedQuery("Tag.findByTag").setString("tag", tag.getTag());
-//            Object c = q.uniqueResult();
-//            // Is existing
-//            if (c == null) {
-//                // Store new task in database and assign local object to created
-//                // in database
-//                tag.setId((Integer) session.save(tag));
-//            } else {
-//                // use existing object in database
-//                Tag tmp = (Tag) c;
-//                tag.setId(tmp.getId());
-//            }
-//        }
-//        // Save task in database
-//        session.save(task);
-//
-//        // Close transaction
-//        trans.commit();
-//        session.close();
-//
-//        return Response.ok().build();
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Path("/getAll")
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getAll() {
-//
-//        // Open instance for the database
-//        Session session = DatabaseManager.getInstance().openSession();
-//        // Get all tasks from database
-//        List<TaskPool> result = session.getNamedQuery("TaskPool.findAll").list();
-//
-//        for (TaskPool taskPool : result) {
-//            taskPool.setAutomaticTaskList(Collections.<AutomaticTask>emptyList());
-//            taskPool.setTasks(Collections.<Task>emptyList());
-//        }
-//        
-//        // Encapsulate the list to transform it via JXR-RS
-//        final GenericEntity<List<TaskPool>> entity = new GenericEntity<List<TaskPool>>(result) {
-//        };
-//
-//        return Response.ok(entity).build();
-//    }
 }

@@ -18,6 +18,7 @@
 
 package de.phoenix.task;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -74,6 +75,9 @@ public class TaskTest {
 //        trans.commit();
     }
 
+    private static String TEST_TITLE = "TestAufgabe";
+    private static String TEST_DESCRIPTION = "Schauen Sie aus dem Fenster";
+
     @Test
     public void createTask() {
 
@@ -94,7 +98,7 @@ public class TaskTest {
         // Get webresource
         WebResource wr = c.resource(BASE_URI).path("task").path("create");
         try {
-            PhoenixTask task = new PhoenixTask("TestAufgabe", ats, texts);
+            PhoenixTask task = new PhoenixTask(TEST_TITLE, TEST_DESCRIPTION, ats, texts);
             ClientResponse post = task.send(wr);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
@@ -112,14 +116,16 @@ public class TaskTest {
 
         List<PhoenixTask> tasks = resp.getEntity(genericPTask);
 
+        assertFalse("TaskList is empty!", tasks.isEmpty());
         for (PhoenixTask phoenixTask : tasks) {
-            System.out.println(phoenixTask.getDescription());
+            assertTrue(phoenixTask.getTitle(), phoenixTask.getTitle().equals(TEST_TITLE));
+            assertTrue(phoenixTask.getDescription(), phoenixTask.getDescription().equals(TEST_DESCRIPTION));
             List<PhoenixText> pattern = phoenixTask.getPattern();
+            assertFalse("PatternList is empty!", pattern.isEmpty());
             for (PhoenixText pat : pattern) {
-                System.out.println(pat.getText());
+                assertFalse("Patterntext is empty!", pat.getText().isEmpty());
             }
         }
-
     }
 
 }

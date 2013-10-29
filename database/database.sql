@@ -10,6 +10,7 @@ USE `phoenix` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(45) NULL,
   `description` LONGTEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;

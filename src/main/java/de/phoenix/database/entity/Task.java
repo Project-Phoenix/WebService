@@ -46,7 +46,8 @@ import javax.xml.bind.annotation.XmlTransient;
 //@formatter:off
 @NamedQueries({
     @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
-    @NamedQuery(name = "Task.findById", query = "SELECT t FROM Task t WHERE t.id = :id")})
+    @NamedQuery(name = "Task.findById", query = "SELECT t FROM Task t WHERE t.id = :id"),
+    @NamedQuery(name = "Task.findByTitle", query = "SELECT t FROM Task t WHERE t.title = :title")})
 //@formatter:on
 public class Task implements Serializable {
 
@@ -57,6 +58,9 @@ public class Task implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
+    @Column(name = "title")
+    private String title;
 
     @Lob
     @Column(name = "description")
@@ -80,7 +84,7 @@ public class Task implements Serializable {
     //@formatter:on
     @ManyToMany
     private List<Text> textList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
     private List<TaskSubmission> taskSubmissionList;
 
@@ -97,12 +101,27 @@ public class Task implements Serializable {
         this.id = id;
     }
 
+    public Task(String title, String description, List<Attachment> attachmentList, List<Text> textList) {
+        this.title = title;
+        this.description = description;
+        this.attachmentList = attachmentList;
+        this.textList = textList;
+    }
+
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -139,7 +158,7 @@ public class Task implements Serializable {
     public void setTexts(List<Text> texts) {
         this.textList = texts;
     }
-    
+
     @XmlTransient
     public List<TaskSubmission> getTaskSubmissions() {
         return taskSubmissionList;
