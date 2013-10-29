@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import de.phoenix.database.DatabaseManager;
 
@@ -49,10 +50,13 @@ public class DatabaseCleaner {
         SQLQuery query = session.createSQLQuery("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE();");
 
         List<String> tableNames = query.list();
+        Transaction transaction = session.beginTransaction();
         for (String table : tableNames) {
             session.createSQLQuery("DELETE FROM " + table + ";").executeUpdate();
         }
+        transaction.commit();
         session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
+
         session.disconnect();
     }
 
