@@ -40,6 +40,8 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.phoenix.rs.entity.PhoenixText;
+
 @Entity
 @Table(name = "text")
 @XmlRootElement
@@ -98,6 +100,13 @@ public class Text implements Serializable {
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
+    }
+
+    public Text(PhoenixText text) {
+        this.content = text.getText();
+        this.creationDate = text.getCreationDate();
+        this.name = text.getName();
+        this.type = text.getType();
     }
 
     public Integer getId() {

@@ -18,12 +18,14 @@
 
 package de.phoenix.task;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,30 +33,28 @@ import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.net.httpserver.HttpServer;
 
+import de.phoenix.TestHttpServer;
 import de.phoenix.rs.entity.PhoenixTask;
-//import de.phoenix.database.entity.Tag;
-//import de.phoenix.database.entity.TaskPool;
+import de.phoenix.rs.entity.PhoenixText;
 
 public class TaskTest {
 
-    private final static String BASE_URL = "http://localhost:7766/rest";
+    private final static String BASE_URI = "http://localhost:7766/rest";
 
-    private static HttpServer httpServer;
+    private static TestHttpServer httpServer;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         // Start Http Server
-        httpServer = HttpServerFactory.create(BASE_URL);
-        httpServer.start();
+        httpServer = new TestHttpServer(BASE_URI);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        httpServer.stop(0);
+        httpServer.stop();
         cleanupDatabase();
     }
 
@@ -77,15 +77,9 @@ public class TaskTest {
     @Test
     public void createTask() {
 
-        // Create client
-        Client c = Client.create();
-        // Get webresource
-        WebResource wr = c.resource(BASE_URL).path("task").path("create");
-
         List<File> ats = new ArrayList<File>();
         List<File> texts = new ArrayList<File>();
 
-//        ats.add(new File("src/test/resources/Pho"))
         File logo = new File("src/test/resources/PhoenixLogo2013.png");
         if (!logo.exists())
             fail("Logo does not exists");
@@ -95,59 +89,37 @@ public class TaskTest {
         File permissionstxt = new File("src/test/resources/permissions.txt");
         texts.add(permissionstxt);
 
-        PhoenixTask task = new PhoenixTask("TestAufgabe", ats, texts);
-        
-//        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
-        ClientResponse post = task.send(wr);
-        
-        System.out.println(post);
+        // Create client
+        Client c = Client.create();
+        // Get webresource
+        WebResource wr = c.resource(BASE_URI).path("task").path("create");
+        try {
+            PhoenixTask task = new PhoenixTask("TestAufgabe", ats, texts);
+            ClientResponse post = task.send(wr);
+            assertTrue(post.toString(), post.getStatus() == 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
 
-//        // Create test task
-//        TaskPool testTask = new TaskPool("Test Task", "This is a test description");
-//
-//        // Create test tags for the task
-//        List<Tag> testTags = Arrays.asList(new Tag("Dev"), new Tag("Test"));
-//        // Assign the tags to the task
-//        testTask.setTags(testTags);
-//
-//        // Call Resource to store the task
-//        ClientResponse cr = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, testTask);
-//
-//        // TEST: DO NOT COPY
-//        // Must be 200 when tasks are stored
-//        assertTrue(cr.toString(), cr.getStatus() == 200);
+        WebResource wr2 = c.resource(BASE_URI).path("task").path("getAll");
+        ClientResponse resp = wr2.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-    }
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
+        };
 
-    @Test
-    public void getTasks() {
-//        // Create client
-//        Client c = Client.create();
-//        // Get webresource
-//        WebResource wr = c.resource(BASE_URL).path("task").path("getAll");
-//
-//        // Call Resource to store the task
-//        ClientResponse cr = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-//
-//        assertTrue(cr.toString(), cr.getStatus() == 200);
-//
-//        // Ugly constructs to receive lists of generic types - no other way to
-//        // solve this
-//        GenericType<List<TaskPool>> submissionType = new GenericType<List<TaskPool>>() {
-//        };
-//
-//        List<TaskPool> result = cr.getEntity(submissionType);
-//
-//        for (TaskPool task : result) {
-//
-//            assertFalse(task.getName().isEmpty());
-//            assertFalse(task.getDescription().isEmpty());
-//
-//            for (Tag tag : task.getTags()) {
-//                assertFalse(tag.getTag().isEmpty());
-//            }
-//
-//        }
+        List<PhoenixTask> tasks = resp.getEntity(genericPTask);
+
+        for (PhoenixTask phoenixTask : tasks) {
+            System.out.println(phoenixTask.getDescription());
+            List<PhoenixText> pattern = phoenixTask.getPattern();
+            for (PhoenixText pat : pattern) {
+                System.out.println(pat.getText());
+            }
+        }
+
     }
 
 }

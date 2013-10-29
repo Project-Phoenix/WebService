@@ -36,6 +36,18 @@ public class DatabaseManager {
         return INSTANCE;
     }
 
+    /**
+     * Shortcut for DatabaseManager.getInstance().openSession().<br>
+     * See {@link #openSession()}
+     * 
+     * @return A session for the database
+     */
+    public static Session getSession() {
+        if (getInstance() == null)
+            return null;
+        return getInstance().openSession();
+    }
+
     /* Singletone End */
 
     private final SessionFactory sessionFactory;

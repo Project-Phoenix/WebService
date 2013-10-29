@@ -18,136 +18,101 @@
 
 package de.phoenix.webresource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataMultiPart;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.Text;
-
-//import java.util.Collections;
-//import java.util.List;
-//
-//import javax.ws.rs.Consumes;
-//import javax.ws.rs.GET;
-//import javax.ws.rs.POST;
-//import javax.ws.rs.Path;
-//import javax.ws.rs.Produces;
-//import javax.ws.rs.core.GenericEntity;
-//import javax.ws.rs.core.MediaType;
-//import javax.ws.rs.core.Response;
-//
-//import org.hibernate.Query;
-//import org.hibernate.Session;
-//import org.hibernate.Transaction;
-//
-//import de.phoenix.database.DatabaseManager;
-//import de.phoenix.database.entity.AutomaticTask;
-//import de.phoenix.database.entity.Tag;
-//import de.phoenix.database.entity.Task;
-//import de.phoenix.database.entity.TaskPool;
+import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixText;
 
 @Path("/task")
 public class TaskResource {
 
     @Path("/create")
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response create(FormDataMultiPart multiPart) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(PhoenixTask phoenixTask) {
 
-        Session session = DatabaseManager.getInstance().openSession();
-        List<Attachment> attachments = createAttachments(multiPart.getFields("attachment"), session);
-        List<Text> pattern = createPattern(multiPart.getFields("pattern"), session);
+        Session session = DatabaseManager.getSession();
+        Transaction trans = session.beginTransaction();
+
         Task task = new Task();
+        task.setDescription(phoenixTask.getDescription());
+        List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
+        for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
+            Attachment at = new Attachment(attachment);
+            Integer id = (Integer) session.save(at);
+            at.setId(id);
+
+            attachments.add(at);
+        }
+
+        List<Text> texts = new ArrayList<Text>(phoenixTask.getPatternSize());
+        for (PhoenixText attachment : phoenixTask.getPattern()) {
+            Text text = new Text(attachment);
+            Integer id = (Integer) session.save(text);
+            text.setId(id);
+
+            texts.add(text);
+        }
+
         task.setAttachments(attachments);
+        task.setTexts(texts);
 
-        task.setTexts(pattern);
-        task.setDescription(multiPart.getField("description").getValue());
-
-        Transaction beginTransaction = session.beginTransaction();
         session.save(task);
-        beginTransaction.commit();
+
+        trans.commit();
 
         return Response.ok().build();
     }
 
-    private List<Attachment> createAttachments(List<FormDataBodyPart> list, Session session) {
-        List<Attachment> result = new ArrayList<Attachment>();
+    @SuppressWarnings("unchecked")
+    @Path("/getAll")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAll() throws SQLException {
 
-        for (FormDataBodyPart bodyPart : list) {
-
-            Transaction trans = session.beginTransaction();
-
-            try {
-                File file = bodyPart.getEntityAs(File.class);
-
-                FileInputStream fin = new FileInputStream(file);
-                Blob blob = Hibernate.createBlob(fin);
-
-                String fileName = bodyPart.getContentDisposition().getFileName();
-                int fileSeperator = fileName.lastIndexOf('.');
-                String fileType = fileName.substring(fileSeperator + 1);
-                fileName = fileName.substring(0, fileSeperator);
-                Attachment at = new Attachment(blob, new Date(), fileName, fileType);
-
-                Integer id = (Integer) session.save(at);
-                at.setId(id);
-
-                result.add(at);
-            } catch (Exception e) {
-                e.printStackTrace();
+        Session session = DatabaseManager.getSession();
+        List<Task> tasks = session.getNamedQuery("Task.findAll").list();
+        List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
+        for (Task task : tasks) {
+            List<Attachment> attachments = task.getAttachments();
+            List<PhoenixAttachment> pAttachments = new ArrayList<PhoenixAttachment>(attachments.size());
+            for (Attachment at : attachments) {
+                pAttachments.add(new PhoenixAttachment(at.getFile().getBytes(1, (int) at.getFile().length()), at.getCreationDate(), at.getName(), at.getName()));
             }
-            trans.commit();
+
+            List<Text> texts = task.getTexts();
+            List<PhoenixText> pTexts = new ArrayList<PhoenixText>(texts.size());
+            for (Text tx : texts) {
+                pTexts.add(new PhoenixText(tx.getContent(), tx.getCreationDate(), tx.getName(), tx.getType()));
+            }
+
+            result.add(new PhoenixTask(pAttachments, pTexts, task.getDescription()));
         }
 
-        return result;
-    }
+        // Encapsulate the list to transform it via JXR-RS
+        final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
+        };
 
-    private List<Text> createPattern(List<FormDataBodyPart> list, Session session) {
-        List<Text> result = new ArrayList<Text>();
-
-        for (FormDataBodyPart bodyPart : list) {
-            Transaction trans = session.beginTransaction();
-
-            try {
-                String context = bodyPart.getEntityAs(String.class);
-
-                String fileName = bodyPart.getContentDisposition().getFileName();
-                int fileSeperator = fileName.lastIndexOf('.');
-                String fileType = fileName.substring(fileSeperator + 1);
-                fileName = fileName.substring(0, fileSeperator);
-                Text text = new Text(context, new Date(), fileName, fileType);
-
-                Integer id = (Integer) session.save(text);
-                text.setId(id);
-
-                result.add(text);
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-            trans.commit();
-        }
-
-        return result;
+        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
     }
 //    @Path("/create")
 //    @POST

@@ -55,7 +55,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.glassfish.distributions</groupId>
 			<artifactId>web-all</artifactId>

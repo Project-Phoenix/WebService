@@ -39,6 +39,10 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.lob.BlobImpl;
+
+import de.phoenix.rs.entity.PhoenixAttachment;
+
 @Entity
 @Table(name = "attachment")
 @XmlRootElement
@@ -94,6 +98,10 @@ public class Attachment implements Serializable {
         this.type = type;
     }
 
+    public Attachment(PhoenixAttachment attachment) {
+        this(new BlobImpl(attachment.getContent()), attachment.getCreationDate(), attachment.getName(), attachment.getType());
+    }
+
     public Integer getId() {
         return id;
     }
@@ -133,7 +141,7 @@ public class Attachment implements Serializable {
     public void setType(String type) {
         this.type = type;
     }
-    
+
     @XmlTransient
     public List<TaskSubmission> getTaskSubmissions() {
         return taskSubmissionList;
