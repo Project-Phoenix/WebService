@@ -41,6 +41,7 @@ import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.util.Updateable;
 
 @Path("/task")
 public class TaskResource {
@@ -80,6 +81,28 @@ public class TaskResource {
         return Response.ok().build();
     }
 
+    @Path("/update")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response change(Updateable<PhoenixTask, String> toUpdate) {
+
+        Session session = DatabaseManager.getSession();
+
+        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", toUpdate.getKey()).uniqueResult();
+        if (task == null)
+            return Response.notModified().entity("No entity found by this title!").build();
+
+        PhoenixTask phoenixTask = toUpdate.getVal();
+        task.setDescription(phoenixTask.getDescription());
+        task.setTitle(phoenixTask.getTitle());
+
+        // TODO: Update attachments and pattern
+        session.update(task);
+
+        session.disconnect();
+        return Response.ok().build();
+    }
+
     @SuppressWarnings("unchecked")
     @Path("/getAll")
     @GET
@@ -111,7 +134,7 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
 
-        List<Task> tasks = session.getNamedQuery("Task.findByTitle").list();
+        List<Task> tasks = session.getNamedQuery("Task.findByTitle").setString("title", title).list();
         session.disconnect();
 
         List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());

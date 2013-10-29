@@ -41,6 +41,7 @@ import de.phoenix.DatabaseCleaner;
 import de.phoenix.TestHttpServer;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.util.Updateable;
 
 public class TaskTest {
 
@@ -115,6 +116,17 @@ public class TaskTest {
                 assertFalse("Patterntext is empty!", pat.getText().isEmpty());
             }
         }
-    }
 
+        WebResource wr3 = c.resource(BASE_URI).path("task").path("update");
+
+        try {
+            PhoenixTask task = new PhoenixTask("Neuer Title", TEST_DESCRIPTION, ats, texts);
+            Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
+            ClientResponse post = wr3.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
+            assertTrue(post.toString(), post.getStatus() == 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }
