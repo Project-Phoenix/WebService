@@ -86,7 +86,7 @@ public class TaskTest {
         // Create client
         Client c = Client.create();
         // Get webresource
-        WebResource wr = c.resource(BASE_URI).path("task").path("create");
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
         try {
             PhoenixTask task = new PhoenixTask(TEST_TITLE, TEST_DESCRIPTION, ats, texts);
             ClientResponse post = task.send(wr);
@@ -96,7 +96,7 @@ public class TaskTest {
             fail();
         }
 
-        WebResource wr2 = c.resource(BASE_URI).path("task").path("getAll");
+        WebResource wr2 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
         ClientResponse resp = wr2.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
         // Ugly constructs to receive lists of generic types - no other way to
@@ -117,7 +117,7 @@ public class TaskTest {
             }
         }
 
-        WebResource wr3 = c.resource(BASE_URI).path("task").path("update");
+        WebResource wr3 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
         try {
             PhoenixTask task = new PhoenixTask("Neuer Title", TEST_DESCRIPTION, ats, texts);

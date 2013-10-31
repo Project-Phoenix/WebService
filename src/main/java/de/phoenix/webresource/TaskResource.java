@@ -43,10 +43,10 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.Updateable;
 
-@Path("/task")
+@Path("/" + PhoenixTask.WEB_RESOURCE_ROOT)
 public class TaskResource {
 
-    @Path("/create")
+    @Path("/" + PhoenixTask.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(PhoenixTask phoenixTask) {
@@ -81,7 +81,7 @@ public class TaskResource {
         return Response.ok().build();
     }
 
-    @Path("/update")
+    @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response change(Updateable<PhoenixTask, String> toUpdate) {
@@ -104,7 +104,7 @@ public class TaskResource {
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/getAll")
+    @Path("/" + PhoenixTask.WEB_RESOURCE_GETALL)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() throws SQLException {
@@ -127,7 +127,7 @@ public class TaskResource {
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/getByTitle")
+    @Path("/" + PhoenixTask.WEB_RESOURCE_GETBYTITLE)
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response getByTitle(String title) throws SQLException {
