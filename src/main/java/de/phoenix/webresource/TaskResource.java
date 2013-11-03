@@ -102,6 +102,23 @@ public class TaskResource {
         return Response.ok().build();
     }
 
+    @Path("/" + PhoenixTask.WEB_RESOURCE_DELETE)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response delete(PhoenixTask phoenixTask) {
+
+        Session session = DatabaseManager.getSession();
+
+        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
+        if (task == null)
+            return Response.notModified().entity("No entity found by this title!").build();
+
+        session.delete(task);
+
+        session.disconnect();
+        return Response.ok().build();
+    }
+
     @SuppressWarnings("unchecked")
     @Path("/" + PhoenixTask.WEB_RESOURCE_GETALL)
     @GET
