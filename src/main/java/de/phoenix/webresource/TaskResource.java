@@ -96,7 +96,6 @@ public class TaskResource {
         task.setDescription(phoenixTask.getDescription());
         task.setTitle(phoenixTask.getTitle());
 
-        // TODO: Update attachments and pattern
         session.update(task);
 
         session.disconnect();
