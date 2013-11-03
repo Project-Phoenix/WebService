@@ -18,8 +18,13 @@
 
 package de.phoenix.database.entity;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +44,7 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.commons.codec.binary.Hex;
 import org.hibernate.lob.BlobImpl;
 
 import de.phoenix.rs.entity.PhoenixAttachment;
@@ -78,6 +84,9 @@ public class Attachment implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "sha1")
+    private String sha1;
+
     @ManyToMany(mappedBy = "attachmentList")
     private List<TaskSubmission> taskSubmissionList;
 
@@ -96,6 +105,15 @@ public class Attachment implements Serializable {
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
+        this.sha1 = calculateSHA1(file);
+    }
+
+    public Attachment(Blob file, Date creationDate, String name, String type, String sha1) {
+        this.file = file;
+        this.creationDate = creationDate;
+        this.name = name;
+        this.type = type;
+        this.sha1 = sha1;
     }
 
     public Attachment(PhoenixAttachment attachment) {
@@ -142,6 +160,14 @@ public class Attachment implements Serializable {
         this.type = type;
     }
 
+    public String getSha1() {
+        return sha1;
+    }
+
+    public void setSha1(String sha1) {
+        this.sha1 = sha1;
+    }
+
     @XmlTransient
     public List<TaskSubmission> getTaskSubmissions() {
         return taskSubmissionList;
@@ -186,4 +212,25 @@ public class Attachment implements Serializable {
         return "de.phoenix.database.entityt.Attachment[ id=" + id + " ]";
     }
 
+    private String calculateSHA1(Blob file) {
+
+        try {
+            MessageDigest ms = MessageDigest.getInstance("SHA1");
+            InputStream binaryStream = file.getBinaryStream();
+            byte[] buffer = new byte[1024];
+            for (int read = 0; (read = binaryStream.read(buffer)) != -1;) {
+                ms.update(buffer, 0, read);
+            }
+            return Hex.encodeHexString(ms.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

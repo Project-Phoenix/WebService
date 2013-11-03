@@ -19,6 +19,8 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +41,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.codec.binary.Hex;
 
 import de.phoenix.rs.entity.PhoenixText;
 
@@ -76,6 +80,9 @@ public class Text implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "sha1")
+    private String sha1;
+
     @ManyToMany(mappedBy = "textList")
     private List<TaskSubmission> taskSubmissionList;
 
@@ -100,13 +107,19 @@ public class Text implements Serializable {
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
+        this.sha1 = calculateSHA1(content.getBytes());
+    }
+
+    public Text(String content, Date creationDate, String name, String type, String sha1) {
+        this.content = content;
+        this.creationDate = creationDate;
+        this.name = name;
+        this.type = type;
+        this.sha1 = sha1;
     }
 
     public Text(PhoenixText text) {
-        this.content = text.getText();
-        this.creationDate = text.getCreationDate();
-        this.name = text.getName();
-        this.type = text.getType();
+        this(text.getText(), text.getCreationDate(), text.getName(), text.getType());
     }
 
     public Integer getId() {
@@ -147,6 +160,14 @@ public class Text implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getSha1() {
+        return sha1;
+    }
+
+    public void setSha1(String sha1) {
+        this.sha1 = sha1;
     }
 
     @XmlTransient
@@ -211,4 +232,14 @@ public class Text implements Serializable {
         return "de.phoenix.database.entityt.Text[ id=" + id + " ]";
     }
 
+    private String calculateSHA1(byte[] bytes) {
+        try {
+            MessageDigest ms = MessageDigest.getInstance("SHA1");
+            ms.update(bytes);
+            return Hex.encodeHexString(ms.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

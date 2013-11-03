@@ -64,12 +64,12 @@ public class TaskResource {
         }
 
         List<Text> texts = new ArrayList<Text>(phoenixTask.getPatternSize());
-        for (PhoenixText attachment : phoenixTask.getPattern()) {
-            Text text = new Text(attachment);
-            Integer id = (Integer) session.save(text);
-            text.setId(id);
+        for (PhoenixText text : phoenixTask.getPattern()) {
+            Text te = new Text(text);
+            Integer id = (Integer) session.save(te);
+            te.setId(id);
 
-            texts.add(text);
+            texts.add(te);
         }
 
         Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);

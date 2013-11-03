@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`attachment` (
   `creationDate` DATETIME NULL,
   `name` VARCHAR(45) NULL,
   `type` VARCHAR(45) NULL,
+  `sha1` VARCHAR(40) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`text` (
   `creationDate` DATETIME NULL,
   `name` VARCHAR(45) NULL,
   `type` VARCHAR(45) NULL,
+  `sha1` VARCHAR(40) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

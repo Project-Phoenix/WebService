@@ -53,12 +53,13 @@ public class TaskTest {
     public static void setUpBeforeClass() throws Exception {
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
+        cleanupDatabase();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
-        cleanupDatabase();
+//        cleanupDatabase();
     }
 
     private static void cleanupDatabase() {
@@ -68,20 +69,27 @@ public class TaskTest {
     private static String TEST_TITLE = "TestAufgabe";
     private static String TEST_DESCRIPTION = "Schauen Sie aus dem Fenster";
 
+    private static File TEST_BINARY_FILE = new File("src/test/resources/PhoenixLogo2013.png");
+    private static File TEST_TEXT_FILE = new File("src/test/resources/permissions.txt");
+
     @Test
     public void createTask() {
 
+        if (!TEST_BINARY_FILE.exists()) {
+            fail("Binary file does not exists!");
+        }
+
+        if (!TEST_TEXT_FILE.exists()) {
+            fail("Text file does not exists!");
+        }
+
+        // Lists for the task
         List<File> ats = new ArrayList<File>();
         List<File> texts = new ArrayList<File>();
 
-        File logo = new File("src/test/resources/PhoenixLogo2013.png");
-        if (!logo.exists())
-            fail("Logo does not exists");
-
-        ats.add(logo);
-
-        File permissionstxt = new File("src/test/resources/permissions.txt");
-        texts.add(permissionstxt);
+        // Add elements for the task
+        ats.add(TEST_BINARY_FILE);
+        texts.add(TEST_TEXT_FILE);
 
         // Create client
         Client c = Client.create();
