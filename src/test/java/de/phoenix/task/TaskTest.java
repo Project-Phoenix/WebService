@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -39,10 +40,13 @@ import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.TestHttpServer;
+import de.phoenix.junit.OrderedRunner;
+import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.Updateable;
 
+@RunWith(OrderedRunner.class)
 public class TaskTest {
 
     private final static String BASE_URI = "http://localhost:7766/rest";
@@ -73,6 +77,7 @@ public class TaskTest {
     private static File TEST_TEXT_FILE = new File("src/test/resources/permissions.txt");
 
     @Test
+    @Order(1)
     public void createTask() {
 
         if (!TEST_BINARY_FILE.exists()) {
@@ -104,6 +109,12 @@ public class TaskTest {
             fail();
         }
 
+    }
+
+    @Test
+    @Order(2)
+    public void getAllTasks() {
+        Client c = Client.create();
         WebResource wr2 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
         ClientResponse resp = wr2.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
@@ -124,7 +135,28 @@ public class TaskTest {
                 assertFalse("Patterntext is empty!", pat.getText().isEmpty());
             }
         }
+    }
 
+    @Test
+    @Order(3)
+    public void getSingleTask() {
+
+        if (!TEST_BINARY_FILE.exists()) {
+            fail("Binary file does not exists!");
+        }
+
+        if (!TEST_TEXT_FILE.exists()) {
+            fail("Text file does not exists!");
+        }
+
+        // Lists for the task
+        List<File> ats = new ArrayList<File>();
+        List<File> texts = new ArrayList<File>();
+
+        // Add elements for the task
+        ats.add(TEST_BINARY_FILE);
+        texts.add(TEST_TEXT_FILE);
+        Client c = Client.create();
         WebResource wr3 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
         try {
