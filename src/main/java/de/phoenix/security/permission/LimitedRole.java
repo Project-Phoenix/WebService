@@ -109,7 +109,7 @@ public class LimitedRole extends Role {
      * A disallowed permission overrides the granted permission. This does not
      * changing the whitelist!
      * 
-     * @param permissionNode
+     * @param node
      *            The permission node. Must be in the format "parent.child" or
      *            "parent.*"!
      */
@@ -121,7 +121,7 @@ public class LimitedRole extends Role {
      * Removes the permission from the blacklist. This does not changing the
      * whitelist!
      * 
-     * @param permissionNode
+     * @param node
      *            The permission node. Must be in the format "parent.child" or
      *            "parent.*"!
      */
