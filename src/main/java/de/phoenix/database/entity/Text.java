@@ -19,8 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
@@ -42,9 +40,9 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.codec.binary.Hex;
-
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.util.hash.Hasher;
+import de.phoenix.util.hash.SHA1Hasher;
 
 @Entity
 @Table(name = "text")
@@ -107,7 +105,8 @@ public class Text implements Serializable {
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
-        this.sha1 = calculateSHA1(content.getBytes());
+        Hasher hasher = new SHA1Hasher();
+        this.sha1 = hasher.generate(content);
     }
 
     public Text(String content, Date creationDate, String name, String type, String sha1) {
@@ -230,16 +229,5 @@ public class Text implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entityt.Text[ id=" + id + " ]";
-    }
-
-    private String calculateSHA1(byte[] bytes) {
-        try {
-            MessageDigest ms = MessageDigest.getInstance("SHA1");
-            ms.update(bytes);
-            return Hex.encodeHexString(ms.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

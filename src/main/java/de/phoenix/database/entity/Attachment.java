@@ -18,11 +18,7 @@
 
 package de.phoenix.database.entity;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Date;
@@ -44,10 +40,11 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.codec.binary.Hex;
 import org.hibernate.lob.BlobImpl;
 
 import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.util.hash.Hasher;
+import de.phoenix.util.hash.SHA1Hasher;
 
 @Entity
 @Table(name = "attachment")
@@ -215,21 +212,9 @@ public class Attachment implements Serializable {
     private String calculateSHA1(Blob file) {
 
         try {
-            MessageDigest ms = MessageDigest.getInstance("SHA1");
-            InputStream binaryStream = file.getBinaryStream();
-            byte[] buffer = new byte[1024];
-            for (int read = 0; (read = binaryStream.read(buffer)) != -1;) {
-                ms.update(buffer, 0, read);
-            }
-            return Hex.encodeHexString(ms.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+            Hasher hasher = new SHA1Hasher();
+            return hasher.generate(file.getBinaryStream());
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }
