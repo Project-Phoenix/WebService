@@ -22,8 +22,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -42,6 +46,7 @@ import de.phoenix.DatabaseCleaner;
 import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
+import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.Updateable;
@@ -63,18 +68,16 @@ public class TaskTest {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
-//        cleanupDatabase();
     }
 
     private static void cleanupDatabase() {
         DatabaseCleaner.getInstance().run();
     }
 
-    private static String TEST_TITLE = "TestAufgabe";
-    private static String TEST_DESCRIPTION = "Schauen Sie aus dem Fenster";
-
-    private static File TEST_BINARY_FILE = new File("src/test/resources/PhoenixLogo2013.png");
-    private static File TEST_TEXT_FILE = new File("src/test/resources/permissions.txt");
+    private static String TEST_TITLE = "Befreundete Zahlen";
+    private static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/TaskDescription.html");
+    private static File TEST_BINARY_FILE = new File("src/test/resources/task/FirstNumbers.pdf");
+    private static File TEST_PATTERN_FILE = new File("src/test/resources/task/TaskPattern.java");
 
     @Test
     @Order(1)
@@ -84,8 +87,12 @@ public class TaskTest {
             fail("Binary file does not exists!");
         }
 
-        if (!TEST_TEXT_FILE.exists()) {
+        if (!TEST_PATTERN_FILE.exists()) {
             fail("Text file does not exists!");
+        }
+
+        if (!TEST_DESCRIPTION_FILE.exists()) {
+            fail("Task Description File does not exists!");
         }
 
         // Lists for the task
@@ -94,14 +101,14 @@ public class TaskTest {
 
         // Add elements for the task
         ats.add(TEST_BINARY_FILE);
-        texts.add(TEST_TEXT_FILE);
+        texts.add(TEST_PATTERN_FILE);
 
         // Create client
         Client c = Client.create();
         // Get webresource
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
         try {
-            PhoenixTask task = new PhoenixTask(TEST_TITLE, TEST_DESCRIPTION, ats, texts);
+            PhoenixTask task = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), ats, texts);
             ClientResponse post = task.send(wr);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
@@ -111,12 +118,31 @@ public class TaskTest {
 
     }
 
+    private String getText(File file) {
+        StringBuilder sBuilder = new StringBuilder((int) file.length());
+        try {
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+            byte[] buffer = new byte[2048];
+            int read = 0;
+            while ((read = bis.read(buffer)) != -1) {
+                sBuilder.append(new String(buffer, 0, read));
+            }
+
+            bis.close();
+            return sBuilder.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Test
     @Order(2)
     public void getAllTasks() {
         Client c = Client.create();
-        WebResource wr2 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
-        ClientResponse resp = wr2.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
+        ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
         // Ugly constructs to receive lists of generic types - no other way to
         // solve this
@@ -128,7 +154,7 @@ public class TaskTest {
         assertFalse("TaskList is empty!", tasks.isEmpty());
         for (PhoenixTask phoenixTask : tasks) {
             assertTrue(phoenixTask.getTitle(), phoenixTask.getTitle().equals(TEST_TITLE));
-            assertTrue(phoenixTask.getDescription(), phoenixTask.getDescription().equals(TEST_DESCRIPTION));
+            assertFalse(phoenixTask.getDescription(), phoenixTask.getDescription().isEmpty());
             List<PhoenixText> pattern = phoenixTask.getPattern();
             assertFalse("PatternList is empty!", pattern.isEmpty());
             for (PhoenixText pat : pattern) {
@@ -139,13 +165,37 @@ public class TaskTest {
 
     @Test
     @Order(3)
-    public void getSingleTask() {
+    public void getTaskByTitle() {
+
+        Client c = Client.create();
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
+        assertTrue(post.toString(), post.getStatus() == 200);
+
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
+        };
+
+        List<PhoenixTask> tasks = post.getEntity(genericPTask);
+        assertFalse("Tasks are empty!", tasks.isEmpty());
+        assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
+
+        PhoenixTask task = tasks.get(0);
+        assertTrue("Task does not exists!", task != null);
+        assertTrue("Task title wrong!", task.getTitle().equals(TEST_TITLE));
+
+    }
+
+    @Test
+    @Order(4)
+    public void updateTask() {
 
         if (!TEST_BINARY_FILE.exists()) {
             fail("Binary file does not exists!");
         }
 
-        if (!TEST_TEXT_FILE.exists()) {
+        if (!TEST_PATTERN_FILE.exists()) {
             fail("Text file does not exists!");
         }
 
@@ -155,16 +205,53 @@ public class TaskTest {
 
         // Add elements for the task
         ats.add(TEST_BINARY_FILE);
-        texts.add(TEST_TEXT_FILE);
+        texts.add(TEST_PATTERN_FILE);
         Client c = Client.create();
-        WebResource wr3 = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
         try {
-            PhoenixTask task = new PhoenixTask("Neuer Title", TEST_DESCRIPTION, ats, texts);
+            PhoenixTask task = new PhoenixTask("Neuer Title", getText(TEST_DESCRIPTION_FILE), ats, texts);
             Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
-            ClientResponse post = wr3.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
+            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/TaskSubmission.java");
+
+    @Test
+    @Order(5)
+    public void submitSolution() {
+
+        if (!TEST_SUBMISSION_FILE.exists()) {
+            fail("Submission File does not exists!");
+        }
+
+        Client c = Client.create();
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
+        assertTrue(post.toString(), post.getStatus() == 200);
+
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
+        };
+
+        List<PhoenixTask> tasks = post.getEntity(genericPTask);
+        assertFalse("Tasks are empty!", tasks.isEmpty());
+        assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
+
+        PhoenixTask task = tasks.get(0);
+
+        try {
+            PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
+            wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
+            post = sub.send(wr);
+            assertTrue(post.toString(), post.getStatus() == 200);
+        } catch (IOException e) {
             e.printStackTrace();
             fail();
         }

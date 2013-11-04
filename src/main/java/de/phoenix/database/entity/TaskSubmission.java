@@ -96,6 +96,13 @@ public class TaskSubmission implements Serializable {
         this.date = date;
     }
 
+    public TaskSubmission(Task task, List<Attachment> attachments, List<Text> texts) {
+        this.task = task;
+        this.attachmentList = attachments;
+        this.textList = texts;
+        this.date = new Date();
+    }
+
     public Integer getId() {
         return id;
     }
