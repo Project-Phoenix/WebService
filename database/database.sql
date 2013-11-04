@@ -336,7 +336,7 @@ ENGINE = InnoDB;
 -- Table `phoenix`.`taskSubmission`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmission` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `date` DATETIME NOT NULL,
   `task` INT NOT NULL,
   PRIMARY KEY (`id`),
