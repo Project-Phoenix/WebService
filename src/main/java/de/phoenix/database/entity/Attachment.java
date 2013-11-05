@@ -218,4 +218,15 @@ public class Attachment implements Serializable {
             return null;
         }
     }
+
+    public PhoenixAttachment convert() {
+
+        try {
+            return new PhoenixAttachment(this.getFile().getBytes(1, (int) this.getFile().length()), getCreationDate(), getName(), getType());
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

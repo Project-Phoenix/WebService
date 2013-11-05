@@ -230,4 +230,8 @@ public class Text implements Serializable {
     public String toString() {
         return "de.phoenix.database.entityt.Text[ id=" + id + " ]";
     }
+
+    public PhoenixText convert() {
+        return new PhoenixText(this.getContent(), this.getCreationDate(), this.getName(), this.getType());
+    }
 }

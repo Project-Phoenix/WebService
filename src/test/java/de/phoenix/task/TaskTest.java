@@ -256,4 +256,31 @@ public class TaskTest {
             fail();
         }
     }
+
+    @Test
+    @Order(6)
+    public void getSubmissionForTask() throws IOException {
+
+        Client c = Client.create();
+        WebResource wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
+        PhoenixTask phoenixTask = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), Collections.singletonList(TEST_BINARY_FILE), Collections.singletonList(TEST_PATTERN_FILE));
+
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
+        assertTrue(post.toString(), post.getStatus() == 200);
+
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<PhoenixSubmission>> genericPTask = new GenericType<List<PhoenixSubmission>>() {
+        };
+
+        List<PhoenixSubmission> submissions = post.getEntity(genericPTask);
+        assertFalse("Result is empty!", submissions.isEmpty());
+        for (PhoenixSubmission phoenixSubmission : submissions) {
+            assertTrue(phoenixSubmission.getAttachmentsSize() + "", phoenixSubmission.getAttachmentsSize() == 0);
+            assertTrue(phoenixSubmission.getTextsSize() + "", phoenixSubmission.getTextsSize() == 1);
+            PhoenixText t = phoenixSubmission.getTexts().get(0);
+            assertTrue((t.getName() + "." + t.getType()) + " not equals" + TEST_SUBMISSION_FILE.getName(), (t.getName() + "." + t.getType()).equals(TEST_SUBMISSION_FILE.getName()));
+        }
+
+    }
 }
