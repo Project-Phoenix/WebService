@@ -40,6 +40,12 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixText;
+
 @Entity
 @Table(name = "taskSubmission")
 @XmlRootElement
@@ -49,7 +55,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "TaskSubmission.findById", query = "SELECT t FROM TaskSubmission t WHERE t.id = :id"),
     @NamedQuery(name = "TaskSubmission.findByDate", query = "SELECT t FROM TaskSubmission t WHERE t.date = :date")})
 //@formatter:on
-public class TaskSubmission implements Serializable {
+public class TaskSubmission implements Serializable, Convertable<PhoenixSubmission> {
 
     private static final long serialVersionUID = 1L;
 
@@ -169,6 +175,11 @@ public class TaskSubmission implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entity.TaskSubmission[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixSubmission convert() {
+        return new PhoenixSubmission(getDate(), getTask().convert(), new ConverterArrayList<PhoenixAttachment>(getAttachments()), new ConverterArrayList<PhoenixText>(getTexts()));
     }
 
 }

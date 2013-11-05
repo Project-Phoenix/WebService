@@ -38,6 +38,7 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.Text;
+import de.phoenix.database.entity.util.ConverterArrayList;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
@@ -129,11 +130,7 @@ public class TaskResource {
         List<Task> tasks = session.getNamedQuery("Task.findAll").list();
         session.disconnect();
 
-        List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
-
-        for (Task task : tasks) {
-            result.add(getPhoenixTask(task));
-        }
+        List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
         // Encapsulate the list to transform it via JXR-RS
         final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
@@ -153,32 +150,12 @@ public class TaskResource {
         List<Task> tasks = session.getNamedQuery("Task.findByTitle").setString("title", title).list();
         session.disconnect();
 
-        List<PhoenixTask> result = new ArrayList<PhoenixTask>(tasks.size());
-
-        for (Task task : tasks) {
-            result.add(getPhoenixTask(task));
-        }
+        List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
         // Encapsulate the list to transform it via JXR-RS
         final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
         };
 
         return Response.ok(entity, MediaType.APPLICATION_JSON).build();
-    }
-
-    private PhoenixTask getPhoenixTask(Task task) throws SQLException {
-        List<Attachment> attachments = task.getAttachments();
-        List<PhoenixAttachment> pAttachments = new ArrayList<PhoenixAttachment>(attachments.size());
-        for (Attachment at : attachments) {
-            pAttachments.add(new PhoenixAttachment(at.getFile().getBytes(1, (int) at.getFile().length()), at.getCreationDate(), at.getName(), at.getName()));
-        }
-
-        List<Text> texts = task.getTexts();
-        List<PhoenixText> pTexts = new ArrayList<PhoenixText>(texts.size());
-        for (Text tx : texts) {
-            pTexts.add(new PhoenixText(tx.getContent(), tx.getCreationDate(), tx.getName(), tx.getType()));
-        }
-
-        return new PhoenixTask(pAttachments, pTexts, task.getDescription(), task.getTitle());
     }
 }

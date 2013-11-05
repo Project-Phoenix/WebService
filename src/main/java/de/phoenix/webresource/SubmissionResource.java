@@ -36,6 +36,7 @@ import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
+import de.phoenix.database.entity.util.ConverterArrayList;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
@@ -100,7 +101,7 @@ public class SubmissionResource {
     public Response getSubmissionsForTask(PhoenixTask phoenixTask) {
 
         Session session = DatabaseManager.getSession();
-        
+
         // Get task from database
         Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
         if (task == null)
@@ -110,20 +111,7 @@ public class SubmissionResource {
         List<TaskSubmission> submissions = task.getTaskSubmissions();
 
         // List containing the result
-        List<PhoenixSubmission> result = new ArrayList<PhoenixSubmission>();
-
-        // Convert the submission to phoenix submission
-        for (TaskSubmission submission : submissions) {
-            List<PhoenixAttachment> attachmentList = new ArrayList<PhoenixAttachment>();
-            for (Attachment attachment : submission.getAttachments()) {
-                attachmentList.add(attachment.convert());
-            }
-            List<PhoenixText> texts = new ArrayList<PhoenixText>();
-            for (Text text : submission.getTexts()) {
-                texts.add(text.convert());
-            }
-            result.add(new PhoenixSubmission(submission.getDate(), phoenixTask, attachmentList, texts));
-        }
+        List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
 
         // Encapsulate the list to transform it via JXR-RS
         final GenericEntity<List<PhoenixSubmission>> entity = new GenericEntity<List<PhoenixSubmission>>(result) {

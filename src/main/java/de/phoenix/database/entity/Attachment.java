@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.lob.BlobImpl;
 
+import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.util.hash.Hasher;
 import de.phoenix.util.hash.SHA1Hasher;
@@ -57,7 +58,7 @@ import de.phoenix.util.hash.SHA1Hasher;
     @NamedQuery(name = "Attachment.findByName", query = "SELECT a FROM Attachment a WHERE a.name = :name"),
     @NamedQuery(name = "Attachment.findByType", query = "SELECT a FROM Attachment a WHERE a.type = :type")})
 //@formatter:on
-public class Attachment implements Serializable {
+public class Attachment implements Serializable, Convertable<PhoenixAttachment> {
 
     private static final long serialVersionUID = 1L;
 
@@ -224,7 +225,6 @@ public class Attachment implements Serializable {
         try {
             return new PhoenixAttachment(this.getFile().getBytes(1, (int) this.getFile().length()), getCreationDate(), getName(), getType());
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }

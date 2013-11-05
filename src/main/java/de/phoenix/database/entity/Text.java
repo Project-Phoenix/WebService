@@ -40,6 +40,7 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.hash.Hasher;
 import de.phoenix.util.hash.SHA1Hasher;
@@ -55,7 +56,7 @@ import de.phoenix.util.hash.SHA1Hasher;
     @NamedQuery(name = "Text.findByName", query = "SELECT t FROM Text t WHERE t.name = :name"),
     @NamedQuery(name = "Text.findByType", query = "SELECT t FROM Text t WHERE t.type = :type")})
 //@formatter:on
-public class Text implements Serializable {
+public class Text implements Serializable, Convertable<PhoenixText> {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -231,6 +232,7 @@ public class Text implements Serializable {
         return "de.phoenix.database.entityt.Text[ id=" + id + " ]";
     }
 
+    @Override
     public PhoenixText convert() {
         return new PhoenixText(this.getContent(), this.getCreationDate(), this.getName(), this.getType());
     }
