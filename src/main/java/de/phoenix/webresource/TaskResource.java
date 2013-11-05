@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Attachment;
@@ -154,6 +155,23 @@ public class TaskResource {
 
         // Encapsulate the list to transform it via JXR-RS
         final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
+        };
+
+        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Path("/" + PhoenixTask.WEB_RESOURCE_GETALL_TITLES)
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllTitles() {
+
+        Session session = DatabaseManager.getSession();
+
+        List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
+
+        // Encapsulate the list to transform it via JXR-RS
+        final GenericEntity<List<String>> entity = new GenericEntity<List<String>>(result) {
         };
 
         return Response.ok(entity, MediaType.APPLICATION_JSON).build();

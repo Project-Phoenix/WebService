@@ -283,4 +283,26 @@ public class TaskTest {
         }
 
     }
+
+    @Test
+    @Order(7)
+    public void getAllTitles() {
+        Client c = Client.create();
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
+
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertTrue(post.toString(), post.getStatus() == 200);
+
+        // Ugly constructs to receive lists of generic types - no other way to
+        // solve this
+        GenericType<List<String>> genericString = new GenericType<List<String>>() {
+        };
+
+        List<String> titles = post.getEntity(genericString);
+
+        assertFalse("Title list is empty!", titles.isEmpty());
+        assertTrue("Title list contain more than 0 elements , " + titles.size(), titles.size() == 1);
+        assertTrue(titles.get(0) + " is not " + TEST_TITLE, titles.get(0).equals(TEST_TITLE));
+
+    }
 }
