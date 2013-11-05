@@ -109,7 +109,7 @@ public class TaskTest {
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
         try {
             PhoenixTask task = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), ats, texts);
-            ClientResponse post = task.send(wr);
+            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
             e.printStackTrace();
@@ -249,7 +249,7 @@ public class TaskTest {
         try {
             PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
             wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
-            post = sub.send(wr);
+            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (IOException e) {
             e.printStackTrace();
