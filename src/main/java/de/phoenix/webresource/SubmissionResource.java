@@ -24,6 +24,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -51,6 +52,7 @@ public class SubmissionResource {
     @Path("/" + PhoenixSubmission.WEB_RESOURCE_SUBMIT)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response submit(PhoenixSubmission phoenixSubmission) {
 
         Session session = DatabaseManager.getSession();
@@ -83,20 +85,24 @@ public class SubmissionResource {
         }
 
         // Store the submission itself
-        TaskSubmission submission = new TaskSubmission(task, attachments, texts);
+        // TODO: PLACEHOLDER
+        TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
+
         // Save it
         session.save(submission);
 
+        // Return the result object
+        phoenixSubmission = submission.convert();
         // Close connection
         trans.commit();
-        session.disconnect();
 
-        return Response.ok().build();
+        return Response.ok(phoenixSubmission).build();
     }
 
     @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getSubmissionsForTask(PhoenixTask phoenixTask) {
 
         Session session = DatabaseManager.getSession();
@@ -112,6 +118,6 @@ public class SubmissionResource {
         // List containing the result
         List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
 
-        return Response.ok(PhoenixSubmission.toSendableList(result), MediaType.APPLICATION_JSON).build();
+        return Response.ok(PhoenixSubmission.toSendableList(result)).build();
     }
 }

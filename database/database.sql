@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NULL,
   `description` LONGTEXT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `title` (`title` ASC))
 ENGINE = InnoDB;
 
 
@@ -339,6 +340,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmission` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `date` DATETIME NOT NULL,
   `task` INT NOT NULL,
+  `status` INT NULL,
+  `statusText` LONGTEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_taskSubmission_task1_idx` (`task` ASC),
   CONSTRAINT `fk_taskSubmission_task1`

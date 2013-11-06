@@ -30,6 +30,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -70,6 +71,12 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
+    @Column(name = "status")
+    private Integer status;
+    @Lob
+    @Column(name = "statusText")
+    private String statusText;
+
     //@formatter:off
     @JoinTable(name = "taskSubmissionAttachment", joinColumns = {
         @JoinColumn(name = "taskSubmission_id", referencedColumnName = "id")}, inverseJoinColumns = {
@@ -102,11 +109,13 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.date = date;
     }
 
-    public TaskSubmission(Task task, List<Attachment> attachments, List<Text> texts) {
+    public TaskSubmission(int status, String statusText, Task task, List<Attachment> attachments, List<Text> texts) {
         this.task = task;
         this.attachmentList = attachments;
         this.textList = texts;
         this.date = new Date();
+        this.status = status;
+        this.statusText = statusText;
     }
 
     public Integer getId() {
@@ -123,6 +132,22 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getStatusText() {
+        return statusText;
+    }
+
+    public void setStatusText(String statusText) {
+        this.statusText = statusText;
     }
 
     @XmlTransient
@@ -179,7 +204,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     @Override
     public PhoenixSubmission convert() {
-        return new PhoenixSubmission(getDate(), getTask().convert(), new ConverterArrayList<PhoenixAttachment>(getAttachments()), new ConverterArrayList<PhoenixText>(getTexts()));
+        return new PhoenixSubmission(getDate(), getTask().convert(), getStatus(), getStatusText(), new ConverterArrayList<PhoenixAttachment>(getAttachments()), new ConverterArrayList<PhoenixText>(getTexts()));
     }
 
 }

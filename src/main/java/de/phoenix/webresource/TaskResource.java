@@ -78,7 +78,6 @@ public class TaskResource {
         session.save(task);
 
         trans.commit();
-        session.disconnect();
 
         return Response.ok().build();
     }
@@ -100,7 +99,6 @@ public class TaskResource {
 
         session.update(task);
 
-        session.disconnect();
         return Response.ok().build();
     }
 
@@ -117,7 +115,6 @@ public class TaskResource {
 
         session.delete(task);
 
-        session.disconnect();
         return Response.ok().build();
     }
 
@@ -129,28 +126,27 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
         List<Task> tasks = session.getNamedQuery("Task.findAll").list();
-        session.disconnect();
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
         // Encapsulate the list to transform it via JXR-RS
-        return Response.ok(PhoenixTask.toSendableList(result), MediaType.APPLICATION_JSON).build();
+        return Response.ok(PhoenixTask.toSendableList(result)).build();
     }
 
     @SuppressWarnings("unchecked")
     @Path("/" + PhoenixTask.WEB_RESOURCE_GETBYTITLE)
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getByTitle(String title) throws SQLException {
 
         Session session = DatabaseManager.getSession();
 
         List<Task> tasks = session.getNamedQuery("Task.findByTitle").setString("title", title).list();
-        session.disconnect();
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
-        return Response.ok(PhoenixTask.toSendableList(result), MediaType.APPLICATION_JSON).build();
+        return Response.ok(PhoenixTask.toSendableList(result)).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -163,6 +159,6 @@ public class TaskResource {
 
         List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
 
-        return Response.ok(RSLists.toSendableStringList(result), MediaType.APPLICATION_JSON).build();
+        return Response.ok(RSLists.toSendableStringList(result)).build();
     }
 }

@@ -164,7 +164,7 @@ public class TaskTest {
 
         Client c = Client.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
-        ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
         List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
@@ -222,7 +222,7 @@ public class TaskTest {
 
         Client c = Client.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
-        ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
         List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
