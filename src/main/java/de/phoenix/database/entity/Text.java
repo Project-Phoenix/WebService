@@ -119,7 +119,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     }
 
     public Text(PhoenixText text) {
-        this(text.getText(), text.getCreationDate(), text.getName(), text.getType());
+        this(text.getText(), new Date(), text.getName(), text.getType());
     }
 
     public Integer getId() {

@@ -115,7 +115,7 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
     }
 
     public Attachment(PhoenixAttachment attachment) {
-        this(new BlobImpl(attachment.getContent()), attachment.getCreationDate(), attachment.getName(), attachment.getType());
+        this(new BlobImpl(attachment.getContent()), new Date(), attachment.getName(), attachment.getType());
     }
 
     public Integer getId() {
