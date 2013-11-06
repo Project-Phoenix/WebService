@@ -27,7 +27,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -43,6 +42,7 @@ import de.phoenix.database.entity.util.ConverterArrayList;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.util.RSLists;
 import de.phoenix.util.Updateable;
 
 @Path("/" + PhoenixTask.WEB_RESOURCE_ROOT)
@@ -134,10 +134,7 @@ public class TaskResource {
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
         // Encapsulate the list to transform it via JXR-RS
-        final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
-        };
-
-        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+        return Response.ok(PhoenixTask.toSendableList(result), MediaType.APPLICATION_JSON).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -153,11 +150,7 @@ public class TaskResource {
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
 
-        // Encapsulate the list to transform it via JXR-RS
-        final GenericEntity<List<PhoenixTask>> entity = new GenericEntity<List<PhoenixTask>>(result) {
-        };
-
-        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+        return Response.ok(PhoenixTask.toSendableList(result), MediaType.APPLICATION_JSON).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -170,10 +163,6 @@ public class TaskResource {
 
         List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
 
-        // Encapsulate the list to transform it via JXR-RS
-        final GenericEntity<List<String>> entity = new GenericEntity<List<String>>(result) {
-        };
-
-        return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+        return Response.ok(RSLists.toSendableStringList(result), MediaType.APPLICATION_JSON).build();
     }
 }

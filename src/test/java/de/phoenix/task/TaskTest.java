@@ -39,7 +39,6 @@ import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
@@ -49,6 +48,7 @@ import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.util.RSLists;
 import de.phoenix.util.Updateable;
 
 @RunWith(OrderedRunner.class)
@@ -143,13 +143,8 @@ public class TaskTest {
         Client c = Client.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
         ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-
-        // Ugly constructs to receive lists of generic types - no other way to
-        // solve this
-        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
-        };
-
-        List<PhoenixTask> tasks = resp.getEntity(genericPTask);
+//
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(resp);
 
         assertFalse("TaskList is empty!", tasks.isEmpty());
         for (PhoenixTask phoenixTask : tasks) {
@@ -172,12 +167,7 @@ public class TaskTest {
         ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        // Ugly constructs to receive lists of generic types - no other way to
-        // solve this
-        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
-        };
-
-        List<PhoenixTask> tasks = post.getEntity(genericPTask);
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
         assertFalse("Tasks are empty!", tasks.isEmpty());
         assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
 
@@ -235,12 +225,7 @@ public class TaskTest {
         ClientResponse post = wr.post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        // Ugly constructs to receive lists of generic types - no other way to
-        // solve this
-        GenericType<List<PhoenixTask>> genericPTask = new GenericType<List<PhoenixTask>>() {
-        };
-
-        List<PhoenixTask> tasks = post.getEntity(genericPTask);
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
         assertFalse("Tasks are empty!", tasks.isEmpty());
         assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
 
@@ -268,12 +253,7 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        // Ugly constructs to receive lists of generic types - no other way to
-        // solve this
-        GenericType<List<PhoenixSubmission>> genericPTask = new GenericType<List<PhoenixSubmission>>() {
-        };
-
-        List<PhoenixSubmission> submissions = post.getEntity(genericPTask);
+        List<PhoenixSubmission> submissions = PhoenixSubmission.fromSendableList(post);
         assertFalse("Result is empty!", submissions.isEmpty());
         for (PhoenixSubmission phoenixSubmission : submissions) {
             assertTrue(phoenixSubmission.getAttachmentsSize() + "", phoenixSubmission.getAttachmentsSize() == 0);
@@ -293,12 +273,7 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        // Ugly constructs to receive lists of generic types - no other way to
-        // solve this
-        GenericType<List<String>> genericString = new GenericType<List<String>>() {
-        };
-
-        List<String> titles = post.getEntity(genericString);
+        List<String> titles = RSLists.fromSendableStringList(post);
 
         assertFalse("Title list is empty!", titles.isEmpty());
         assertTrue("Title list contain more than 0 elements , " + titles.size(), titles.size() == 1);
