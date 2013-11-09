@@ -41,6 +41,9 @@ import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.submission.DefaultSubmissionController;
+import de.phoenix.submission.SubmissionControllResult;
+import de.phoenix.submission.SubmissionController;
 
 /**
  * Webresource for uploading and getting submissions from user.
@@ -48,6 +51,8 @@ import de.phoenix.rs.entity.PhoenixText;
  */
 @Path("/" + PhoenixSubmission.WEB_RESOURCE_ROOT)
 public class SubmissionResource {
+
+    private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
 
     @Path("/" + PhoenixSubmission.WEB_RESOURCE_SUBMIT)
     @POST
@@ -85,8 +90,11 @@ public class SubmissionResource {
         }
 
         // Store the submission itself
-        // TODO: PLACEHOLDER
         TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
+
+        SubmissionControllResult status = CONTROLLER.controlSolution(submission);
+        submission.setStatus(status.getStatus().ordinal());
+        submission.setStatusText(status.getText());
 
         // Save it
         session.save(submission);

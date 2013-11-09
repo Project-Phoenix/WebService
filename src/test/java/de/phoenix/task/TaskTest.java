@@ -46,6 +46,7 @@ import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.RSLists;
@@ -210,7 +211,7 @@ public class TaskTest {
         }
     }
 
-    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/TaskSubmission.java");
+    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/SpecialNumbers.java");
 
     @Test
     @Order(5)
@@ -236,6 +237,8 @@ public class TaskTest {
             wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
             assertTrue(post.toString(), post.getStatus() == 200);
+            sub = post.getEntity(PhoenixSubmission.class);
+            assertTrue(sub.getStatus() == SubmissionStatus.COMPILED.ordinal());
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -260,6 +263,7 @@ public class TaskTest {
             assertTrue(phoenixSubmission.getTextsSize() + "", phoenixSubmission.getTextsSize() == 1);
             PhoenixText t = phoenixSubmission.getTexts().get(0);
             assertTrue((t.getName() + "." + t.getType()) + " not equals" + TEST_SUBMISSION_FILE.getName(), (t.getName() + "." + t.getType()).equals(TEST_SUBMISSION_FILE.getName()));
+
         }
 
     }
