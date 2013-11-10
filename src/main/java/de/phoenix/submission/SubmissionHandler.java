@@ -18,23 +18,17 @@
 
 package de.phoenix.submission;
 
-import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
+import de.phoenix.database.entity.TaskSubmission;
 
-public class SubmissionControllResult {
-    private SubmissionStatus status;
-    private String text;
+public interface SubmissionHandler {
 
-    public SubmissionControllResult(SubmissionStatus status, String text) {
-        this.status = status;
-        this.text = text;
-    }
-
-    public SubmissionStatus getStatus() {
-        return status;
-    }
-
-    public String getText() {
-        return text;
-    }
+    /**
+     * Handles a submission
+     * 
+     * @param submission
+     *            The submission to handle
+     * @return The result of this handle
+     */
+    public SubmissionResult controlSubmission(TaskSubmission submission);
 
 }

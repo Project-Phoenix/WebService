@@ -20,9 +20,12 @@ package de.phoenix.submission;
 
 public class DefaultSubmissionController extends SubmissionController {
 
+    /**
+     * Default submission controller. First compiles the sources
+     */
     public DefaultSubmissionController() {
         super();
-        addChecker(new SubmissionCompiler());
+        addHandler(new SubmissionJavaCompiler());
     }
 
 }

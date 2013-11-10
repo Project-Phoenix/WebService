@@ -42,7 +42,7 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.DefaultSubmissionController;
-import de.phoenix.submission.SubmissionControllResult;
+import de.phoenix.submission.SubmissionResult;
 import de.phoenix.submission.SubmissionController;
 
 /**
@@ -92,7 +92,7 @@ public class SubmissionResource {
         // Store the submission itself
         TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
 
-        SubmissionControllResult status = CONTROLLER.controlSolution(submission);
+        SubmissionResult status = CONTROLLER.controllSolution(submission);
         submission.setStatus(status.getStatus().ordinal());
         submission.setStatusText(status.getText());
 

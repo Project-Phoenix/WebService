@@ -26,26 +26,45 @@ import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
 
 public class SubmissionController {
 
-    private List<SubmissionControllable> submissionInspectors;
+    private List<SubmissionHandler> submissionHandler;
 
+    /**
+     * Create an empty submission controller doing nothing when
+     * {@link #controllSolution(TaskSubmission)} is called
+     */
     public SubmissionController() {
-        submissionInspectors = new ArrayList<SubmissionControllable>();
+        submissionHandler = new ArrayList<SubmissionHandler>();
     }
 
-    public void addChecker(SubmissionControllable submissionInspector) {
-        this.submissionInspectors.add(submissionInspector);
+    /**
+     * Add an handler to the handler list. The order the handler are invoked is
+     * the same they were added
+     * 
+     * @param handler
+     *            New handler, will be added at last position of the list
+     */
+    public void addHandler(SubmissionHandler handler) {
+        this.submissionHandler.add(handler);
     }
 
-    public SubmissionControllResult controlSolution(TaskSubmission submission) {
-        SubmissionControllResult status = null;
-        for (SubmissionControllable check : submissionInspectors) {
-            status = check.controlSubmission(submission);
+    /**
+     * Start the controll mechansim of a submission. All added handlers are
+     * invoked in the order they were added to this controller. <br>
+     * When an error status was returned, the whole prozess is stopped and
+     * returned an result containing the error message
+     * 
+     * @param submission
+     *            The submission to becontrolled
+     * @return SubmissionResult containg neccessary information
+     */
+    public SubmissionResult controllSolution(TaskSubmission submission) {
+        SubmissionResult status = null;
+        for (SubmissionHandler handler : submissionHandler) {
+            status = handler.controlSubmission(submission);
             if (status.equals(SubmissionStatus.ERROR))
                 break;
         }
         return status;
     }
-
-
 
 }

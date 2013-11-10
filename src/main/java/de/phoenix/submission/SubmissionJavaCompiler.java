@@ -33,33 +33,52 @@ import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
 
-public class SubmissionCompiler implements SubmissionControllable {
+public class SubmissionJavaCompiler implements SubmissionHandler {
 
     private JavaCompiler compiler;
 
-    public SubmissionCompiler() {
+    public SubmissionJavaCompiler() {
         this.compiler = ToolProvider.getSystemJavaCompiler();
+        if (this.compiler == null) {
+            throw new RuntimeException("No compiler was found - this handler will always return SubmissionStatus Errors!");
+        }
     }
-
     @Override
-    public SubmissionControllResult controlSubmission(TaskSubmission submission) {
+    public SubmissionResult controlSubmission(TaskSubmission submission) {
+        if (this.compiler == null) {
+            return new SubmissionResult(SubmissionStatus.ERROR, "No compiler found");
+        }
+
+        // Convert texts to compileable obbjects
         List<SimpleJavaFileObject> compileObjects = prepareTexts(submission.getTexts());
+        // Collector for compilation information
         DiagnosticCollector<Object> dia = new DiagnosticCollector<Object>();
+        // Create task to compile
         CompilationTask task = compiler.getTask(null, null, dia, null, null, compileObjects);
+        // Start compiling
         boolean result = task.call();
 
+        // Print out results - if compilation was successfull, nothing happens
         List<Diagnostic<? extends Object>> diagnostics = dia.getDiagnostics();
         StringBuilder sBuilder = new StringBuilder();
         for (Diagnostic<? extends Object> diagnostic : diagnostics) {
             sBuilder.append(diagnostic);
             sBuilder.append("\n");
         }
+
         if (result)
-            return new SubmissionControllResult(SubmissionStatus.COMPILED, "Kompiliert!");
+            return new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!");
         else
-            return new SubmissionControllResult(SubmissionStatus.ERROR, sBuilder.toString());
+            return new SubmissionResult(SubmissionStatus.ERROR, sBuilder.toString());
     }
 
+    /**
+     * Convert the texts to compiable objects
+     * 
+     * @param texts
+     *            The texts containing source code
+     * @return The list containing compiable objects
+     */
     private List<SimpleJavaFileObject> prepareTexts(List<Text> texts) {
 
         List<SimpleJavaFileObject> list = new ArrayList<SimpleJavaFileObject>(texts.size());
@@ -70,6 +89,10 @@ public class SubmissionCompiler implements SubmissionControllable {
         return list;
     }
 
+    /**
+     * Wrapper class for compiable objects created just be strings without an
+     * existing file source
+     */
     private static class JavaObject extends SimpleJavaFileObject {
 
         private String content;
