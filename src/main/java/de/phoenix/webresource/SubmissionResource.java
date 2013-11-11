@@ -39,6 +39,7 @@ import de.phoenix.database.entity.Text;
 import de.phoenix.database.entity.util.ConverterArrayList;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.DefaultSubmissionController;
@@ -92,19 +93,17 @@ public class SubmissionResource {
         // Store the submission itself
         TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
 
-        SubmissionResult status = CONTROLLER.controllSolution(submission);
-        submission.setStatus(status.getStatus().ordinal());
-        submission.setStatusText(status.getText());
+        SubmissionResult result = CONTROLLER.controllSolution(submission);
+        submission.setStatus(result.getStatus().ordinal());
+        submission.setStatusText(result.getStatusText());
 
         // Save it
         session.save(submission);
 
-        // Return the result object
-        phoenixSubmission = submission.convert();
         // Close connection
         trans.commit();
 
-        return Response.ok(phoenixSubmission).build();
+        return Response.ok((PhoenixSubmissionResult)result).build();
     }
 
     @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS)

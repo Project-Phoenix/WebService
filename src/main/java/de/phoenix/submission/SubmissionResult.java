@@ -18,28 +18,38 @@
 
 package de.phoenix.submission;
 
-import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class SubmissionResult {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-    private SubmissionStatus status;
-    private String text;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
+
+public class SubmissionResult extends PhoenixSubmissionResult {
+
+    @JsonIgnore
+    private List<Object> temponaryResult = new ArrayList<Object>();
 
     public SubmissionResult() {
-
+        super();
     }
 
-    public SubmissionResult(SubmissionStatus status, String text) {
-        this.status = status;
-        this.text = text;
+    public SubmissionResult(SubmissionStatus status, String statusText) {
+        super(status, statusText);
     }
 
-    public SubmissionStatus getStatus() {
-        return status;
+    public SubmissionResult(SubmissionStatus newStatus, String newStatusText, SubmissionResult oldResult) {
+        this(newStatus, newStatusText);
+        add(oldResult.temponaryResult.toArray());
     }
 
-    public String getText() {
-        return text;
+    @JsonIgnore
+    public List<Object> getTemponaryResult() {
+        return temponaryResult;
     }
 
+    public void add(Object... obj) {
+        this.temponaryResult.addAll(Arrays.asList(obj));
+    }
 }

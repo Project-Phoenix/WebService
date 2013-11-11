@@ -46,7 +46,8 @@ import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.entity.PhoenixSubmission;
-import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.RSLists;
@@ -237,8 +238,8 @@ public class TaskTest {
             wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
             assertTrue(post.toString(), post.getStatus() == 200);
-            sub = post.getEntity(PhoenixSubmission.class);
-            assertTrue(sub.getStatus() == SubmissionStatus.COMPILED.ordinal());
+            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
+            assertTrue(res.getStatus().equals(SubmissionStatus.COMPILED));
         } catch (IOException e) {
             e.printStackTrace();
             fail();

@@ -29,6 +29,6 @@ public interface SubmissionHandler {
      *            The submission to handle
      * @return The result of this handle
      */
-    public SubmissionResult controlSubmission(TaskSubmission submission);
+    public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorResult);
 
 }

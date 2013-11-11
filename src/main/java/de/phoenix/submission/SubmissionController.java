@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.phoenix.database.entity.TaskSubmission;
-import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 
 public class SubmissionController {
 
@@ -58,9 +58,9 @@ public class SubmissionController {
      * @return SubmissionResult containg neccessary information
      */
     public SubmissionResult controllSolution(TaskSubmission submission) {
-        SubmissionResult status = null;
+        SubmissionResult status = new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
         for (SubmissionHandler handler : submissionHandler) {
-            status = handler.controlSubmission(submission);
+            status = handler.controlSubmission(submission, status);
             if (status.equals(SubmissionStatus.ERROR))
                 break;
         }

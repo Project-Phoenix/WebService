@@ -31,7 +31,7 @@ import javax.tools.ToolProvider;
 
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
-import de.phoenix.rs.entity.PhoenixSubmission.SubmissionStatus;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 
 public class SubmissionJavaCompiler implements SubmissionHandler {
 
@@ -44,7 +44,7 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
         }
     }
     @Override
-    public SubmissionResult controlSubmission(TaskSubmission submission) {
+    public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorStatus) {
         if (this.compiler == null) {
             return new SubmissionResult(SubmissionStatus.ERROR, "No compiler found");
         }
@@ -66,12 +66,14 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
             sBuilder.append("\n");
         }
 
-        if (result)
-            return new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!");
-        else
+        if (result) {
+            SubmissionResult res = new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!", predecessorStatus);
+            // TODO: Add compiled classes to access from later handler
+            return res;
+
+        } else
             return new SubmissionResult(SubmissionStatus.ERROR, sBuilder.toString());
     }
-
     /**
      * Convert the texts to compiable objects
      * 
