@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.phoenix.webresource.AccountResource;
 import de.phoenix.webresource.SubmissionResource;
 import de.phoenix.webresource.TaskResource;
+import de.phoenix.webresource.TaskSheetResource;
 import de.phoenix.webresource.TokenResource;
 
 @ApplicationPath("/rest")
@@ -37,7 +38,7 @@ public class PhoenixApplication extends Application {
 
     public PhoenixApplication() {
         // Main Constructor - called once in the application lifecycle
-        
+
         ObjectMapper m = new ObjectMapper();
         m.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
     }
@@ -52,6 +53,7 @@ public class PhoenixApplication extends Application {
         classSet.add(TokenResource.class);
         classSet.add(AccountResource.class);
         classSet.add(TaskResource.class);
+        classSet.add(TaskSheetResource.class);
 
         return classSet;
     }

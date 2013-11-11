@@ -21,6 +21,7 @@ package de.phoenix.database.entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,6 +39,11 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
+
 @Entity
 @Table(name = "taskSheet")
 @XmlRootElement
@@ -47,7 +53,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "TaskSheet.findById", query = "SELECT t FROM TaskSheet t WHERE t.id = :id"),
     @NamedQuery(name = "TaskSheet.findByCreationDate", query = "SELECT t FROM TaskSheet t WHERE t.creationDate = :creationDate")})
 //@formatter:on
-public class TaskSheet implements Serializable {
+public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -135,6 +141,11 @@ public class TaskSheet implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entityt.TaskSheet[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixTaskSheet convert() {
+        return new PhoenixTaskSheet(new ConverterArrayList<PhoenixTask>(this.taskList), getCreationDate());
     }
 
 }
