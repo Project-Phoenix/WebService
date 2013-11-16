@@ -45,6 +45,7 @@ import de.phoenix.DatabaseCleaner;
 import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
+import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
@@ -109,7 +110,7 @@ public class TaskTest {
         texts.add(TEST_PATTERN_FILE);
 
         // Create client
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         // Get webresource
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
         try {
@@ -145,7 +146,7 @@ public class TaskTest {
     @Test
     @Order(2)
     public void getAllTasks() {
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
         ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
@@ -167,7 +168,7 @@ public class TaskTest {
     @Order(3)
     public void getTaskByTitle() {
 
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -201,7 +202,8 @@ public class TaskTest {
         // Add elements for the task
         ats.add(TEST_BINARY_FILE);
         texts.add(TEST_PATTERN_FILE);
-        Client c = Client.create();
+        
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
         try {
@@ -225,7 +227,7 @@ public class TaskTest {
             fail("Submission File does not exists!");
         }
 
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -253,7 +255,7 @@ public class TaskTest {
     @Order(6)
     public void getSubmissionForTask() throws IOException {
 
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
         PhoenixTask phoenixTask = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), Collections.singletonList(TEST_BINARY_FILE), Collections.singletonList(TEST_PATTERN_FILE));
 
@@ -275,7 +277,7 @@ public class TaskTest {
     @Test
     @Order(7)
     public void getAllTitles() {
-        Client c = Client.create();
+        Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
