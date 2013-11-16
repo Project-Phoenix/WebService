@@ -35,6 +35,7 @@ public class TestHttpServer {
 
     public TestHttpServer(String baseURI, String... packages) throws IllegalArgumentException, IOException {
         ResourceConfig rc = new PackagesResourceConfig(packages);
+        
         httpServer = HttpServerFactory.create(URI.create(baseURI), rc);
         httpServer.start();
     }

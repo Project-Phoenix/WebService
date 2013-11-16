@@ -20,9 +20,12 @@ package de.phoenix.database.entity;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -33,6 +36,11 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.rs.entity.PhoenixDetails;
+import de.phoenix.rs.entity.PhoenixLecture;
+
 @Entity
 @Table(name = "lecture")
 @XmlRootElement
@@ -42,10 +50,12 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Lecture.findById", query = "SELECT l FROM Lecture l WHERE l.id = :id"),
     @NamedQuery(name = "Lecture.findByName", query = "SELECT l FROM Lecture l WHERE l.name = :name")})
 //@formatter:on
-public class Lecture implements Serializable {
+public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     private static final long serialVersionUID = 1L;
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
@@ -74,6 +84,10 @@ public class Lecture implements Serializable {
 
     public Lecture(Integer id) {
         this.id = id;
+    }
+
+    public Lecture(PhoenixLecture lecture) {
+        this.name = lecture.getTitle();
     }
 
     public Integer getId() {
@@ -134,6 +148,11 @@ public class Lecture implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entityt.Lecture[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixLecture convert() {
+        return new PhoenixLecture(getName(), new ConverterArrayList<PhoenixDetails>(getDetails()));
     }
 
 }

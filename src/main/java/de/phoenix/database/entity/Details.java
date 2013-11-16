@@ -21,9 +21,12 @@ package de.phoenix.database.entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
@@ -33,6 +36,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.rs.entity.PhoenixDetails;
 
 @Entity
 @Table(name = "details")
@@ -48,12 +57,13 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Details.findByStartTime", query = "SELECT d FROM Details d WHERE d.startTime = :startTime"),
     @NamedQuery(name = "Details.findByEndTime", query = "SELECT d FROM Details d WHERE d.endTime = :endTime")})
 //@formatter:on
-public class Details implements Serializable {
+public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @Basic(optional = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -89,6 +99,15 @@ public class Details implements Serializable {
 
     public Details(Integer id) {
         this.id = id;
+    }
+
+    public Details(PhoenixDetails details) {
+        this.room = details.getRoom();
+        this.turnus = details.getInvervall();
+        this.weekday = details.getWeekDay();
+        this.time = details.getTime().toDateTimeToday().toDate();
+        this.startTime = details.getStartDate().toDate();
+        this.endTime = details.getEndDate().toDate();
     }
 
     public Integer getId() {
@@ -189,6 +208,11 @@ public class Details implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entityt.Details[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixDetails convert() {
+        return new PhoenixDetails(getRoom(), getWeekday(), new LocalTime(getTime()), getTurnus(), new LocalDate(getStartTime()), new LocalDate(getEndTime()));
     }
 
 }

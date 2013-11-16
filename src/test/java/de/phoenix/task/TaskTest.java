@@ -70,6 +70,9 @@ public class TaskTest {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
+        File toDelete = new File("SpecialNumbers.class");
+        if (toDelete.exists())
+            toDelete.delete();
     }
 
     private static void cleanupDatabase() {
@@ -145,7 +148,7 @@ public class TaskTest {
         Client c = Client.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
         ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-//
+
         List<PhoenixTask> tasks = PhoenixTask.fromSendableList(resp);
 
         assertFalse("TaskList is empty!", tasks.isEmpty());
