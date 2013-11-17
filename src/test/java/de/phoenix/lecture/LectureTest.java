@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.AfterClass;
@@ -73,10 +74,11 @@ public class LectureTest {
         Client c = PhoenixClient.create();
         WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_CREATE);
 
-        LocalTime time = new LocalTime(11, 15);
+        LocalTime startTime = new LocalTime(11, 15);
+        LocalTime endTime = new LocalTime(12, 45);
         LocalDate startDate = new LocalDate(2013, 10, 01);
         LocalDate endDate = new LocalDate(2014, 03, 31);
-        PhoenixDetails detail = new PhoenixDetails("G29-336", 0, time, "weekly", startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-336", DateTimeConstants.MONDAY, startTime, endTime, "weekly", startDate, endDate);
 
         PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Collections.singletonList(detail));
 

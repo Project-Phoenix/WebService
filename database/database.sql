@@ -84,10 +84,11 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`details` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `room` VARCHAR(45) NULL,
   `weekday` INT NULL,
-  `time` TIME NULL,
-  `turnus` VARCHAR(45) NULL,
-  `startTime` DATETIME NULL,
-  `endTime` DATETIME NULL,
+  `startTime` TIME NULL,
+  `endTime` TIME NULL,
+  `interval` VARCHAR(45) NULL,
+  `startDate` DATETIME NULL,
+  `endDate` DATETIME NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

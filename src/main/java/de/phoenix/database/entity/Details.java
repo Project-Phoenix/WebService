@@ -52,10 +52,11 @@ import de.phoenix.rs.entity.PhoenixDetails;
     @NamedQuery(name = "Details.findById", query = "SELECT d FROM Details d WHERE d.id = :id"),
     @NamedQuery(name = "Details.findByRoom", query = "SELECT d FROM Details d WHERE d.room = :room"),
     @NamedQuery(name = "Details.findByWeekday", query = "SELECT d FROM Details d WHERE d.weekday = :weekday"),
-    @NamedQuery(name = "Details.findByTime", query = "SELECT d FROM Details d WHERE d.time = :time"),
-    @NamedQuery(name = "Details.findByTurnus", query = "SELECT d FROM Details d WHERE d.turnus = :turnus"),
     @NamedQuery(name = "Details.findByStartTime", query = "SELECT d FROM Details d WHERE d.startTime = :startTime"),
-    @NamedQuery(name = "Details.findByEndTime", query = "SELECT d FROM Details d WHERE d.endTime = :endTime")})
+    @NamedQuery(name = "Details.findByEndTime", query = "SELECT d FROM Details d WHERE d.endTime = :endTime"),
+    @NamedQuery(name = "Details.findByInterval", query = "SELECT d FROM Details d WHERE d.interval = :interval"),
+    @NamedQuery(name = "Details.findByStartDate", query = "SELECT d FROM Details d WHERE d.startDate = :startDate"),
+    @NamedQuery(name = "Details.findByEndDate", query = "SELECT d FROM Details d WHERE d.endDate = :endDate")})
 //@formatter:on
 public class Details implements Serializable, Convertable<PhoenixDetails> {
 
@@ -73,20 +74,25 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
     @Column(name = "weekday")
     private Integer weekday;
 
-    @Column(name = "time")
-    @Temporal(TemporalType.TIME)
-    private Date time;
-
-    @Column(name = "turnus")
-    private String turnus;
-
     @Column(name = "startTime")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIME)
     private Date startTime;
 
     @Column(name = "endTime")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIME)
     private Date endTime;
+
+    // Brackets [] because of , interval is a keyword
+    @Column(name = "[interval]")
+    private String interval;
+
+    @Column(name = "startDate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDate;
+
+    @Column(name = "endDate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endDate;
 
     @ManyToMany(mappedBy = "detailsList")
     private List<LectureGroup> lectureGroupList;
@@ -103,11 +109,14 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     public Details(PhoenixDetails details) {
         this.room = details.getRoom();
-        this.turnus = details.getInvervall();
+        this.interval = details.getInverval();
         this.weekday = details.getWeekDay();
-        this.time = details.getTime().toDateTimeToday().toDate();
-        this.startTime = details.getStartDate().toDate();
-        this.endTime = details.getEndDate().toDate();
+
+        this.startTime = details.getStartTime().toDateTimeToday().toDate();
+        this.endTime = details.getEndTime().toDateTimeToday().toDate();
+
+        this.startDate = details.getStartDate().toDate();
+        this.endDate = details.getEndDate().toDate();
     }
 
     public Integer getId() {
@@ -134,22 +143,6 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
         this.weekday = weekday;
     }
 
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public String getTurnus() {
-        return turnus;
-    }
-
-    public void setTurnus(String turnus) {
-        this.turnus = turnus;
-    }
-
     public Date getStartTime() {
         return startTime;
     }
@@ -164,6 +157,30 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getInterval() {
+        return interval;
+    }
+
+    public void setInterval(String interval) {
+        this.interval = interval;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     @XmlTransient
@@ -212,7 +229,6 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     @Override
     public PhoenixDetails convert() {
-        return new PhoenixDetails(getRoom(), getWeekday(), new LocalTime(getTime()), getTurnus(), new LocalDate(getStartTime()), new LocalDate(getEndTime()));
+        return new PhoenixDetails(getRoom(), getWeekday(), new LocalTime(getStartTime()), new LocalTime(getEndTime()), getInterval(), new LocalDate(getStartDate()), new LocalDate(getEndDate()));
     }
-
 }
