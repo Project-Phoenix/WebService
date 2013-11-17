@@ -39,6 +39,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.Period;
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixDetails;
@@ -109,7 +112,7 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     public Details(PhoenixDetails details) {
         this.room = details.getRoom();
-        this.interval = details.getInverval();
+        this.setInterval(details.getInverval());
         this.weekday = details.getWeekDay();
 
         this.startTime = details.getStartTime().toDateTimeToday().toDate();
@@ -159,12 +162,14 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
         this.endTime = endTime;
     }
 
-    public String getInterval() {
-        return interval;
+    private static final PeriodFormatter PERIOD_FORMAT = ISOPeriodFormat.standard();
+
+    public Period getInterval() {
+        return PERIOD_FORMAT.parsePeriod(interval);
     }
 
-    public void setInterval(String interval) {
-        this.interval = interval;
+    public void setInterval(Period interval) {
+        this.interval = PERIOD_FORMAT.print(interval);
     }
 
     public Date getStartDate() {

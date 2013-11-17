@@ -22,7 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.Period;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,9 +79,9 @@ public class LectureTest {
         LocalTime endTime = new LocalTime(12, 45);
         LocalDate startDate = new LocalDate(2013, 10, 01);
         LocalDate endDate = new LocalDate(2014, 03, 31);
-        PhoenixDetails detail = new PhoenixDetails("G29-336", DateTimeConstants.MONDAY, startTime, endTime, "weekly", startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-336", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
 
-        PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Collections.singletonList(detail));
+        PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Arrays.asList(detail));
 
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
 
@@ -100,6 +101,7 @@ public class LectureTest {
         assertFalse("Lecture list is empty!", lectures.isEmpty());
         PhoenixLecture lec = lectures.get(0);
         assertTrue("LectureName was " + lec.getTitle() + ", but should be" + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
+        assertTrue("Intervall is not 1 weeks, but " + lec.getLectureDetails().get(0).getInverval(), lec.getLectureDetails().get(0).getInverval().getWeeks() == 1);
 
     }
 }
