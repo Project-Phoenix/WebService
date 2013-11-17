@@ -19,21 +19,35 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.joda.time.LocalTime;
+
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.rs.entity.PhoenixDetails;
+import de.phoenix.rs.entity.PhoenixLectureGroup;
 
 @Entity
 @Table(name = "lectureGroup")
@@ -44,13 +58,15 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "LectureGroup.findById", query = "SELECT l FROM LectureGroup l WHERE l.id = :id"),
     @NamedQuery(name = "LectureGroup.findByName", query = "SELECT l FROM LectureGroup l WHERE l.name = :name"),
     @NamedQuery(name = "LectureGroup.findByMaxMember", query = "SELECT l FROM LectureGroup l WHERE l.maxMember = :maxMember"),
-    @NamedQuery(name = "LectureGroup.findBySubmissionEndDate", query = "SELECT l FROM LectureGroup l WHERE l.submissionEndDate = :submissionEndDate")})
+    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineTime", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineTime = :submissionDeadlineTime"),
+    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineWeekyday", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineWeekyday = :submissionDeadlineWeekyday")})
 //@formatter:on
-public class LectureGroup implements Serializable {
+public class LectureGroup implements Serializable, Convertable<PhoenixLectureGroup> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
@@ -61,8 +77,12 @@ public class LectureGroup implements Serializable {
     @Column(name = "maxMember")
     private Integer maxMember;
 
-    @Column(name = "submissionEndDate")
-    private String submissionEndDate;
+    @Column(name = "submissionDeadlineTime")
+    @Temporal(TemporalType.TIME)
+    private Date submissionDeadlineTime;
+
+    @Column(name = "submissionDeadlineWeekyday", columnDefinition = "TINYINT")
+    private int submissionDeadlineWeekyday;
 
     //@formatter:off
     @JoinTable(name = "lectureGroupDetails", joinColumns = {
@@ -72,8 +92,9 @@ public class LectureGroup implements Serializable {
     @ManyToMany
     private List<Details> detailsList;
 
-    @ManyToMany(mappedBy = "lectureGroupList")
-    private List<Lecture> lectureList;
+    @JoinColumn(name = "lecture", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Lecture lecture;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureGroup")
     private List<LectureGroupTaskSheet> lectureGroupTaskSheetList;
@@ -83,6 +104,13 @@ public class LectureGroup implements Serializable {
 
     public LectureGroup(Integer id) {
         this.id = id;
+    }
+
+    public LectureGroup(PhoenixLectureGroup phoenixLectureGroup) {
+        this.maxMember = phoenixLectureGroup.getMaxMember();
+        this.name = phoenixLectureGroup.getName();
+        this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime().toDateTimeToday().toDate();
+        this.submissionDeadlineWeekyday = phoenixLectureGroup.getSubmissionDeadlineWeekyday();
     }
 
     public Integer getId() {
@@ -109,30 +137,38 @@ public class LectureGroup implements Serializable {
         this.maxMember = maxMember;
     }
 
-    public String getSubmissionEndDate() {
-        return submissionEndDate;
+    public int getSubmissionDeadlineWeekyday() {
+        return submissionDeadlineWeekyday;
     }
 
-    public void setSubmissionEndDate(String submissionEndDate) {
-        this.submissionEndDate = submissionEndDate;
+    public void setSubmissionDeadlineWeekyday(int submissionDeadlineWeekyday) {
+        this.submissionDeadlineWeekyday = submissionDeadlineWeekyday;
+    }
+
+    public Date getSubmissionDeadlineTime() {
+        return submissionDeadlineTime;
+    }
+
+    public void setSubmissionDeadlineTime(Date submissionDeadlineTime) {
+        this.submissionDeadlineTime = submissionDeadlineTime;
     }
 
     @XmlTransient
-    public List<Details> getDetailsList() {
+    public List<Details> getDetails() {
         return detailsList;
     }
 
-    public void setDetailsList(List<Details> detailsList) {
-        this.detailsList = detailsList;
+    public void setDetails(List<Details> details) {
+        this.detailsList = details;
     }
 
     @XmlTransient
-    public List<Lecture> getLectureList() {
-        return lectureList;
+    public Lecture getLecture() {
+        return lecture;
     }
 
-    public void setLectureList(List<Lecture> lectureList) {
-        this.lectureList = lectureList;
+    public void setLecture(Lecture lecture) {
+        this.lecture = lecture;
     }
 
     @XmlTransient
@@ -170,4 +206,8 @@ public class LectureGroup implements Serializable {
         return "de.phoenix.database.entityt.LectureGroup[ id=" + id + " ]";
     }
 
+    @Override
+    public PhoenixLectureGroup convert() {
+        return new PhoenixLectureGroup(getName(), getMaxMember(), getSubmissionDeadlineWeekyday(), new LocalTime(getSubmissionDeadlineTime()), new ConverterArrayList<PhoenixDetails>(getDetails()), getLecture().convert());
+    }
 }

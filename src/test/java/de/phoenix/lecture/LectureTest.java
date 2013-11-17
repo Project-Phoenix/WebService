@@ -47,6 +47,7 @@ import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
+import de.phoenix.rs.entity.PhoenixLectureGroup;
 
 @RunWith(OrderedRunner.class)
 public class LectureTest {
@@ -103,5 +104,44 @@ public class LectureTest {
         assertTrue("LectureName was " + lec.getTitle() + ", but should be" + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
         assertTrue("Intervall is not 1 weeks, but " + lec.getLectureDetails().get(0).getInverval(), lec.getLectureDetails().get(0).getInverval().getWeeks() == 1);
 
+    }
+
+    private static final String TEST_GROUP_NAME = "Gruppe 2";
+    private static final int TEST_GROUP_MAX_SIZE = 22;
+
+    @Test
+    @Order(3)
+    public void addGroup() {
+        Client c = PhoenixClient.create();
+        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GETALL);
+
+        // Get created test lecture to assign to lecture group
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertTrue(response.toString(), response.getStatus() == 200);
+        List<PhoenixLecture> lectures = PhoenixLecture.fromSendableList(response);
+        PhoenixLecture lec = lectures.get(0);
+
+        WebResource ws2 = c.resource(BASE_URI).path(PhoenixLectureGroup.WEB_RESOURCE_ROOT).path(PhoenixLectureGroup.WEB_RESOURCE_CREATE);
+
+        // Create information for the group information
+        LocalTime startTime = new LocalTime(15, 00);
+        LocalTime endTime = new LocalTime(16, 30);
+        LocalDate startDate = new LocalDate(2013, 10, 21);
+        LocalDate endDate = new LocalDate(2014, 01, 27);
+
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
+
+        // Create a test group with
+        // name = Gruppe 2
+        // members = 22
+        // default submission day is Monday
+        // default submission time on Monday is 10 o'clock
+        // In the room G29-k058 and other details described above
+        // and the assigned lecture
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+
+        assertTrue(response.toString(), response.getStatus() == 200);
     }
 }

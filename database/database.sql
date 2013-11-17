@@ -56,24 +56,32 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`lectureGroup`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroup` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
-  `maxMember` INT NULL,
-  `submissionEndDate` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`lecture`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`lectureGroup`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroup` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL,
+  `maxMember` INT NULL,
+  `submissionDeadlineTime` TIME NULL,
+  `submissionDeadlineWeekyday` TINYINT NULL,
+  `lecture` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_lectureGroup_lecture1_idx` (`lecture` ASC),
+  CONSTRAINT `fk_lectureGroup_lecture1`
+    FOREIGN KEY (`lecture`)
+    REFERENCES `phoenix`.`lecture` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -194,28 +202,6 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheet` (
   CONSTRAINT `fk_lectureGroupTaskSheet_taskSheet1`
     FOREIGN KEY (`taskSheet`)
     REFERENCES `phoenix`.`taskSheet` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `phoenix`.`lectureGroups`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroups` (
-  `lecture_id` INT NOT NULL,
-  `group_id` INT NOT NULL,
-  PRIMARY KEY (`lecture_id`, `group_id`),
-  INDEX `fk_lectureGroups_group1_idx` (`group_id` ASC),
-  INDEX `fk_lectureGroups_lecture1_idx` (`lecture_id` ASC),
-  CONSTRAINT `fk_lecture_has_group_lecture1`
-    FOREIGN KEY (`lecture_id`)
-    REFERENCES `phoenix`.`lecture` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_lecture_has_group_group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `phoenix`.`lectureGroup` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
