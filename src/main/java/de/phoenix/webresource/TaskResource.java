@@ -78,7 +78,7 @@ public class TaskResource {
         session.save(task);
 
         trans.commit();
-
+        session.close();
         return Response.ok().build();
     }
 
@@ -98,6 +98,7 @@ public class TaskResource {
         task.setTitle(phoenixTask.getTitle());
 
         session.update(task);
+        session.close();
 
         return Response.ok().build();
     }
@@ -114,6 +115,7 @@ public class TaskResource {
             return Response.notModified().entity("No entity found by this title!").build();
 
         session.delete(task);
+        session.close();
 
         return Response.ok().build();
     }
@@ -128,6 +130,7 @@ public class TaskResource {
         List<Task> tasks = session.getNamedQuery("Task.findAll").list();
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
+        session.close();
 
         // Encapsulate the list to transform it via JXR-RS
         return Response.ok(PhoenixTask.toSendableList(result)).build();
@@ -145,6 +148,7 @@ public class TaskResource {
         List<Task> tasks = session.getNamedQuery("Task.findByTitle").setString("title", title).list();
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
+        session.close();
 
         return Response.ok(PhoenixTask.toSendableList(result)).build();
     }
@@ -159,6 +163,7 @@ public class TaskResource {
 
         List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
 
+        session.close();
         return Response.ok(RSLists.toSendableStringList(result)).build();
     }
 }

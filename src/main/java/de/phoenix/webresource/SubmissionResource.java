@@ -102,6 +102,7 @@ public class SubmissionResource {
 
         // Close connection
         trans.commit();
+        session.close();
 
         return Response.ok((PhoenixSubmissionResult)result).build();
     }
@@ -124,6 +125,7 @@ public class SubmissionResource {
 
         // List containing the result
         List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
+        session.close();
 
         return Response.ok(PhoenixSubmission.toSendableList(result)).build();
     }

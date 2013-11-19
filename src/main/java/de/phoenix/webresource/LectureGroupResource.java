@@ -80,7 +80,7 @@ public class LectureGroupResource {
         session.save(lectureGroup);
 
         trans.commit();
-
+        session.close();
         return Response.ok().build();
     }
 

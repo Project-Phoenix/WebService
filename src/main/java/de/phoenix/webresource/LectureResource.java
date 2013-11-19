@@ -67,6 +67,7 @@ public class LectureResource {
         session.save(lecture);
 
         trans.commit();
+        session.close();
         return Response.ok().build();
     }
 
@@ -81,6 +82,7 @@ public class LectureResource {
 
         List<PhoenixLecture> result = new ConverterArrayList<PhoenixLecture>(lectures);
 
+        session.close();
         return Response.ok(PhoenixLecture.toSendableList(result)).build();
     }
 }

@@ -66,6 +66,7 @@ public class TaskSheetResource {
 
         session.save(taskSheet);
         trans.commit();
+        session.close();
 
         return Response.ok().build();
     }
@@ -80,6 +81,7 @@ public class TaskSheetResource {
         List<TaskSheet> sheets = session.getNamedQuery("TaskSheet.findAll").list();
 
         List<PhoenixTaskSheet> result = new ConverterArrayList<PhoenixTaskSheet>(sheets);
+        session.close();
 
         return Response.ok(PhoenixTaskSheet.toSendableList(result)).build();
     }

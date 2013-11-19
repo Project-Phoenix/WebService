@@ -202,7 +202,7 @@ public class TaskTest {
         // Add elements for the task
         ats.add(TEST_BINARY_FILE);
         texts.add(TEST_PATTERN_FILE);
-        
+
         Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
