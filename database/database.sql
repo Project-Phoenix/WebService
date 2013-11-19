@@ -10,7 +10,7 @@ USE `phoenix` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(45) NULL,
+  `title` VARCHAR(255) NULL,
   `description` LONGTEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `title` (`title` ASC))
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`attachment` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `file` LONGBLOB NULL,
   `creationDate` DATETIME NULL,
-  `name` VARCHAR(45) NULL,
+  `name` VARCHAR(255) NULL,
   `type` VARCHAR(45) NULL,
   `sha1` VARCHAR(40) NULL,
   PRIMARY KEY (`id`))
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`text` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `content` LONGTEXT NULL,
   `creationDate` DATETIME NULL,
-  `name` VARCHAR(45) NULL,
+  `name` VARCHAR(255) NULL,
   `type` VARCHAR(45) NULL,
   `sha1` VARCHAR(40) NULL,
   PRIMARY KEY (`id`))
@@ -60,7 +60,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
+  `name` VARCHAR(255) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -70,7 +70,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroup` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
+  `name` VARCHAR(255) NULL,
   `maxMember` INT NULL,
   `submissionDeadlineTime` TIME NULL,
   `submissionDeadlineWeekyday` TINYINT NULL,
