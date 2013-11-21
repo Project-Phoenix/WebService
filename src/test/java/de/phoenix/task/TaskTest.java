@@ -265,7 +265,7 @@ public class TaskTest {
         Client c = PhoenixClient.create();
         WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
-        ClientResponse post = wrGetTask.post(ClientResponse.class, TEST_TITLE);
+        ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
         PhoenixTask phoenixTask = tasks.get(0);
         
