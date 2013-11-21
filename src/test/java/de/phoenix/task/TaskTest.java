@@ -46,6 +46,7 @@ import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.PhoenixClient;
+import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
@@ -101,20 +102,23 @@ public class TaskTest {
             fail("Task Description File does not exists!");
         }
 
-        // Lists for the task
-        List<File> ats = new ArrayList<File>();
-        List<File> texts = new ArrayList<File>();
-
-        // Add elements for the task
-        ats.add(TEST_BINARY_FILE);
-        texts.add(TEST_PATTERN_FILE);
-
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
         try {
-            PhoenixTask task = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), ats, texts);
+
+            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
+            texts.add(textFile);
+
+            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
+            attachments.add(binaryFile);
+
+            String description = getText(TEST_DESCRIPTION_FILE);
+
+            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
             assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
@@ -195,19 +199,22 @@ public class TaskTest {
             fail("Text file does not exists!");
         }
 
-        // Lists for the task
-        List<File> ats = new ArrayList<File>();
-        List<File> texts = new ArrayList<File>();
-
-        // Add elements for the task
-        ats.add(TEST_BINARY_FILE);
-        texts.add(TEST_PATTERN_FILE);
-
         Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
 
         try {
-            PhoenixTask task = new PhoenixTask("Neuer Title", getText(TEST_DESCRIPTION_FILE), ats, texts);
+            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
+            texts.add(textFile);
+
+            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
+            attachments.add(binaryFile);
+
+            String description = getText(TEST_DESCRIPTION_FILE);
+
+            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
+
             Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
             assertTrue(post.toString(), post.getStatus() == 200);
@@ -256,10 +263,15 @@ public class TaskTest {
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
-        PhoenixTask phoenixTask = new PhoenixTask(TEST_TITLE, getText(TEST_DESCRIPTION_FILE), Collections.singletonList(TEST_BINARY_FILE), Collections.singletonList(TEST_PATTERN_FILE));
+        WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
+        ClientResponse post = wrGetTask.post(ClientResponse.class, TEST_TITLE);
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
+        PhoenixTask phoenixTask = tasks.get(0);
+        
+        WebResource wrGetSubmissions = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
+
+        post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
         assertTrue(post.toString(), post.getStatus() == 200);
 
         List<PhoenixSubmission> submissions = PhoenixSubmission.fromSendableList(post);
