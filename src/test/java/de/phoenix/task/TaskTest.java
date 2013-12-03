@@ -109,7 +109,7 @@ public class TaskTest {
         try {
 
             List<PhoenixText> texts = new ArrayList<PhoenixText>();
-            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
+            PhoenixText textFile = new PhoenixText(TEST_PATTERN_FILE, TEST_PATTERN_FILE.getName());
             texts.add(textFile);
 
             List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
@@ -268,7 +268,7 @@ public class TaskTest {
         ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
         PhoenixTask phoenixTask = tasks.get(0);
-        
+
         WebResource wrGetSubmissions = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
 
         post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
