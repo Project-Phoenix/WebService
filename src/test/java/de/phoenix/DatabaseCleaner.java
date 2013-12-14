@@ -57,7 +57,8 @@ public class DatabaseCleaner {
         transaction.commit();
         session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
 
-        session.disconnect();
+//        session.close();
+//        session.disconnect();
     }
 
 }

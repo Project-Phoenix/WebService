@@ -29,6 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -55,6 +56,14 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
         Transaction trans = session.beginTransaction();
+
+        Task tmp = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
+
+        // Name already exists - No duplicates allowed
+        if (tmp != null) {
+            session.close();
+            return Response.status(Status.BAD_REQUEST).entity("Duplicate name for " + phoenixTask.getTitle() + "!").build();
+        }
 
         List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
         for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
@@ -131,26 +140,27 @@ public class TaskResource {
 
         List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
         session.close();
-
         // Encapsulate the list to transform it via JXR-RS
         return Response.ok(PhoenixTask.toSendableList(result)).build();
     }
 
-    @SuppressWarnings("unchecked")
     @Path("/" + PhoenixTask.WEB_RESOURCE_GETBYTITLE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getByTitle(String title) throws SQLException {
+    public Response getByTitle(String title) {
 
         Session session = DatabaseManager.getSession();
 
-        List<Task> tasks = session.getNamedQuery("Task.findByTitle").setString("title", title).list();
-
-        List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
+        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", title).uniqueResult();
+        if (task == null)
+            return Response.status(Status.NO_CONTENT).build();
+        // Always convert before closing the session
+        PhoenixTask result = task.convert();
+        
         session.close();
 
-        return Response.ok(PhoenixTask.toSendableList(result)).build();
+        return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @SuppressWarnings("unchecked")

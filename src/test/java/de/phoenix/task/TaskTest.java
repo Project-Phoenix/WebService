@@ -53,7 +53,6 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.RSLists;
-import de.phoenix.util.Updateable;
 
 @RunWith(OrderedRunner.class)
 public class TaskTest {
@@ -66,7 +65,7 @@ public class TaskTest {
     public static void setUpBeforeClass() throws Exception {
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
-        cleanupDatabase();
+        DatabaseCleaner.getInstance().run();
     }
 
     @AfterClass
@@ -75,10 +74,6 @@ public class TaskTest {
         File toDelete = new File("SpecialNumbers.class");
         if (toDelete.exists())
             toDelete.delete();
-    }
-
-    private static void cleanupDatabase() {
-        DatabaseCleaner.getInstance().run();
     }
 
     private static String TEST_TITLE = "Befreundete Zahlen";
@@ -177,52 +172,48 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
-        assertFalse("Tasks are empty!", tasks.isEmpty());
-        assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
-
-        PhoenixTask task = tasks.get(0);
-        assertTrue("Task does not exists!", task != null);
+        PhoenixTask task = post.getEntity(PhoenixTask.class);
+        assertFalse("No task found!", task == null);
         assertTrue("Task title wrong!", task.getTitle().equals(TEST_TITLE));
-
     }
 
-    @Test
-    @Order(4)
-    public void updateTask() {
-
-        if (!TEST_BINARY_FILE.exists()) {
-            fail("Binary file does not exists!");
-        }
-
-        if (!TEST_PATTERN_FILE.exists()) {
-            fail("Text file does not exists!");
-        }
-
-        Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
-
-        try {
-            List<PhoenixText> texts = new ArrayList<PhoenixText>();
-            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
-            texts.add(textFile);
-
-            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
-            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
-            attachments.add(binaryFile);
-
-            String description = getText(TEST_DESCRIPTION_FILE);
-
-            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
-
-            Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
-            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
-            assertTrue(post.toString(), post.getStatus() == 200);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
+    // TODO: Think about this
+//    @Test
+//    @Order(4)
+//    public void updateTask() {
+//
+//        if (!TEST_BINARY_FILE.exists()) {
+//            fail("Binary file does not exists!");
+//        }
+//
+//        if (!TEST_PATTERN_FILE.exists()) {
+//            fail("Text file does not exists!");
+//        }
+//
+//        Client c = PhoenixClient.create();
+//        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
+//
+//        try {
+//            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+//            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
+//            texts.add(textFile);
+//
+//            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+//            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
+//            attachments.add(binaryFile);
+//
+//            String description = getText(TEST_DESCRIPTION_FILE);
+//
+//            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
+//
+//            Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
+//            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
+//            assertTrue(post.toString(), post.getStatus() == 200);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 
     private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/SpecialNumbers.java");
 
@@ -239,11 +230,8 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
-        assertFalse("Tasks are empty!", tasks.isEmpty());
-        assertTrue(Integer.toString(tasks.size()), tasks.size() == 1);
-
-        PhoenixTask task = tasks.get(0);
+        PhoenixTask task = post.getEntity(PhoenixTask.class);
+        assertFalse("No task found!", task == null);
 
         try {
             PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
@@ -266,8 +254,7 @@ public class TaskTest {
         WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
         ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
-        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
-        PhoenixTask phoenixTask = tasks.get(0);
+        PhoenixTask phoenixTask = post.getEntity(PhoenixTask.class);
 
         WebResource wrGetSubmissions = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
 
@@ -301,5 +288,33 @@ public class TaskTest {
         assertTrue("Title list contain more than 0 elements , " + titles.size(), titles.size() == 1);
         assertTrue(titles.get(0) + " is not " + TEST_TITLE, titles.get(0).equals(TEST_TITLE));
 
+    }
+
+    @Test
+    @Order(8)
+    public void createDuplicateTask() {
+        // Create client
+        Client c = PhoenixClient.create();
+        // Get webresource
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        try {
+
+            // Empty lists - we have not interest in lists for this test
+            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+
+            // No interest in description
+            String description = "";
+
+            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
+            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+
+            // Because we want to create a title with same title, the system
+            // throws an exception
+            assertTrue(post.toString(), post.getStatus() == 400 && post.getEntity(String.class).equals("Duplicate name for " + task.getTitle() + "!"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 }
