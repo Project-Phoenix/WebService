@@ -64,47 +64,51 @@ public class SubmissionResource {
         Session session = DatabaseManager.getSession();
 
         // Get task from the database
-        // TODO: Require, that task must be unique!
-        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixSubmission.getTask().getTitle()).uniqueResult();
-        if (task == null)
-            return Response.notModified().entity("No entity found by this title!").build();
+        try {
+            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixSubmission.getTask().getTitle()).uniqueResult();
+            if (task == null)
+                return Response.notModified().entity("No entity found by this title!").build();
 
-        Transaction trans = session.beginTransaction();
-        // Store attachments
-        List<Attachment> attachments = new ArrayList<Attachment>(phoenixSubmission.getAttachmentsSize());
-        for (PhoenixAttachment attachment : phoenixSubmission.getAttachments()) {
-            Attachment at = new Attachment(attachment);
-            Integer id = (Integer) session.save(at);
-            at.setId(id);
+            Transaction trans = session.beginTransaction();
+            // Store attachments
+            List<Attachment> attachments = new ArrayList<Attachment>(phoenixSubmission.getAttachmentsSize());
+            for (PhoenixAttachment attachment : phoenixSubmission.getAttachments()) {
+                Attachment at = new Attachment(attachment);
+                Integer id = (Integer) session.save(at);
+                at.setId(id);
 
-            attachments.add(at);
+                attachments.add(at);
+            }
+
+            // Store texts
+            List<Text> texts = new ArrayList<Text>(phoenixSubmission.getTextsSize());
+            for (PhoenixText text : phoenixSubmission.getTexts()) {
+                Text te = new Text(text);
+                Integer id = (Integer) session.save(te);
+                te.setId(id);
+
+                texts.add(te);
+            }
+
+            // Store the submission itself
+            TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
+
+            SubmissionResult result = CONTROLLER.controllSolution(submission);
+            submission.setStatus(result.getStatus().ordinal());
+            submission.setStatusText(result.getStatusText());
+
+            // Save it
+            session.save(submission);
+
+            // Close connection
+            trans.commit();
+
+            return Response.ok((PhoenixSubmissionResult) result).build();
+
+        } finally {
+            if (session != null)
+                session.close();
         }
-
-        // Store texts
-        List<Text> texts = new ArrayList<Text>(phoenixSubmission.getTextsSize());
-        for (PhoenixText text : phoenixSubmission.getTexts()) {
-            Text te = new Text(text);
-            Integer id = (Integer) session.save(te);
-            te.setId(id);
-
-            texts.add(te);
-        }
-
-        // Store the submission itself
-        TaskSubmission submission = new TaskSubmission(0, "Bestanden", task, attachments, texts);
-
-        SubmissionResult result = CONTROLLER.controllSolution(submission);
-        submission.setStatus(result.getStatus().ordinal());
-        submission.setStatusText(result.getStatusText());
-
-        // Save it
-        session.save(submission);
-
-        // Close connection
-        trans.commit();
-        session.close();
-
-        return Response.ok((PhoenixSubmissionResult)result).build();
     }
 
     @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS)
@@ -116,17 +120,24 @@ public class SubmissionResource {
         Session session = DatabaseManager.getSession();
 
         // Get task from database
-        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
-        if (task == null)
-            return Response.notModified().entity("No entity found by this title!").build();
+        try {
+            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
+            if (task == null)
+                return Response.notModified().entity("No entity found by this title!").build();
 
-        // Get all submissions for this task
-        List<TaskSubmission> submissions = task.getTaskSubmissions();
+            // Get all submissions for this task
+            List<TaskSubmission> submissions = task.getTaskSubmissions();
 
-        // List containing the result
-        List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
-        session.close();
+            // List containing the result
+            List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
 
-        return Response.ok(PhoenixSubmission.toSendableList(result)).build();
+            return Response.ok(PhoenixSubmission.toSendableList(result)).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+
+        }
+
     }
 }

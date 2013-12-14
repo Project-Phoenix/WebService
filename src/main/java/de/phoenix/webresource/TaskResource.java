@@ -55,40 +55,45 @@ public class TaskResource {
     public Response create(PhoenixTask phoenixTask) {
 
         Session session = DatabaseManager.getSession();
-        Transaction trans = session.beginTransaction();
+        try {
+            Transaction trans = session.beginTransaction();
 
-        Task tmp = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
+            Task tmp = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
 
-        // Name already exists - No duplicates allowed
-        if (tmp != null) {
-            session.close();
-            return Response.status(Status.BAD_REQUEST).entity("Duplicate name for " + phoenixTask.getTitle() + "!").build();
+            // Name already exists - No duplicates allowed
+            if (tmp != null) {
+                return Response.status(Status.BAD_REQUEST).entity("Duplicate name for " + phoenixTask.getTitle() + "!").build();
+            }
+
+            List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
+            for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
+                Attachment at = new Attachment(attachment);
+                Integer id = (Integer) session.save(at);
+                at.setId(id);
+
+                attachments.add(at);
+            }
+
+            List<Text> texts = new ArrayList<Text>(phoenixTask.getPatternSize());
+            for (PhoenixText text : phoenixTask.getPattern()) {
+                Text te = new Text(text);
+                Integer id = (Integer) session.save(te);
+                te.setId(id);
+
+                texts.add(te);
+            }
+
+            Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);
+            session.save(task);
+
+            trans.commit();
+            return Response.ok().build();
+
+        } finally {
+            if (session != null)
+                session.close();
         }
 
-        List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
-        for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
-            Attachment at = new Attachment(attachment);
-            Integer id = (Integer) session.save(at);
-            at.setId(id);
-
-            attachments.add(at);
-        }
-
-        List<Text> texts = new ArrayList<Text>(phoenixTask.getPatternSize());
-        for (PhoenixText text : phoenixTask.getPattern()) {
-            Text te = new Text(text);
-            Integer id = (Integer) session.save(te);
-            te.setId(id);
-
-            texts.add(te);
-        }
-
-        Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);
-        session.save(task);
-
-        trans.commit();
-        session.close();
-        return Response.ok().build();
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)
@@ -97,19 +102,23 @@ public class TaskResource {
     public Response change(Updateable<PhoenixTask, String> toUpdate) {
 
         Session session = DatabaseManager.getSession();
+        try {
 
-        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", toUpdate.getKey()).uniqueResult();
-        if (task == null)
-            return Response.notModified().entity("No entity found by this title!").build();
+            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", toUpdate.getKey()).uniqueResult();
+            if (task == null)
+                return Response.notModified().entity("No entity found by this title!").build();
 
-        PhoenixTask phoenixTask = toUpdate.getVal();
-        task.setDescription(phoenixTask.getDescription());
-        task.setTitle(phoenixTask.getTitle());
+            PhoenixTask phoenixTask = toUpdate.getVal();
+            task.setDescription(phoenixTask.getDescription());
+            task.setTitle(phoenixTask.getTitle());
 
-        session.update(task);
-        session.close();
+            session.update(task);
+            return Response.ok().build();
 
-        return Response.ok().build();
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_DELETE)
@@ -118,15 +127,20 @@ public class TaskResource {
     public Response delete(PhoenixTask phoenixTask) {
 
         Session session = DatabaseManager.getSession();
+        try {
 
-        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
-        if (task == null)
-            return Response.notModified().entity("No entity found by this title!").build();
+            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", phoenixTask.getTitle()).uniqueResult();
+            if (task == null)
+                return Response.notModified().entity("No entity found by this title!").build();
 
-        session.delete(task);
-        session.close();
+            session.delete(task);
 
-        return Response.ok().build();
+            return Response.ok().build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -136,12 +150,18 @@ public class TaskResource {
     public Response getAll() throws SQLException {
 
         Session session = DatabaseManager.getSession();
-        List<Task> tasks = session.getNamedQuery("Task.findAll").list();
+        try {
+            List<Task> tasks = session.getNamedQuery("Task.findAll").list();
 
-        List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
-        session.close();
-        // Encapsulate the list to transform it via JXR-RS
-        return Response.ok(PhoenixTask.toSendableList(result)).build();
+            List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
+
+            // Encapsulate the list to transform it via JXR-RS
+            return Response.ok(PhoenixTask.toSendableList(result)).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_GETBYTITLE)
@@ -152,15 +172,19 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
 
-        Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", title).uniqueResult();
-        if (task == null)
-            return Response.status(Status.NO_CONTENT).build();
-        // Always convert before closing the session
-        PhoenixTask result = task.convert();
-        
-        session.close();
+        try {
+            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", title).uniqueResult();
+            if (task == null)
+                return Response.status(Status.NO_CONTENT).build();
+            // Always convert before closing the session
+            PhoenixTask result = task.convert();
 
-        return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+            return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -171,9 +195,14 @@ public class TaskResource {
 
         Session session = DatabaseManager.getSession();
 
-        List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
+        try {
+            List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
 
-        session.close();
-        return Response.ok(RSLists.toSendableStringList(result)).build();
+            return Response.ok(RSLists.toSendableStringList(result)).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 }

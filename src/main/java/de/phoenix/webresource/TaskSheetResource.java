@@ -51,24 +51,29 @@ public class TaskSheetResource {
 
         Session session = DatabaseManager.getSession();
 
-        Transaction trans = session.beginTransaction();
-        List<Task> tasks = new ArrayList<Task>(phoenixSheet.getTasksSize());
-        Query findTask = session.getNamedQuery("Task.findByName");
+        try {
+            Transaction trans = session.beginTransaction();
+            List<Task> tasks = new ArrayList<Task>(phoenixSheet.getTasksSize());
+            Query findTask = session.getNamedQuery("Task.findByName");
 
-        for (PhoenixTask pTask : phoenixSheet.getTasks()) {
-            findTask.setParameter("title", pTask.getTitle()).uniqueResult();
-            tasks.add((Task) findTask.uniqueResult());
+            for (PhoenixTask pTask : phoenixSheet.getTasks()) {
+                findTask.setParameter("title", pTask.getTitle()).uniqueResult();
+                tasks.add((Task) findTask.uniqueResult());
+            }
+
+            TaskSheet taskSheet = new TaskSheet();
+            taskSheet.setTasks(tasks);
+            taskSheet.setCreationDate(new Date());
+
+            session.save(taskSheet);
+            trans.commit();
+
+            return Response.ok().build();
+
+        } finally {
+            if (session != null)
+                session.close();
         }
-
-        TaskSheet taskSheet = new TaskSheet();
-        taskSheet.setTasks(tasks);
-        taskSheet.setCreationDate(new Date());
-
-        session.save(taskSheet);
-        trans.commit();
-        session.close();
-
-        return Response.ok().build();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,11 +83,17 @@ public class TaskSheetResource {
     public Response getAllSheets() {
         Session session = DatabaseManager.getSession();
 
-        List<TaskSheet> sheets = session.getNamedQuery("TaskSheet.findAll").list();
+        try {
+            List<TaskSheet> sheets = session.getNamedQuery("TaskSheet.findAll").list();
 
-        List<PhoenixTaskSheet> result = new ConverterArrayList<PhoenixTaskSheet>(sheets);
-        session.close();
+            List<PhoenixTaskSheet> result = new ConverterArrayList<PhoenixTaskSheet>(sheets);
+            session.close();
 
-        return Response.ok(PhoenixTaskSheet.toSendableList(result)).build();
+            return Response.ok(PhoenixTaskSheet.toSendableList(result)).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 }

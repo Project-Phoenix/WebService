@@ -53,35 +53,41 @@ public class LectureGroupResource {
         }
 
         Session session = DatabaseManager.getSession();
+        try {
 
-        Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixLecture.getTitle()).uniqueResult();
+            Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixLecture.getTitle()).uniqueResult();
 
-        if (lecture == null) {
-            return Response.status(Status.BAD_REQUEST).entity("No lecture find in database!").build();
+            if (lecture == null) {
+                return Response.status(Status.BAD_REQUEST).entity("No lecture find in database!").build();
+            }
+
+            LectureGroup lectureGroup = new LectureGroup(phoenixLectureGroup);
+
+            lectureGroup.setLecture(lecture);
+
+            Transaction trans = session.beginTransaction();
+            // Store all relevant details of this lecture
+            List<Details> details = new ArrayList<Details>(phoenixLectureGroup.getDetailsSize());
+            for (PhoenixDetails phoenixDetails : phoenixLectureGroup.getDetails()) {
+                Details detail = new Details(phoenixDetails);
+                Integer id = (Integer) session.save(detail);
+                detail.setId(id);
+
+                details.add(detail);
+            }
+
+            lectureGroup.setDetails(details);
+
+            session.save(lectureGroup);
+
+            trans.commit();
+            return Response.ok().build();
+
+        } finally {
+            if (session != null)
+                session.close();
         }
 
-        LectureGroup lectureGroup = new LectureGroup(phoenixLectureGroup);
-
-        lectureGroup.setLecture(lecture);
-
-        Transaction trans = session.beginTransaction();
-        // Store all relevant details of this lecture
-        List<Details> details = new ArrayList<Details>(phoenixLectureGroup.getDetailsSize());
-        for (PhoenixDetails phoenixDetails : phoenixLectureGroup.getDetails()) {
-            Details detail = new Details(phoenixDetails);
-            Integer id = (Integer) session.save(detail);
-            detail.setId(id);
-
-            details.add(detail);
-        }
-
-        lectureGroup.setDetails(details);
-
-        session.save(lectureGroup);
-
-        trans.commit();
-        session.close();
-        return Response.ok().build();
     }
 
 }

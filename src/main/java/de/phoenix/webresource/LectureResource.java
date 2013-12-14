@@ -46,29 +46,36 @@ public class LectureResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLecture(PhoenixLecture phoenixLecture) {
-        Lecture lecture = new Lecture(phoenixLecture);
 
         Session session = DatabaseManager.getSession();
-        Transaction trans = session.beginTransaction();
 
-        // Store all relevant details of this lecture
-        List<Details> details = new ArrayList<Details>(phoenixLecture.lectureDetailsSize());
-        for (PhoenixDetails phoenixDetails : phoenixLecture.getLectureDetails()) {
-            Details detail = new Details(phoenixDetails);
-            Integer id = (Integer) session.save(detail);
-            detail.setId(id);
+        try {
+            Transaction trans = session.beginTransaction();
 
-            details.add(detail);
+            // Store all relevant details of this lecture
+            List<Details> details = new ArrayList<Details>(phoenixLecture.lectureDetailsSize());
+            for (PhoenixDetails phoenixDetails : phoenixLecture.getLectureDetails()) {
+                Details detail = new Details(phoenixDetails);
+                Integer id = (Integer) session.save(detail);
+                detail.setId(id);
+
+                details.add(detail);
+            }
+
+            Lecture lecture = new Lecture(phoenixLecture);
+            lecture.setDetails(details);
+
+            // Persist lecture
+            session.save(lecture);
+
+            trans.commit();
+            return Response.ok().build();
+
+        } finally {
+            if (session != null)
+                session.close();
         }
 
-        lecture.setDetails(details);
-
-        // Persist lecture
-        session.save(lecture);
-
-        trans.commit();
-        session.close();
-        return Response.ok().build();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,11 +85,18 @@ public class LectureResource {
     public Response getAllLectures() {
 
         Session session = DatabaseManager.getSession();
-        List<Lecture> lectures = session.getNamedQuery("Lecture.findAll").list();
 
-        List<PhoenixLecture> result = new ConverterArrayList<PhoenixLecture>(lectures);
+        try {
 
-        session.close();
-        return Response.ok(PhoenixLecture.toSendableList(result)).build();
+            List<Lecture> lectures = session.getNamedQuery("Lecture.findAll").list();
+
+            List<PhoenixLecture> result = new ConverterArrayList<PhoenixLecture>(lectures);
+
+            return Response.ok(PhoenixLecture.toSendableList(result)).build();
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 }
