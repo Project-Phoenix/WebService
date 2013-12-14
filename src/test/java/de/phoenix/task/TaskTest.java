@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
+import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
@@ -63,23 +64,36 @@ public class TaskTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        DatabaseCleaner.getInstance().run();
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
-        DatabaseCleaner.getInstance().run();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
-        File toDelete = new File("SpecialNumbers.class");
-        if (toDelete.exists())
-            toDelete.delete();
+
+        DatabaseCleaner.getInstance().run();
+        DatabaseTestData.getInstance().createTestData();
+        deleteAllClassFiles();
+    }
+
+    private static void deleteAllClassFiles() {
+        File dir = new File(".");
+        File[] files = dir.listFiles();
+        if (files == null)
+            return;
+        for (int i = 0; i < files.length; ++i) {
+            File file = files[i];
+            if (file.getName().endsWith(".class"))
+                file.delete();
+        }
     }
 
     private static String TEST_TITLE = "Befreundete Zahlen";
-    private static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/TaskDescription.html");
-    private static File TEST_BINARY_FILE = new File("src/test/resources/task/FirstNumbers.pdf");
-    private static File TEST_PATTERN_FILE = new File("src/test/resources/task/TaskPattern.java");
+    private static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/specialNumbers/TaskDescription.html");
+    private static File TEST_BINARY_FILE = new File("src/test/resources/task/specialNumbers/FirstNumbers.pdf");
+    private static File TEST_PATTERN_FILE = new File("src/test/resources/task/specialNumbers/TaskPattern.java");
 
     @Test
     @Order(1)
@@ -215,7 +229,7 @@ public class TaskTest {
 //        }
 //    }
 
-    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/SpecialNumbers.java");
+    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
 
     @Test
     @Order(5)

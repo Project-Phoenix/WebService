@@ -21,6 +21,7 @@ package de.phoenix.lecture;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +42,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
+import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
@@ -58,14 +60,30 @@ public class LectureTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        DatabaseCleaner.getInstance().run();
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
-        DatabaseCleaner.getInstance().run();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
+
+        DatabaseCleaner.getInstance().run();
+        DatabaseTestData.getInstance().createTestData();
+        deleteAllClassFiles();
+    }
+
+    private static void deleteAllClassFiles() {
+        File dir = new File(".");
+        File[] files = dir.listFiles();
+        if (files == null)
+            return;
+        for (int i = 0; i < files.length; ++i) {
+            File file = files[i];
+            if (file.getName().endsWith(".class"))
+                file.delete();
+        }
     }
 
     private final String TEST_LECTURE_TITLE = "Einf";

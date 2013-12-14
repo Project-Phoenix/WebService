@@ -1,3 +1,4 @@
 target/
+*.class
 *.mwb.bak
 src/test/resources/hibernate.cfg.xml
