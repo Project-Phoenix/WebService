@@ -46,18 +46,22 @@ public class DatabaseCleaner {
 
         Session session = DatabaseManager.getSession();
 
-        session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
-        SQLQuery query = session.createSQLQuery("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE();");
+        try {
+            session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
+            SQLQuery query = session.createSQLQuery("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE();");
 
-        List<String> tableNames = query.list();
-        Transaction transaction = session.beginTransaction();
-        for (String table : tableNames) {
-            session.createSQLQuery("DELETE FROM " + table + ";").executeUpdate();
+            List<String> tableNames = query.list();
+            Transaction transaction = session.beginTransaction();
+            for (String table : tableNames) {
+                session.createSQLQuery("DELETE FROM " + table + ";").executeUpdate();
+            }
+            transaction.commit();
+            session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
+
+        } finally {
+
+            session.close();
         }
-        transaction.commit();
-        session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
-
-        session.close();
     }
 
 }
