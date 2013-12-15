@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,7 +32,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -85,14 +83,13 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     @ManyToMany(mappedBy = "textList")
     private List<TaskSubmission> taskSubmissionList;
 
+    // The text pattern for a task
     @ManyToMany(mappedBy = "textList")
     private List<Task> taskList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "test")
-    private List<Test> testList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
-    private List<Test> testList1;
+    // The possible test files for a task
+    @ManyToMany(mappedBy = "testList")
+    private List<Task> taskList1;
 
     public Text() {
     }
@@ -189,21 +186,12 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     }
 
     @XmlTransient
-    public List<Test> getTests() {
-        return testList;
+    public List<Task> getTaskTests() {
+        return taskList1;
     }
 
-    public void setTests(List<Test> tests) {
-        this.testList = tests;
-    }
-
-    @XmlTransient
-    public List<Test> getTestList1() {
-        return testList1;
-    }
-
-    public void setTestList1(List<Test> testList1) {
-        this.testList1 = testList1;
+    public void setTaskTests(List<Task> taskTests) {
+        this.taskList1 = taskTests;
     }
 
     @Override

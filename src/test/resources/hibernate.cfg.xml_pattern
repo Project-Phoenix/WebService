@@ -29,7 +29,6 @@
 		<property name="hbm2ddl.auto">validate</property>
 
 		<mapping class="de.phoenix.database.entity.Attachment" />
-		<mapping class="de.phoenix.database.entity.AutomaticTask" />
 		<mapping class="de.phoenix.database.entity.Details" />
 		<mapping class="de.phoenix.database.entity.Lecture" />
 		<mapping class="de.phoenix.database.entity.LectureGroup" />
@@ -38,7 +37,6 @@
 		<mapping class="de.phoenix.database.entity.Task" />
 		<mapping class="de.phoenix.database.entity.TaskSheet" />
 		<mapping class="de.phoenix.database.entity.TaskSubmission" />
-		<mapping class="de.phoenix.database.entity.Test" />
 		<mapping class="de.phoenix.database.entity.Text" />
 
 	</session-factory>

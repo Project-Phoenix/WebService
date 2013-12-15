@@ -35,8 +35,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -72,6 +72,13 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @Column(name = "description")
     private String description;
 
+    @DefaultValue(value = "0")
+    @Column(name = "isAutomaticTest")
+    private Boolean isAutomaticTest = false;
+
+    @Column(name = "backend")
+    private String backend;
+
     @ManyToMany(mappedBy = "taskList")
     private List<TaskSheet> taskSheetList;
 
@@ -91,11 +98,16 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @ManyToMany
     private List<Text> textList;
 
+    //@formatter:off
+    @JoinTable(name = "taskTests", joinColumns = {
+            @JoinColumn(name = "task_id", referencedColumnName = "id")}, inverseJoinColumns = {
+            @JoinColumn(name = "text_id", referencedColumnName = "id")})
+    //@formatter:on
+    @ManyToMany
+    private List<Text> testList;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
     private List<TaskSubmission> taskSubmissionList;
-
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "task")
-    private AutomaticTask automaticTask;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
     private List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDatesList;
@@ -138,6 +150,22 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
         this.description = description;
     }
 
+    public Boolean isAutomaticTest() {
+        return isAutomaticTest;
+    }
+
+    public void setAutomaticTest(Boolean isAutomaticTest) {
+        this.isAutomaticTest = isAutomaticTest;
+    }
+
+    public String getBackend() {
+        return backend;
+    }
+
+    public void setBackend(String backend) {
+        this.backend = backend;
+    }
+
     @XmlTransient
     public List<TaskSheet> getTaskSheets() {
         return taskSheetList;
@@ -174,12 +202,13 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
         this.taskSubmissionList = taskSubmissions;
     }
 
-    public AutomaticTask getAutomaticTask() {
-        return automaticTask;
+    @XmlTransient
+    public List<Text> getTests() {
+        return testList;
     }
 
-    public void setAutomaticTask(AutomaticTask automaticTask) {
-        this.automaticTask = automaticTask;
+    public void setTests(List<Text> tests) {
+        this.testList = tests;
     }
 
     @XmlTransient

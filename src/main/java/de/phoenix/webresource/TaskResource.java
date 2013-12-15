@@ -41,6 +41,7 @@ import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.Text;
 import de.phoenix.database.entity.util.ConverterArrayList;
 import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.RSLists;
@@ -53,6 +54,8 @@ public class TaskResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(PhoenixTask phoenixTask) {
+
+        boolean isAutomaticTask = (phoenixTask instanceof PhoenixAutomaticTask);
 
         Session session = DatabaseManager.getSession();
         try {
@@ -84,6 +87,21 @@ public class TaskResource {
             }
 
             Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);
+            if (isAutomaticTask) {
+                PhoenixAutomaticTask autoTask = (PhoenixAutomaticTask) phoenixTask;
+                task.setBackend(autoTask.getBackend());
+                task.setAutomaticTest(true);
+
+                List<Text> tests = new ArrayList<Text>(autoTask.getTestsSize());
+                for (PhoenixText test : autoTask.getTests()) {
+                    Text te = new Text(test);
+                    Integer id = (Integer) session.save(te);
+                    te.setId(id);
+
+                    tests.add(te);
+                }
+                task.setTests(tests);
+            }
             session.save(task);
 
             trans.commit();
@@ -95,7 +113,6 @@ public class TaskResource {
         }
 
     }
-
     @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

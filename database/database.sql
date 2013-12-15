@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NULL,
   `description` LONGTEXT NULL,
+  `isAutomaticTest` TINYINT(1) NULL DEFAULT FALSE,
+  `backend` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   INDEX `title` (`title` ASC))
 ENGINE = InnoDB;
@@ -98,66 +100,6 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`details` (
   `startDate` DATETIME NULL,
   `endDate` DATETIME NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `phoenix`.`automaticTask`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`automaticTask` (
-  `id` INT NOT NULL,
-  `backend` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_automaticTask_task1`
-    FOREIGN KEY (`id`)
-    REFERENCES `phoenix`.`task` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `phoenix`.`test`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`test` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `task` INT NOT NULL,
-  `test` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_test_text1_idx` (`task` ASC),
-  INDEX `fk_test_text2_idx` (`test` ASC),
-  CONSTRAINT `fk_test_text1`
-    FOREIGN KEY (`task`)
-    REFERENCES `phoenix`.`text` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_test_text2`
-    FOREIGN KEY (`test`)
-    REFERENCES `phoenix`.`text` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `phoenix`.`automaticTaskTests`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`automaticTaskTests` (
-  `automaticTask_id` INT NOT NULL,
-  `test_id` INT NOT NULL,
-  PRIMARY KEY (`automaticTask_id`, `test_id`),
-  INDEX `fk_automaticTaskTests_test1_idx` (`test_id` ASC),
-  INDEX `fk_automaticTaskTests_automaticTask1_idx` (`automaticTask_id` ASC),
-  CONSTRAINT `fk_automaticTaskTests_automaticTask1`
-    FOREIGN KEY (`automaticTask_id`)
-    REFERENCES `phoenix`.`automaticTask` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_automaticTaskTests_test1`
-    FOREIGN KEY (`test_id`)
-    REFERENCES `phoenix`.`test` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -378,6 +320,28 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmissionAttachment` (
   CONSTRAINT `fk_taskSubmission_has_attachment_attachment1`
     FOREIGN KEY (`attachment_id`)
     REFERENCES `phoenix`.`attachment` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`taskTests`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `phoenix`.`taskTests` (
+  `task_id` INT NOT NULL,
+  `text_id` INT NOT NULL,
+  PRIMARY KEY (`task_id`, `text_id`),
+  INDEX `fk_task_has_text_text1_idx` (`text_id` ASC),
+  INDEX `fk_task_has_text_task1_idx` (`task_id` ASC),
+  CONSTRAINT `fk_task_has_text_task1`
+    FOREIGN KEY (`task_id`)
+    REFERENCES `phoenix`.`task` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_task_has_text_text1`
+    FOREIGN KEY (`text_id`)
+    REFERENCES `phoenix`.`text` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

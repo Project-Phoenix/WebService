@@ -48,6 +48,7 @@ import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
@@ -90,10 +91,10 @@ public class TaskTest {
         }
     }
 
-    private static String TEST_TITLE = "Befreundete Zahlen";
-    private static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/specialNumbers/TaskDescription.html");
-    private static File TEST_BINARY_FILE = new File("src/test/resources/task/specialNumbers/FirstNumbers.pdf");
-    private static File TEST_PATTERN_FILE = new File("src/test/resources/task/specialNumbers/TaskPattern.java");
+    private final static String TEST_TITLE = "Befreundete Zahlen";
+    private final static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/specialNumbers/TaskDescription.html");
+    private final static File TEST_BINARY_FILE = new File("src/test/resources/task/specialNumbers/FirstNumbers.pdf");
+    private final static File TEST_PATTERN_FILE = new File("src/test/resources/task/specialNumbers/TaskPattern.java");
 
     @Test
     @Order(1)
@@ -229,7 +230,7 @@ public class TaskTest {
 //        }
 //    }
 
-    private static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
+    private final static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
 
     @Test
     @Order(5)
@@ -253,7 +254,7 @@ public class TaskTest {
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
             assertTrue(post.toString(), post.getStatus() == 200);
             PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
-            assertTrue(res.getStatus().equals(SubmissionStatus.COMPILED));
+            assertTrue(res.getStatus().equals(SubmissionStatus.SUBMITTED));
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -326,6 +327,36 @@ public class TaskTest {
             // Because we want to create a title with same title, the system
             // throws an exception
             assertTrue(post.toString(), post.getStatus() == 400 && post.getEntity(String.class).equals("Duplicate name for " + task.getTitle() + "!"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    private final static String AUTOMATIC_TEST_TITLE = "TernarySearch";
+
+    @Test
+    @Order(9)
+    public void createAutomaticTask() {
+        // Create client
+        Client c = PhoenixClient.create();
+        // Get webresource
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        try {
+
+            // Empty lists - we have not interest in lists for this test
+            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+
+            // No interest in description
+            String description = "";
+
+//            PhoenixTask task = new PhoenixTask(attachments, texts, description, AUTOMATIC_TEST_TITLE);
+            PhoenixTask task = new PhoenixAutomaticTask(attachments, texts, description, AUTOMATIC_TEST_TITLE, "java", new ArrayList<PhoenixText>());
+//            PhoenixTask task = new PhoenixAutomaticTask(attachments, texts, description, AUTOMATIC_TEST_TITLE, "java", new ArrayList<PhoenixAutomaticTask>());
+            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+
+            assertTrue(post.toString(), post.getStatus() == 200);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
