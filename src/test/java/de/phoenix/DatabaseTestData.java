@@ -21,6 +21,7 @@ package de.phoenix;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class DatabaseTestData {
             byte[] buffer = new byte[2048];
             int read = 0;
             while ((read = bis.read(buffer)) != -1) {
-                sBuilder.append(new String(buffer, 0, read));
+                sBuilder.append(new String(buffer, 0, read, Charset.forName("UTF-8")));
             }
 
             bis.close();
