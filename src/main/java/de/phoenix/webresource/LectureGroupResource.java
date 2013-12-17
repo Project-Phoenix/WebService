@@ -67,7 +67,7 @@ public class LectureGroupResource {
 
             Transaction trans = session.beginTransaction();
             // Store all relevant details of this lecture
-            List<Details> details = new ArrayList<Details>(phoenixLectureGroup.getDetailsSize());
+            List<Details> details = new ArrayList<Details>();
             for (PhoenixDetails phoenixDetails : phoenixLectureGroup.getDetails()) {
                 Details detail = new Details(phoenixDetails);
                 Integer id = (Integer) session.save(detail);

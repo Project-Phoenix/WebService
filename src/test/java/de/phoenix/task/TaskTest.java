@@ -279,8 +279,8 @@ public class TaskTest {
         List<PhoenixSubmission> submissions = PhoenixSubmission.fromSendableList(post);
         assertFalse("Result is empty!", submissions.isEmpty());
         for (PhoenixSubmission phoenixSubmission : submissions) {
-            assertTrue(phoenixSubmission.getAttachmentsSize() + "", phoenixSubmission.getAttachmentsSize() == 0);
-            assertTrue(phoenixSubmission.getTextsSize() + "", phoenixSubmission.getTextsSize() == 1);
+            assertTrue(phoenixSubmission.getAttachments().size() + "", phoenixSubmission.getAttachments().size() == 0);
+            assertTrue(phoenixSubmission.getTexts().size() + "", phoenixSubmission.getTexts().size() == 1);
             PhoenixText t = phoenixSubmission.getTexts().get(0);
             assertTrue((t.getName() + "." + t.getType()) + " not equals" + TEST_SUBMISSION_FILE.getName(), (t.getName() + "." + t.getType()).equals(TEST_SUBMISSION_FILE.getName()));
 

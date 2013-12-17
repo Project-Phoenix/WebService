@@ -53,7 +53,7 @@ public class LectureResource {
             Transaction trans = session.beginTransaction();
 
             // Store all relevant details of this lecture
-            List<Details> details = new ArrayList<Details>(phoenixLecture.lectureDetailsSize());
+            List<Details> details = new ArrayList<Details>();
             for (PhoenixDetails phoenixDetails : phoenixLecture.getLectureDetails()) {
                 Details detail = new Details(phoenixDetails);
                 Integer id = (Integer) session.save(detail);

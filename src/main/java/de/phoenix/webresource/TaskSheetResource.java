@@ -53,7 +53,7 @@ public class TaskSheetResource {
 
         try {
             Transaction trans = session.beginTransaction();
-            List<Task> tasks = new ArrayList<Task>(phoenixSheet.getTasksSize());
+            List<Task> tasks = new ArrayList<Task>();
             Query findTask = session.getNamedQuery("Task.findByName");
 
             for (PhoenixTask pTask : phoenixSheet.getTasks()) {

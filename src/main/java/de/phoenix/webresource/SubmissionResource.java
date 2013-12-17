@@ -72,7 +72,7 @@ public class SubmissionResource {
 
             Transaction trans = session.beginTransaction();
             // Store attachments
-            List<Attachment> attachments = new ArrayList<Attachment>(phoenixSubmission.getAttachmentsSize());
+            List<Attachment> attachments = new ArrayList<Attachment>();
             for (PhoenixAttachment attachment : phoenixSubmission.getAttachments()) {
                 Attachment at = new Attachment(attachment);
                 Integer id = (Integer) session.save(at);
@@ -82,7 +82,7 @@ public class SubmissionResource {
             }
 
             // Store texts
-            List<Text> texts = new ArrayList<Text>(phoenixSubmission.getTextsSize());
+            List<Text> texts = new ArrayList<Text>();
             for (PhoenixText text : phoenixSubmission.getTexts()) {
                 Text te = new Text(text);
                 Integer id = (Integer) session.save(te);

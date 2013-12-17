@@ -68,7 +68,7 @@ public class TaskResource {
                 return Response.status(Status.BAD_REQUEST).entity("Duplicate name for " + phoenixTask.getTitle() + "!").build();
             }
 
-            List<Attachment> attachments = new ArrayList<Attachment>(phoenixTask.getAttachmentsSize());
+            List<Attachment> attachments = new ArrayList<Attachment>();
             for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
                 Attachment at = new Attachment(attachment);
                 Integer id = (Integer) session.save(at);
@@ -77,7 +77,7 @@ public class TaskResource {
                 attachments.add(at);
             }
 
-            List<Text> texts = new ArrayList<Text>(phoenixTask.getPatternSize());
+            List<Text> texts = new ArrayList<Text>();
             for (PhoenixText text : phoenixTask.getPattern()) {
                 Text te = new Text(text);
                 Integer id = (Integer) session.save(te);
@@ -92,7 +92,7 @@ public class TaskResource {
                 task.setBackend(autoTask.getBackend());
                 task.setAutomaticTest(true);
 
-                List<Text> tests = new ArrayList<Text>(autoTask.getTestsSize());
+                List<Text> tests = new ArrayList<Text>();
                 for (PhoenixText test : autoTask.getTests()) {
                     Text te = new Text(test);
                     Integer id = (Integer) session.save(te);
