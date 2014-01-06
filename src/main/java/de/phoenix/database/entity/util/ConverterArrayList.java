@@ -32,6 +32,10 @@ import java.util.Collection;
 public class ConverterArrayList<T> extends ArrayList<T> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected ConverterArrayList() {
+
+    }
 
     /**
      * Constructs an ArrayList from the collection and convert every element of
