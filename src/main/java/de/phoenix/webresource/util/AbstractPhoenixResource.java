@@ -48,7 +48,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         try {
             Transaction trans = session.beginTransaction();
 
-            T entity = create(phoenixEntity);
+            T entity = create(phoenixEntity, session);
             session.save(entity);
 
             trans.commit();
@@ -59,7 +59,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-    protected T create(E phoenixEntity) {
+    protected T create(E phoenixEntity, Session session) {
         throw new UnsupportedOperationException("Not supportet!");
     }
 

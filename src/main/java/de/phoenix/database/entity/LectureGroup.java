@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,6 +41,8 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.joda.time.LocalTime;
 
 import de.phoenix.database.entity.util.Convertable;
@@ -90,13 +91,14 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         @JoinColumn(name = "additionalInfo_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Details> detailsList;
 
     @JoinColumn(name = "lecture", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Lecture lecture;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureGroup")
+    @OneToMany(mappedBy = "lectureGroup")
     private List<LectureGroupTaskSheet> lectureGroupTaskSheetList;
 
     public LectureGroup() {

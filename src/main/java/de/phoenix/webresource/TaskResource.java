@@ -128,7 +128,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     }
 
     @Override
-    protected Task create(PhoenixTask phoenixTask) {
+    protected Task create(PhoenixTask phoenixTask, Session session) {
         boolean isAutomaticTask = (phoenixTask instanceof PhoenixAutomaticTask);
 
         List<Attachment> attachments = new ArrayList<Attachment>();

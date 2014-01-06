@@ -26,18 +26,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.rs.entity.PhoenixDetails;
-import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
@@ -54,62 +50,31 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createGroup(PhoenixLectureGroup phoenixLectureGroup) {
 
-        PhoenixLecture phoenixLecture = phoenixLectureGroup.getLecture();
-        if (phoenixLecture == null) {
-            return Response.status(Status.BAD_REQUEST).entity("No lecture attached to group!").build();
-        }
-
-        Session session = DatabaseManager.getSession();
-        try {
-
-            Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixLecture.getTitle()).uniqueResult();
-
-            if (lecture == null) {
-                return Response.status(Status.BAD_REQUEST).entity("No lecture find in database!").build();
-            }
-
-            LectureGroup lectureGroup = new LectureGroup(phoenixLectureGroup);
-
-            lectureGroup.setLecture(lecture);
-
-            Transaction trans = session.beginTransaction();
-            // Store all relevant details of this lecture
-            List<Details> details = new ArrayList<Details>();
-            for (PhoenixDetails phoenixDetails : phoenixLectureGroup.getDetails()) {
-                Details detail = new Details(phoenixDetails);
-                Integer id = (Integer) session.save(detail);
-                detail.setId(id);
-
-                details.add(detail);
-            }
-
-            lectureGroup.setDetails(details);
-
-            session.save(lectureGroup);
-
-            trans.commit();
-            return Response.ok().build();
-
-        } finally {
-            if (session != null)
-                session.close();
-        }
-
+        return onCreate(phoenixLectureGroup);
     }
 
-    /**
-     * private int maxMember;
-     * 
-     * private int submissionDeadlineWeekyday; private LocalTime
-     * submissionDeadlineTime;
-     * 
-     * @Column(name = "name") private String name;
-     * @Column(name = "maxMember") private Integer maxMember;
-     * @Column(name = "submissionDeadlineTime")
-     * @Temporal(TemporalType.TIME) private Date submissionDeadlineTime;
-     * @Column(name = "submissionDeadlineWeekyday", columnDefinition =
-     *              "TINYINT") private int submissionDeadlineWeekyday;
-     */
+    @Override
+    protected LectureGroup create(PhoenixLectureGroup phoenixEntity, Session session) {
+
+        Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixEntity.getLecture().getTitle()).uniqueResult();
+
+        if (lecture == null) {
+            return null;
+        }
+
+        LectureGroup lectureGroup = new LectureGroup(phoenixEntity);
+        lectureGroup.setLecture(lecture);
+
+        // Store all relevant details of this lecture
+        List<Details> details = new ArrayList<Details>();
+        for (PhoenixDetails phoenixDetails : phoenixEntity.getDetails()) {
+            Details detail = new Details(phoenixDetails);
+            details.add(detail);
+        }
+
+        lectureGroup.setDetails(details);
+        return lectureGroup;
+    }
 
     @Override
     protected void setCriteria(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria) {

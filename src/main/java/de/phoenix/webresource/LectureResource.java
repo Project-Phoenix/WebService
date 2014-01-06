@@ -58,7 +58,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     }
 
     @Override
-    protected Lecture create(PhoenixLecture phoenixEntity) {
+    protected Lecture create(PhoenixLecture phoenixEntity, Session session) {
         // Store all relevant details of this lecture
         List<Details> details = new ArrayList<Details>();
         for (PhoenixDetails phoenixDetails : phoenixEntity.getLectureDetails()) {
