@@ -99,11 +99,10 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
     }
 
     public Attachment(Blob file, Date creationDate, String name, String type) {
-        this.file = file;
+        this.setFile(file);
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
-        this.sha1 = calculateSHA1(file);
     }
 
     public Attachment(Blob file, Date creationDate, String name, String type, String sha1) {
@@ -132,6 +131,7 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
 
     public void setFile(Blob file) {
         this.file = file;
+        this.sha1 = calculateSHA1(this.file);
     }
 
     public Date getCreationDate() {

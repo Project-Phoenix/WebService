@@ -163,7 +163,7 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
         this.endTime = endTime;
     }
 
-    private static final PeriodFormatter PERIOD_FORMAT = ISOPeriodFormat.standard();
+    public static final PeriodFormatter PERIOD_FORMAT = ISOPeriodFormat.standard();
 
     public Period getInterval() {
         return PERIOD_FORMAT.parsePeriod(interval);

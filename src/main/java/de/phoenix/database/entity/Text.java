@@ -40,7 +40,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixText;
-import de.phoenix.util.hash.Hasher;
 import de.phoenix.util.hash.SHA1Hasher;
 
 @Entity
@@ -99,12 +98,10 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     }
 
     public Text(String content, Date creationDate, String name, String type) {
-        this.content = content;
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
-        Hasher hasher = new SHA1Hasher();
-        this.sha1 = hasher.generate(content);
+        this.setContent(content);
     }
 
     public Text(String content, Date creationDate, String name, String type, String sha1) {
@@ -133,6 +130,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
 
     public void setContent(String content) {
         this.content = content;
+        this.sha1 = new SHA1Hasher().generate(content);
     }
 
     public Date getCreationDate() {

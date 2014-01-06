@@ -18,47 +18,63 @@
 
 package de.phoenix.webresource;
 
+import java.io.IOException;
+import java.util.Date;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Session;
+import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 
-import de.phoenix.database.DatabaseManager;
+import de.phoenix.database.entity.Attachment;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
+import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixAttachment.WEB_RESOURCE_ROOT)
-public class AttachmentResource {
+public class AttachmentResource extends AbstractPhoenixResource<Attachment, PhoenixAttachment> {
+
+    public AttachmentResource() {
+        super(Attachment.class);
+    }
 
     @Path("/" + PhoenixAttachment.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAttachment(UpdateEntity<PhoenixAttachment> updatedAttachment) {
-        Session session = DatabaseManager.getSession();
-        try {
-            // TODO: Implement update single details
-            return Response.ok().build();
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        return onUpdate(updatedAttachment);
     }
 
     @Path("/" + PhoenixAttachment.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAttachment(SelectEntity<PhoenixAttachment> selectAttachment) {
-        Session session = DatabaseManager.getSession();
+        return onDelete(selectAttachment);
+    }
+
+    @Override
+    protected void setValues(Attachment entity, PhoenixAttachment phoenixEntity) {
+
+        entity.setName(phoenixEntity.getName());
+        entity.setType(phoenixEntity.getType());
+        entity.setCreationDate(phoenixEntity.getCreationDate());
         try {
-            // TODO: Implement delete single details
-            return Response.ok().build();
-        } finally {
-            if (session != null)
-                session.close();
+            entity.setFile(Hibernate.createBlob(phoenixEntity.getStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+    }
+
+    @Override
+    protected void setCriteria(SelectEntity<PhoenixAttachment> selectEntity, Criteria criteria) {
+        addParameter(selectEntity, "creationDate", Date.class, "creationDate", criteria);
+        addParameter(selectEntity, "name", String.class, "name", criteria);
+        addParameter(selectEntity, "type", String.class, "type", criteria);
     }
 }

@@ -64,8 +64,8 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
 
         LectureGroup lectureGroup = new LectureGroup(phoenixEntity);
         lectureGroup.setLecture(lecture);
-
         // Store all relevant details of this lecture
+
         List<Details> details = new ArrayList<Details>();
         for (PhoenixDetails phoenixDetails : phoenixEntity.getDetails()) {
             Details detail = new Details(phoenixDetails);
