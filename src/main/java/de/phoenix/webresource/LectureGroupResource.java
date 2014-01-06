@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -38,9 +39,15 @@ import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_ROOT)
-public class LectureGroupResource {
+public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, PhoenixLectureGroup> {
+
+    public LectureGroupResource() {
+        super(LectureGroup.class);
+    }
 
     @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_CREATE)
     @POST
@@ -88,6 +95,34 @@ public class LectureGroupResource {
                 session.close();
         }
 
+    }
+
+    /**
+     * private int maxMember;
+     * 
+     * private int submissionDeadlineWeekyday; private LocalTime
+     * submissionDeadlineTime;
+     * 
+     * @Column(name = "name") private String name;
+     * @Column(name = "maxMember") private Integer maxMember;
+     * @Column(name = "submissionDeadlineTime")
+     * @Temporal(TemporalType.TIME) private Date submissionDeadlineTime;
+     * @Column(name = "submissionDeadlineWeekyday", columnDefinition =
+     *              "TINYINT") private int submissionDeadlineWeekyday;
+     */
+
+    @Override
+    protected void setCriteria(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria) {
+        addParameter(selectEntity, "name", String.class, "name", criteria);
+        addParameter(selectEntity, "maxMember", int.class, "maxMember", criteria);
+        addParameter(selectEntity, "submissionDeadLineTime", String.class, "name", criteria);
+        addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, "name", criteria);
+        addParameter(selectEntity, "name", String.class, "name", criteria);
+    }
+
+    @Override
+    protected void setValues(LectureGroup entity, PhoenixLectureGroup phoenixEntity) {
+        entity.setName(phoenixEntity.getName());
     }
 
 }

@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,6 +38,9 @@ import javax.persistence.Table;
 import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterArrayList;
@@ -65,7 +67,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "title")
+    @Column(name = "title", unique = true)
     private String title;
 
     @Lob
@@ -88,6 +90,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
             @JoinColumn(name = "attachment_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Attachment> attachmentList;
 
     //@formatter:off
@@ -96,6 +99,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
             @JoinColumn(name = "text_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Text> textList;
 
     //@formatter:off
@@ -104,12 +108,13 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
             @JoinColumn(name = "text_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Text> testList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
+    @OneToMany(mappedBy = "task")
     private List<TaskSubmission> taskSubmissionList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "task")
+    @OneToMany(mappedBy = "task")
     private List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDatesList;
 
     public Task() {

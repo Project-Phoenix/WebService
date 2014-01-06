@@ -59,7 +59,7 @@ import de.phoenix.rs.entity.PhoenixLectureGroup;
     @NamedQuery(name = "LectureGroup.findByName", query = "SELECT l FROM LectureGroup l WHERE l.name = :name"),
     @NamedQuery(name = "LectureGroup.findByMaxMember", query = "SELECT l FROM LectureGroup l WHERE l.maxMember = :maxMember"),
     @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineTime", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineTime = :submissionDeadlineTime"),
-    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineWeekyday", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineWeekyday = :submissionDeadlineWeekyday")})
+    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineWeekday", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineWeekday = :submissionDeadlineWeekday")})
 //@formatter:on
 public class LectureGroup implements Serializable, Convertable<PhoenixLectureGroup> {
 
@@ -81,8 +81,8 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     @Temporal(TemporalType.TIME)
     private Date submissionDeadlineTime;
 
-    @Column(name = "submissionDeadlineWeekyday", columnDefinition = "TINYINT")
-    private int submissionDeadlineWeekyday;
+    @Column(name = "submissionDeadlineWeekday", columnDefinition = "TINYINT")
+    private int submissionDeadlineWeekday;
 
     //@formatter:off
     @JoinTable(name = "lectureGroupDetails", joinColumns = {
@@ -110,7 +110,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         this.maxMember = phoenixLectureGroup.getMaxMember();
         this.name = phoenixLectureGroup.getName();
         this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime().toDateTimeToday().toDate();
-        this.submissionDeadlineWeekyday = phoenixLectureGroup.getSubmissionDeadlineWeekyday();
+        this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday();
     }
 
     public Integer getId() {
@@ -137,12 +137,12 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         this.maxMember = maxMember;
     }
 
-    public int getSubmissionDeadlineWeekyday() {
-        return submissionDeadlineWeekyday;
+    public int getSubmissionDeadlineWeekday() {
+        return submissionDeadlineWeekday;
     }
 
-    public void setSubmissionDeadlineWeekyday(int submissionDeadlineWeekyday) {
-        this.submissionDeadlineWeekyday = submissionDeadlineWeekyday;
+    public void setSubmissionDeadlineWeekday(int submissionDeadlineWeekday) {
+        this.submissionDeadlineWeekday = submissionDeadlineWeekday;
     }
 
     public Date getSubmissionDeadlineTime() {
@@ -208,6 +208,6 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     @Override
     public PhoenixLectureGroup convert() {
-        return new PhoenixLectureGroup(getName(), getMaxMember(), getSubmissionDeadlineWeekyday(), new LocalTime(getSubmissionDeadlineTime()), new ConverterArrayList<PhoenixDetails>(getDetails()), getLecture().convert());
+        return new PhoenixLectureGroup(getName(), getMaxMember(), getSubmissionDeadlineWeekday(), new LocalTime(getSubmissionDeadlineTime()), new ConverterArrayList<PhoenixDetails>(getDetails()), getLecture().convert());
     }
 }

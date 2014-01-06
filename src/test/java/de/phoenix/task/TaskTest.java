@@ -192,48 +192,10 @@ public class TaskTest {
         assertTrue("Task title wrong!", task.getTitle().equals(TEST_TITLE));
     }
 
-    // TODO: Think about this
-//    @Test
-//    @Order(4)
-//    public void updateTask() {
-//
-//        if (!TEST_BINARY_FILE.exists()) {
-//            fail("Binary file does not exists!");
-//        }
-//
-//        if (!TEST_PATTERN_FILE.exists()) {
-//            fail("Text file does not exists!");
-//        }
-//
-//        Client c = PhoenixClient.create();
-//        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_UPDATE);
-//
-//        try {
-//            List<PhoenixText> texts = new ArrayList<PhoenixText>();
-//            PhoenixText textFile = new PhoenixText(TEST_DESCRIPTION_FILE, TEST_DESCRIPTION_FILE.getName());
-//            texts.add(textFile);
-//
-//            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
-//            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
-//            attachments.add(binaryFile);
-//
-//            String description = getText(TEST_DESCRIPTION_FILE);
-//
-//            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
-//
-//            Updateable<PhoenixTask, String> tmp = new Updateable<PhoenixTask, String>(task, TEST_TITLE);
-//            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, tmp);
-//            assertTrue(post.toString(), post.getStatus() == 200);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            fail();
-//        }
-//    }
-
     private final static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
 
     @Test
-    @Order(5)
+    @Order(4)
     public void submitSolution() {
 
         if (!TEST_SUBMISSION_FILE.exists()) {
@@ -262,7 +224,7 @@ public class TaskTest {
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
@@ -289,7 +251,7 @@ public class TaskTest {
     }
 
     @Test
-    @Order(7)
+    @Order(6)
     public void getAllTitles() {
         Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
@@ -306,7 +268,7 @@ public class TaskTest {
     }
 
     @Test
-    @Order(8)
+    @Order(7)
     public void createDuplicateTask() {
         // Create client
         Client c = PhoenixClient.create();
@@ -326,7 +288,7 @@ public class TaskTest {
 
             // Because we want to create a title with same title, the system
             // throws an exception
-            assertTrue(post.toString(), post.getStatus() == 400 && post.getEntity(String.class).equals("Duplicate name for " + task.getTitle() + "!"));
+            assertTrue(post.toString(), post.getStatus() == 400 && post.getEntity(String.class).equals("Duplicate task title!"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -336,7 +298,7 @@ public class TaskTest {
     private final static String AUTOMATIC_TEST_TITLE = "TernarySearch";
 
     @Test
-    @Order(9)
+    @Order(8)
     public void createAutomaticTask() {
         // Create client
         Client c = PhoenixClient.create();
@@ -351,9 +313,7 @@ public class TaskTest {
             // No interest in description
             String description = "";
 
-//            PhoenixTask task = new PhoenixTask(attachments, texts, description, AUTOMATIC_TEST_TITLE);
             PhoenixTask task = new PhoenixAutomaticTask(attachments, texts, description, AUTOMATIC_TEST_TITLE, "java", new ArrayList<PhoenixText>());
-//            PhoenixTask task = new PhoenixAutomaticTask(attachments, texts, description, AUTOMATIC_TEST_TITLE, "java", new ArrayList<PhoenixAutomaticTask>());
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
 
             assertTrue(post.toString(), post.getStatus() == 200);

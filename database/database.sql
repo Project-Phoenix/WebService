@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `isAutomaticTest` TINYINT(1) NULL DEFAULT FALSE,
   `backend` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
-  INDEX `title` (`title` ASC))
+  INDEX `title` (`title` ASC),
+  UNIQUE INDEX `title_UNIQUE` (`title` ASC))
 ENGINE = InnoDB;
 
 
@@ -25,7 +26,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `phoenix`.`taskSheet` (
   `id` INT NOT NULL,
   `creationDate` DATETIME NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `taskSheetKey` (`creationDate` ASC))
 ENGINE = InnoDB;
 
 
@@ -39,7 +41,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`attachment` (
   `name` VARCHAR(255) NULL,
   `type` VARCHAR(45) NULL,
   `sha1` VARCHAR(40) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `attachmentKey` (`creationDate` ASC, `name` ASC, `type` ASC))
 ENGINE = InnoDB;
 
 
@@ -53,7 +56,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`text` (
   `name` VARCHAR(255) NULL,
   `type` VARCHAR(45) NULL,
   `sha1` VARCHAR(40) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `textKey` (`creationDate` ASC, `name` ASC, `type` ASC))
 ENGINE = InnoDB;
 
 
@@ -63,7 +67,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `lectureKey` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -75,10 +80,11 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroup` (
   `name` VARCHAR(255) NULL,
   `maxMember` INT NULL,
   `submissionDeadlineTime` TIME NULL,
-  `submissionDeadlineWeekyday` TINYINT NULL,
+  `submissionDeadlineWeekday` TINYINT NULL,
   `lecture` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_lectureGroup_lecture1_idx` (`lecture` ASC),
+  INDEX `lectureGroupKey` (`name` ASC),
   CONSTRAINT `fk_lectureGroup_lecture1`
     FOREIGN KEY (`lecture`)
     REFERENCES `phoenix`.`lecture` (`id`)
@@ -99,7 +105,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`details` (
   `interval` VARCHAR(45) NULL,
   `startDate` DATETIME NULL,
   `endDate` DATETIME NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `detailsKey` (`room` ASC, `weekday` ASC, `startTime` ASC, `endTime` ASC, `interval` ASC, `startDate` ASC, `endDate` ASC))
 ENGINE = InnoDB;
 
 
@@ -273,6 +280,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmission` (
   `statusText` LONGTEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_taskSubmission_task1_idx` (`task` ASC),
+  INDEX `submissionKey` (`date` ASC, `status` ASC, `statusText`(50) ASC),
   CONSTRAINT `fk_taskSubmission_task1`
     FOREIGN KEY (`task`)
     REFERENCES `phoenix`.`task` (`id`)

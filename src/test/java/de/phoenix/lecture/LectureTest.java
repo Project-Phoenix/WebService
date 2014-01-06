@@ -50,6 +50,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.SelectEntity;
 
 @RunWith(OrderedRunner.class)
 public class LectureTest {
@@ -161,5 +162,23 @@ public class LectureTest {
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
 
         assertTrue(response.toString(), response.getStatus() == 200);
+    }
+
+    @Test
+    @Order(4)
+    public void getLecture() {
+        Client c = PhoenixClient.create();
+        WebResource get = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+
+        // Create select object from the phoenix lecture
+        SelectEntity<PhoenixLecture> selectObject = new SelectEntity<PhoenixLecture>();
+        selectObject.addKey("title", TEST_LECTURE_TITLE);
+
+        // Search for the object - can match many
+        ClientResponse response = get.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectObject);
+        assertTrue(response.toString(), response.getStatus() == 200);
+        List<PhoenixLecture> lectures = PhoenixLecture.fromSendableList(response);
+        PhoenixLecture lec = lectures.get(0);
+        assertTrue(lec.getTitle() + " is not " + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
     }
 }

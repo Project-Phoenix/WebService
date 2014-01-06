@@ -59,7 +59,8 @@ import de.phoenix.rs.entity.PhoenixDetails;
     @NamedQuery(name = "Details.findByEndTime", query = "SELECT d FROM Details d WHERE d.endTime = :endTime"),
     @NamedQuery(name = "Details.findByInterval", query = "SELECT d FROM Details d WHERE d.interval = :interval"),
     @NamedQuery(name = "Details.findByStartDate", query = "SELECT d FROM Details d WHERE d.startDate = :startDate"),
-    @NamedQuery(name = "Details.findByEndDate", query = "SELECT d FROM Details d WHERE d.endDate = :endDate")})
+    @NamedQuery(name = "Details.findByEndDate", query = "SELECT d FROM Details d WHERE d.endDate = :endDate"),
+    @NamedQuery(name = "Details.findByPhoenixDetails", query = "SELECT d FROM Details d WHERE d.room = :room AND d.weekday = :weekday AND d.startTime = :startTime AND d.endTime = :endTime AND d.interval = :interval AND d.startDate = :startDate AND d.endDate = :endDate")})
 //@formatter:on
 public class Details implements Serializable, Convertable<PhoenixDetails> {
 

@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +36,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterArrayList;
@@ -65,7 +67,8 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
+    @OneToMany(mappedBy = "lecture")
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<LectureGroup> lectureGroupList;
 
     //@formatter:off
@@ -74,6 +77,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
             @JoinColumn(name = "additionalInfo_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Details> detailsList;
 
     public Lecture() {

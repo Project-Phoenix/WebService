@@ -26,11 +26,13 @@ import javax.ws.rs.core.Application;
 
 import de.phoenix.rs.JacksonConfigurator;
 import de.phoenix.webresource.AccountResource;
+import de.phoenix.webresource.AttachmentResource;
 import de.phoenix.webresource.LectureGroupResource;
 import de.phoenix.webresource.LectureResource;
 import de.phoenix.webresource.SubmissionResource;
 import de.phoenix.webresource.TaskResource;
 import de.phoenix.webresource.TaskSheetResource;
+import de.phoenix.webresource.TextResource;
 import de.phoenix.webresource.TokenResource;
 
 @ApplicationPath("/rest")
@@ -56,6 +58,9 @@ public class PhoenixApplication extends Application {
         classSet.add(TaskSheetResource.class);
         classSet.add(LectureResource.class);
         classSet.add(LectureGroupResource.class);
+
+        classSet.add(TextResource.class);
+        classSet.add(AttachmentResource.class);
 
         classSet.add(JacksonConfigurator.class);
 
