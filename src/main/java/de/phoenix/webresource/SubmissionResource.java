@@ -18,6 +18,7 @@
 
 package de.phoenix.webresource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +45,8 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.DefaultSubmissionController;
-import de.phoenix.submission.SubmissionResult;
 import de.phoenix.submission.SubmissionController;
+import de.phoenix.submission.SubmissionResult;
 
 /**
  * Webresource for uploading and getting submissions from user.
@@ -74,7 +75,13 @@ public class SubmissionResource {
             // Store attachments
             List<Attachment> attachments = new ArrayList<Attachment>();
             for (PhoenixAttachment attachment : phoenixSubmission.getAttachments()) {
-                Attachment at = new Attachment(attachment);
+                Attachment at;
+                try {
+                    at = new Attachment(attachment);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
                 Integer id = (Integer) session.save(at);
                 at.setId(id);
 

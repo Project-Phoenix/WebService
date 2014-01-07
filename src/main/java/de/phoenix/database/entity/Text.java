@@ -19,7 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -33,10 +32,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixText;
@@ -67,8 +67,8 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     private String content;
 
     @Column(name = "creationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime creationDate;
 
     @Column(name = "name")
     private String name;
@@ -97,14 +97,14 @@ public class Text implements Serializable, Convertable<PhoenixText> {
         this.id = id;
     }
 
-    public Text(String content, Date creationDate, String name, String type) {
+    public Text(String content, DateTime creationDate, String name, String type) {
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
         this.setContent(content);
     }
 
-    public Text(String content, Date creationDate, String name, String type, String sha1) {
+    public Text(String content, DateTime creationDate, String name, String type, String sha1) {
         this.content = content;
         this.creationDate = creationDate;
         this.name = name;
@@ -113,7 +113,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     }
 
     public Text(PhoenixText text) {
-        this(text.getText(), new Date(), text.getName(), text.getType());
+        this(text.getText(), new DateTime(), text.getName(), text.getType());
     }
 
     public Integer getId() {
@@ -133,11 +133,11 @@ public class Text implements Serializable, Convertable<PhoenixText> {
         this.sha1 = new SHA1Hasher().generate(content);
     }
 
-    public Date getCreationDate() {
+    public DateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(DateTime creationDate) {
         this.creationDate = creationDate;
     }
 

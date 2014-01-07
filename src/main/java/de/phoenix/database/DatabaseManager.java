@@ -20,7 +20,6 @@ package de.phoenix.database;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 public class DatabaseManager {
 
@@ -28,7 +27,7 @@ public class DatabaseManager {
     private static final DatabaseManager INSTANCE = new DatabaseManager();
 
     private DatabaseManager() {
-        Configuration config = new AnnotationConfiguration().configure("hibernate.cfg.xml");
+        Configuration config = new Configuration().configure("hibernate.cfg.xml");
         this.sessionFactory = config.buildSessionFactory();
     }
 

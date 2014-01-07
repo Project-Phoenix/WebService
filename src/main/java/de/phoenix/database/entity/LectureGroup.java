@@ -19,7 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -36,13 +35,12 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
 import org.joda.time.LocalTime;
 
 import de.phoenix.database.entity.util.Convertable;
@@ -79,8 +77,8 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     private Integer maxMember;
 
     @Column(name = "submissionDeadlineTime")
-    @Temporal(TemporalType.TIME)
-    private Date submissionDeadlineTime;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentLocalTimeAsTime")
+    private LocalTime submissionDeadlineTime;
 
     @Column(name = "submissionDeadlineWeekday", columnDefinition = "TINYINT")
     private int submissionDeadlineWeekday;
@@ -111,7 +109,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     public LectureGroup(PhoenixLectureGroup phoenixLectureGroup) {
         this.maxMember = phoenixLectureGroup.getMaxMember();
         this.name = phoenixLectureGroup.getName();
-        this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime().toDateTimeToday().toDate();
+        this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime();
         this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday();
     }
 
@@ -147,11 +145,11 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         this.submissionDeadlineWeekday = submissionDeadlineWeekday;
     }
 
-    public Date getSubmissionDeadlineTime() {
+    public LocalTime getSubmissionDeadlineTime() {
         return submissionDeadlineTime;
     }
 
-    public void setSubmissionDeadlineTime(Date submissionDeadlineTime) {
+    public void setSubmissionDeadlineTime(LocalTime submissionDeadlineTime) {
         this.submissionDeadlineTime = submissionDeadlineTime;
     }
 

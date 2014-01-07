@@ -19,7 +19,6 @@
 package de.phoenix.webresource;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -33,6 +32,7 @@ import javax.ws.rs.core.Response;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
@@ -63,7 +63,7 @@ public class TaskSheetResource {
 
             TaskSheet taskSheet = new TaskSheet();
             taskSheet.setTasks(tasks);
-            taskSheet.setCreationDate(new Date());
+            taskSheet.setCreationDate(new DateTime());
 
             session.save(taskSheet);
             trans.commit();

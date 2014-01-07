@@ -19,7 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -32,16 +31,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
-import org.joda.time.format.ISOPeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixDetails;
@@ -79,24 +75,25 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
     private Integer weekday;
 
     @Column(name = "startTime")
-    @Temporal(TemporalType.TIME)
-    private Date startTime;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentLocalTimeAsTime")
+    private LocalTime startTime;
 
     @Column(name = "endTime")
-    @Temporal(TemporalType.TIME)
-    private Date endTime;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentLocalTimeAsTime")
+    private LocalTime endTime;
 
     // Brackets [] because of , interval is a keyword
     @Column(name = "[interval]")
-    private String interval;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentPeriod")
+    private Period interval;
 
     @Column(name = "startDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
+    private LocalDate startDate;
 
     @Column(name = "endDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
+    private LocalDate endDate;
 
     @ManyToMany(mappedBy = "detailsList")
     private List<LectureGroup> lectureGroupList;
@@ -116,11 +113,11 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
         this.setInterval(details.getInverval());
         this.weekday = details.getWeekDay();
 
-        this.startTime = details.getStartTime().toDateTimeToday().toDate();
-        this.endTime = details.getEndTime().toDateTimeToday().toDate();
+        this.startTime = details.getStartTime();
+        this.endTime = details.getEndTime();
 
-        this.startDate = details.getStartDate().toDate();
-        this.endDate = details.getEndDate().toDate();
+        this.startDate = details.getStartDate();
+        this.endDate = details.getEndDate();
     }
 
     public Integer getId() {
@@ -147,45 +144,43 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
         this.weekday = weekday;
     }
 
-    public Date getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
-    public static final PeriodFormatter PERIOD_FORMAT = ISOPeriodFormat.standard();
-
     public Period getInterval() {
-        return PERIOD_FORMAT.parsePeriod(interval);
+        return interval;
     }
 
     public void setInterval(Period interval) {
-        this.interval = PERIOD_FORMAT.print(interval);
+        this.interval = interval;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

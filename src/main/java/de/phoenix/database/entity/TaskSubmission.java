@@ -19,7 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -36,10 +35,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterArrayList;
@@ -68,8 +68,8 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     @Basic(optional = false)
     @Column(name = "date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime date;
 
     @Column(name = "status")
     private Integer status;
@@ -104,7 +104,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.id = id;
     }
 
-    public TaskSubmission(Integer id, Date date) {
+    public TaskSubmission(Integer id, DateTime date) {
         this.id = id;
         this.date = date;
     }
@@ -113,7 +113,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.task = task;
         this.attachmentList = attachments;
         this.textList = texts;
-        this.date = new Date();
+        this.date = new DateTime();
         this.status = status;
         this.statusText = statusText;
     }
@@ -126,11 +126,11 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.id = id;
     }
 
-    public Date getDate() {
+    public DateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(DateTime date) {
         this.date = date;
     }
 

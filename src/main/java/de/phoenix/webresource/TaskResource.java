@@ -18,6 +18,7 @@
 
 package de.phoenix.webresource;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,12 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
         List<Attachment> attachments = new ArrayList<Attachment>();
         for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
-            Attachment at = new Attachment(attachment);
+            Attachment at;
+            try {
+                at = new Attachment(attachment);
+            } catch (IOException e) {
+                return null;
+            }
             attachments.add(at);
         }
 

@@ -25,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
@@ -62,46 +61,21 @@ public class DetailsResource extends AbstractPhoenixResource<Details, PhoenixDet
 
         entity.setRoom(phoenixEntity.getRoom());
         entity.setWeekday(phoenixEntity.getWeekDay());
-        entity.setStartTime(phoenixEntity.getStartTime().toDateTimeToday().toDate());
-        entity.setEndTime(phoenixEntity.getEndTime().toDateTimeToday().toDate());
+        entity.setStartTime(phoenixEntity.getStartTime());
+        entity.setEndTime(phoenixEntity.getEndTime());
         entity.setInterval(phoenixEntity.getInverval());
-        entity.setStartDate(phoenixEntity.getStartDate().toDate());
-        entity.setEndDate(phoenixEntity.getStartDate().toDate());
+        entity.setStartDate(phoenixEntity.getStartDate());
+        entity.setEndDate(phoenixEntity.getStartDate());
     }
 
     @Override
     protected void setCriteria(SelectEntity<PhoenixDetails> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "room", String.class, "room", criteria);
         addParameter(selectEntity, "weekDay", int.class, "weekday", criteria);
-
-        // Necessary because of conversion between Date <-> LocalTime
-        // LocalTime
-        LocalTime startTime = selectEntity.get("startTime", LocalTime.class);
-        if (startTime != null) {
-            criteria.add(Restrictions.eq("startTime", startTime.toDateTimeToday().toDate()));
-        }
-
-        // LocalTime
-        LocalTime endTime = selectEntity.get("endTime", LocalTime.class);
-        if (endTime != null)
-            criteria.add(Restrictions.eq("endTime", endTime.toDateTimeToday().toDate()));
-
-        // Period
-        Period period = selectEntity.get("interval", Period.class);
-        if (period != null) {
-            criteria.add(Restrictions.eq("interval", Details.PERIOD_FORMAT.print(period)));
-        }
-
-        // LocalDate
-        LocalDate startDate = selectEntity.get("startTime", LocalDate.class);
-        if (startDate != null) {
-            criteria.add(Restrictions.eq("startTime", startDate.toDate()));
-        }
-
-        // LocalDate
-        LocalDate endDate = selectEntity.get("endTime", LocalDate.class);
-        if (endDate != null) {
-            criteria.add(Restrictions.eq("endTime", endDate.toDate()));
-        }
+        addParameter(selectEntity, "startTime", LocalTime.class, "startTime", criteria);
+        addParameter(selectEntity, "endTime", LocalTime.class, "endTime", criteria);
+        addParameter(selectEntity, "interval", Period.class, "interval", criteria);
+        addParameter(selectEntity, "startDate", LocalDate.class, "startDate", criteria);
+        addParameter(selectEntity, "endDate", LocalDate.class, "endDate", criteria);
     }
 }

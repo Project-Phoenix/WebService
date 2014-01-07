@@ -57,6 +57,7 @@ public class AttachmentResource extends AbstractPhoenixResource<Attachment, Phoe
         return onDelete(selectAttachment);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void setValues(Attachment entity, PhoenixAttachment phoenixEntity) {
 

@@ -103,8 +103,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`details` (
   `startTime` TIME NULL,
   `endTime` TIME NULL,
   `interval` VARCHAR(45) NULL,
-  `startDate` DATETIME NULL,
-  `endDate` DATETIME NULL,
+  `startDate` DATE NULL,
+  `endDate` DATE NULL,
   PRIMARY KEY (`id`),
   INDEX `detailsKey` (`room` ASC, `weekday` ASC, `startTime` ASC, `endTime` ASC, `interval` ASC, `startDate` ASC, `endDate` ASC))
 ENGINE = InnoDB;

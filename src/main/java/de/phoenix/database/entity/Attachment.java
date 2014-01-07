@@ -18,10 +18,10 @@
 
 package de.phoenix.database.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -35,12 +35,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.lob.BlobImpl;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixAttachment;
@@ -73,8 +73,8 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
     private Blob file;
 
     @Column(name = "creationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime creationDate;
 
     @Column(name = "name")
     private String name;
@@ -98,14 +98,14 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
         this.id = id;
     }
 
-    public Attachment(Blob file, Date creationDate, String name, String type) {
+    public Attachment(Blob file, DateTime creationDate, String name, String type) {
         this.setFile(file);
         this.creationDate = creationDate;
         this.name = name;
         this.type = type;
     }
 
-    public Attachment(Blob file, Date creationDate, String name, String type, String sha1) {
+    public Attachment(Blob file, DateTime creationDate, String name, String type, String sha1) {
         this.file = file;
         this.creationDate = creationDate;
         this.name = name;
@@ -113,8 +113,10 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
         this.sha1 = sha1;
     }
 
-    public Attachment(PhoenixAttachment attachment) {
-        this(new BlobImpl(attachment.getContent()), new Date(), attachment.getName(), attachment.getType());
+    @SuppressWarnings("deprecation")
+    public Attachment(PhoenixAttachment attachment) throws IOException {
+
+        this(Hibernate.createBlob(attachment.getStream()), new DateTime(), attachment.getName(), attachment.getType());
     }
 
     public Integer getId() {
@@ -134,11 +136,11 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
         this.sha1 = calculateSHA1(this.file);
     }
 
-    public Date getCreationDate() {
+    public DateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(DateTime creationDate) {
         this.creationDate = creationDate;
     }
 

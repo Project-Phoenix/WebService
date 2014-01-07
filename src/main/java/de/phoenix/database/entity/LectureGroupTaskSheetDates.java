@@ -19,7 +19,7 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -29,9 +29,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "lectureGroupTaskSheetDates")
@@ -53,12 +54,12 @@ public class LectureGroupTaskSheetDates implements Serializable {
     protected LectureGroupTaskSheetDatesPK lectureGroupTaskSheetDatesPK;
 
     @Column(name = "deadline")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deadline;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime deadline;
 
     @Column(name = "releaseDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date releaseDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime releaseDate;
 
     @JoinColumn(name = "task_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -91,19 +92,19 @@ public class LectureGroupTaskSheetDates implements Serializable {
         this.lectureGroupTaskSheetDatesPK = lectureGroupTaskSheetDatesPK;
     }
 
-    public Date getDeadline() {
+    public DateTime getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(Date deadline) {
+    public void setDeadline(DateTime deadline) {
         this.deadline = deadline;
     }
 
-    public Date getReleaseDate() {
+    public DateTime getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
     }
 

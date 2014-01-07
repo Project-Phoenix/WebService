@@ -19,7 +19,6 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -34,10 +33,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterArrayList;
@@ -62,8 +62,8 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
     private Integer id;
 
     @Column(name = "creationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime creationDate;
 
     //@formatter:off
     @JoinTable(name = "taskSheetTasks", joinColumns = {
@@ -91,11 +91,11 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
         this.id = id;
     }
 
-    public Date getCreationDate() {
+    public DateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(DateTime creationDate) {
         this.creationDate = creationDate;
     }
 
