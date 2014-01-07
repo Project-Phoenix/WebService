@@ -40,8 +40,7 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.database.entity.util.ConverterArrayList;
-import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 
 @Entity
@@ -145,7 +144,7 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     @Override
     public PhoenixTaskSheet convert() {
-        return new PhoenixTaskSheet(new ConverterArrayList<PhoenixTask>(this.taskList), getCreationDate());
+        return new PhoenixTaskSheet(ConverterUtil.convert(taskList), getCreationDate());
     }
 
 }

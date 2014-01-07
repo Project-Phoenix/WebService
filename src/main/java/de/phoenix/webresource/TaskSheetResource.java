@@ -37,7 +37,7 @@ import org.joda.time.DateTime;
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
-import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 
@@ -86,7 +86,7 @@ public class TaskSheetResource {
         try {
             List<TaskSheet> sheets = session.getNamedQuery("TaskSheet.findAll").list();
 
-            List<PhoenixTaskSheet> result = new ConverterArrayList<PhoenixTaskSheet>(sheets);
+            List<PhoenixTaskSheet> result = ConverterUtil.convert(sheets);
             session.close();
 
             return Response.ok(PhoenixTaskSheet.toSendableList(result)).build();

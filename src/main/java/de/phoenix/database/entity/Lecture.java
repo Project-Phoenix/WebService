@@ -41,8 +41,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.database.entity.util.ConverterArrayList;
-import de.phoenix.rs.entity.PhoenixDetails;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixLecture;
 
 @Entity
@@ -153,7 +152,6 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     @Override
     public PhoenixLecture convert() {
-        return new PhoenixLecture(getName(), new ConverterArrayList<PhoenixDetails>(getDetails()));
+        return new PhoenixLecture(getName(), ConverterUtil.convert(getDetails()));
     }
-
 }

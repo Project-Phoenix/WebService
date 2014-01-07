@@ -35,7 +35,7 @@ import org.hibernate.Session;
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
-import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.key.SelectEntity;
@@ -86,7 +86,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
 
             List<Lecture> lectures = session.getNamedQuery("Lecture.findAll").list();
 
-            List<PhoenixLecture> result = new ConverterArrayList<PhoenixLecture>(lectures);
+            List<PhoenixLecture> result = ConverterUtil.convert(lectures);
 
             return Response.ok(PhoenixLecture.toSendableList(result)).build();
 

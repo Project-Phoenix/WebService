@@ -37,7 +37,7 @@ import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
-import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
@@ -142,7 +142,7 @@ public class SubmissionResource {
             List<TaskSubmission> submissions = task.getTaskSubmissions();
 
             // List containing the result
-            List<PhoenixSubmission> result = new ConverterArrayList<PhoenixSubmission>(submissions);
+            List<PhoenixSubmission> result = ConverterUtil.convert(submissions);
 
             return Response.ok(PhoenixSubmission.toSendableList(result)).build();
 

@@ -43,10 +43,8 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.database.entity.util.ConverterArrayList;
-import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTask;
-import de.phoenix.rs.entity.PhoenixText;
 
 @Entity
 @Table(name = "task")
@@ -253,6 +251,6 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
 
     @Override
     public PhoenixTask convert() {
-        return new PhoenixTask(new ConverterArrayList<PhoenixAttachment>(this.getAttachments()), new ConverterArrayList<PhoenixText>(this.getTexts()), getDescription(), getTitle());
+        return new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
     }
 }

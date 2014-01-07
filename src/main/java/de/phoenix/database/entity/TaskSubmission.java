@@ -42,10 +42,8 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.database.entity.util.ConverterArrayList;
-import de.phoenix.rs.entity.PhoenixAttachment;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixSubmission;
-import de.phoenix.rs.entity.PhoenixText;
 
 @Entity
 @Table(name = "taskSubmission")
@@ -204,7 +202,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     @Override
     public PhoenixSubmission convert() {
-        return new PhoenixSubmission(getDate(), getTask().convert(), getStatus(), getStatusText(), new ConverterArrayList<PhoenixAttachment>(getAttachments()), new ConverterArrayList<PhoenixText>(getTexts()));
+        return new PhoenixSubmission(getDate(), getTask().convert(), getStatus(), getStatusText(), ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()));
     }
 
 }

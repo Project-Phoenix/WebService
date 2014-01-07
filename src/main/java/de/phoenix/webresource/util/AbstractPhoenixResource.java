@@ -30,15 +30,15 @@ import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.key.PhoenixEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 
 public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extends PhoenixEntity> {
-    
+
     private final Class<T> clazz;
-    
+
     public AbstractPhoenixResource(Class<T> clazz) {
         this.clazz = clazz;
     }
@@ -111,7 +111,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
 
             List<T> entities = searchEntity(selectEntity, session);
 
-            List<E> result = new ConverterArrayList<E>(entities);
+            List<E> result = ConverterUtil.convert(entities);
 
             return result;
         } finally {

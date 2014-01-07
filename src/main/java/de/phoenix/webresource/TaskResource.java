@@ -42,7 +42,7 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.Text;
-import de.phoenix.database.entity.util.ConverterArrayList;
+import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
@@ -71,7 +71,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         try {
             List<Task> tasks = session.getNamedQuery("Task.findAll").list();
 
-            List<PhoenixTask> result = new ConverterArrayList<PhoenixTask>(tasks);
+            List<PhoenixTask> result = ConverterUtil.convert(tasks);
 
             // Encapsulate the list to transform it via JXR-RS
             return Response.ok(PhoenixTask.toSendableList(result)).build();
