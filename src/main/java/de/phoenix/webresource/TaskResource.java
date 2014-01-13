@@ -190,10 +190,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getTask(SelectEntity<PhoenixTask> selectEntity) {
-
-        List<PhoenixTask> list = onGet(selectEntity);
-
-        return Response.ok(PhoenixTask.toSendableList(list)).build();
+        return Response.ok(onGet(selectEntity)).build();
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)

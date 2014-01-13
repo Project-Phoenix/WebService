@@ -254,7 +254,7 @@ public class TaskTest {
         post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixSubmission> submissions = PhoenixSubmission.fromSendableList(post);
+        List<PhoenixSubmission> submissions = EntityUtil.extractEntityList(post);
         assertFalse("Result is empty!", submissions.isEmpty());
         for (PhoenixSubmission phoenixSubmission : submissions) {
             assertTrue(phoenixSubmission.getAttachments().size() + "", phoenixSubmission.getAttachments().size() == 0);

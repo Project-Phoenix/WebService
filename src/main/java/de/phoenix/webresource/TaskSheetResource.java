@@ -89,7 +89,7 @@ public class TaskSheetResource {
             List<PhoenixTaskSheet> result = ConverterUtil.convert(sheets);
             session.close();
 
-            return Response.ok(PhoenixTaskSheet.toSendableList(result)).build();
+            return Response.ok(result).build();
 
         } finally {
             if (session != null)

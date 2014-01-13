@@ -144,7 +144,7 @@ public class SubmissionResource {
             // List containing the result
             List<PhoenixSubmission> result = ConverterUtil.convert(submissions);
 
-            return Response.ok(PhoenixSubmission.toSendableList(result)).build();
+            return Response.ok(result).build();
 
         } finally {
             if (session != null)
