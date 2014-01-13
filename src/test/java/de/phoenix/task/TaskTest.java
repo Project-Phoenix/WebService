@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -55,6 +55,7 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
@@ -221,9 +222,10 @@ public class TaskTest {
         PhoenixTask task = list.get(0);
 
         try {
-            PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
-            wr = PhoenixSubmission.submitResource(c, BASE_URI);
-            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+            PhoenixSubmission sub = new PhoenixSubmission(task, new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
+            wr = PhoenixTask.submitResource(c, BASE_URI);
+            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+
             assertTrue(post.toString(), post.getStatus() == 200);
             PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
             assertTrue(res.getStatus().equals(SubmissionStatus.SUBMITTED));

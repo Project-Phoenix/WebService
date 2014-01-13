@@ -18,7 +18,9 @@
 
 package de.phoenix.database.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -38,12 +40,18 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
+import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.submission.SubmissionResult;
 
 @Entity
 @Table(name = "taskSubmission")
@@ -81,6 +89,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         @JoinColumn(name = "attachment_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Attachment> attachmentList;
 
     //@formatter:off
@@ -89,6 +98,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         @JoinColumn(name = "text_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Text> textList;
 
     @JoinColumn(name = "task", referencedColumnName = "id")
@@ -114,6 +124,31 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.date = new DateTime();
         this.status = status;
         this.statusText = statusText;
+    }
+
+    public TaskSubmission(Task task, PhoenixSubmission phoenixSubmission) {
+        
+        this.task = task;
+        this.date = new DateTime();
+
+        List<PhoenixAttachment> attachments = phoenixSubmission.getAttachments();
+        this.attachmentList = new ArrayList<Attachment>();
+        for (PhoenixAttachment phoenixAttachment : attachments) {
+            try {
+                this.attachmentList.add(new Attachment(phoenixAttachment));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<PhoenixText> texts = phoenixSubmission.getTexts();
+        this.textList = new ArrayList<Text>();
+        for (PhoenixText phoenixText : texts) {
+            this.textList.add(new Text(phoenixText));
+        }
+
+        this.status = SubmissionStatus.SUBMITTED.ordinal();
+        this.statusText = "";
     }
 
     public Integer getId() {
@@ -172,6 +207,11 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public void setSubmissionResult(SubmissionResult result) {
+        this.status = result.getStatus().ordinal();
+        this.statusText = result.getStatusText();
     }
 
     @Override

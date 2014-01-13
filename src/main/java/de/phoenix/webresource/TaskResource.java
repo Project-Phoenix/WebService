@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
@@ -41,18 +42,27 @@ import org.hibernate.exception.ConstraintViolationException;
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
+import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
+import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.rs.key.AddToEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
+import de.phoenix.submission.DefaultSubmissionController;
+import de.phoenix.submission.SubmissionController;
+import de.phoenix.submission.SubmissionResult;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixTask.WEB_RESOURCE_ROOT)
 public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
+
+    private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
 
     public TaskResource() {
         super(Task.class);
@@ -228,6 +238,48 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         if (selectEntity.get("backend", String.class) != null) {
             addParameter(selectEntity, "backend", String.class, "backend", criteria);
             criteria.add(Restrictions.eq("backend", true));
+        }
+    }
+
+    @Path("/" + PhoenixTask.WEB_RESOURCE_ADD_SUBMISSION)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addSubmission(AddToEntity<PhoenixTask, PhoenixSubmission> addToEntity) {
+        List<PhoenixSubmission> phoenixSubmissions = addToEntity.getAttachedEntities();
+
+        // Disallow multiple submissions
+        if (phoenixSubmissions.size() != 1) {
+            return Response.status(Status.BAD_REQUEST).entity("Only one submission is allowed!").build();
+        }
+
+        Session session = DatabaseManager.getSession();
+        try {
+            List<Task> tasks = searchEntity(addToEntity, session);
+            Response response = checkOnlyOne(tasks);
+            if (response.getStatus() != 200)
+                return response;
+
+            Task task = tasks.get(0);
+
+            Transaction trans = session.beginTransaction();
+            PhoenixSubmission phoenixSubmission = phoenixSubmissions.get(0);
+            TaskSubmission taskSubmission = new TaskSubmission(task, phoenixSubmission);
+
+            SubmissionResult result = new SubmissionResult(SubmissionStatus.SUBMITTED, "");
+            if (task.isAutomaticTest()) {
+                result = CONTROLLER.controllSolution(taskSubmission);
+                taskSubmission.setSubmissionResult(result);
+            }
+
+            session.save(taskSubmission);
+
+            trans.commit();
+
+            return Response.ok(result, MediaType.APPLICATION_JSON).build();
+        } finally {
+            if (session != null)
+                session.close();
         }
     }
 }
