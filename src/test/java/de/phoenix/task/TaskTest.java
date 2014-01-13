@@ -222,7 +222,7 @@ public class TaskTest {
         PhoenixTask task = list.get(0);
 
         try {
-            PhoenixSubmission sub = new PhoenixSubmission(task, new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
+            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
             wr = PhoenixTask.submitResource(c, BASE_URI);
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
 

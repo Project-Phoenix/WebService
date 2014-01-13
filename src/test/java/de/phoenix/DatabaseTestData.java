@@ -94,7 +94,7 @@ public class DatabaseTestData {
     private void createTasks(Client c) throws Exception {
 
         WebResource createTaskResource = PhoenixTask.createResource(c, BASE_URI);
-        WebResource submitSolutionResource = PhoenixSubmission.submitResource(c, BASE_URI);
+        WebResource submitSolutionResource = PhoenixTask.submitResource(c, BASE_URI);
 
         createSpecialNumberTask(createTaskResource);
         solveSpecialNumbers(submitSolutionResource);
@@ -160,8 +160,9 @@ public class DatabaseTestData {
         List<File> textFiles = new ArrayList<File>();
         textFiles.add(new File("src/test/resources/task/specialNumbers/SpecialNumbers.java"));
 
-        PhoenixSubmission sub = new PhoenixSubmission(this.specialNumbersTask, attachments, textFiles);
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        PhoenixSubmission sub = new PhoenixSubmission(attachments, textFiles);
+
+        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(this.specialNumbersTask, sub));
         if (post.getStatus() != 200)
             throw new Exception("Status is not 200!");
     }
@@ -175,8 +176,8 @@ public class DatabaseTestData {
         List<File> textFiles = new ArrayList<File>();
         textFiles.add(new File("src/test/resources/task/ternarySearch/TernarySearch.java"));
 
-        PhoenixSubmission sub = new PhoenixSubmission(this.ternarySearchTask, attachments, textFiles);
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        PhoenixSubmission sub = new PhoenixSubmission(attachments, textFiles);
+        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(this.ternarySearchTask, sub));
         if (post.getStatus() != 200)
             throw new Exception("Status is not 200!");
     }
