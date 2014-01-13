@@ -49,7 +49,6 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
-import de.phoenix.util.RSLists;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixTask.WEB_RESOURCE_ROOT)
@@ -177,7 +176,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         try {
             List<String> result = session.createCriteria(Task.class).setProjection(Projections.property("title")).list();
 
-            return Response.ok(RSLists.toSendableStringList(result)).build();
+            return Response.ok(result).build();
 
         } finally {
             if (session != null)

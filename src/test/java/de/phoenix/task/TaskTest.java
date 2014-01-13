@@ -57,7 +57,6 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
-import de.phoenix.util.RSLists;
 
 @RunWith(OrderedRunner.class)
 public class TaskTest {
@@ -275,7 +274,7 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<String> titles = RSLists.fromSendableStringList(post);
+        List<String> titles = EntityUtil.extractEntityList(post);
 
         assertFalse("Title list is empty!", titles.isEmpty());
         assertTrue("Title list contain more than 0 elements , " + titles.size(), titles.size() == 1);
