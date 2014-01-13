@@ -32,10 +32,7 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -44,31 +41,27 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
-import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
-import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
-import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
-@RunWith(OrderedRunner.class)
-public class LectureTest {
+// This lecture test is based on the old api and should not used for an API quickblick
+@Deprecated
+public class OldLectureTest {
 
     private final static String BASE_URI = "http://localhost:7766/rest";
 
     private static TestHttpServer httpServer;
 
-    @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         DatabaseCleaner.getInstance().run();
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
     }
 
-    @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
 
@@ -91,8 +84,6 @@ public class LectureTest {
 
     private final String TEST_LECTURE_TITLE = "Einf";
 
-    @Test
-    @Order(1)
     public void createLecture() throws ParseException {
         Client c = PhoenixClient.create();
         WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_CREATE);
@@ -110,15 +101,14 @@ public class LectureTest {
         assertTrue(response.toString(), response.getStatus() == 200);
     }
 
-    @Test
-    @Order(2)
     public void getLectures() {
         Client c = PhoenixClient.create();
-        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
-        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixLecture>());
+        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GETALL);
+
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertTrue(response.toString(), response.getStatus() == 200);
 
-        List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
+        List<PhoenixLecture> lectures = PhoenixLecture.fromSendableList(response);
         assertFalse("Lecture list is empty!", lectures.isEmpty());
         PhoenixLecture lec = lectures.get(0);
         assertTrue("LectureName was " + lec.getTitle() + ", but should be" + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
@@ -129,21 +119,16 @@ public class LectureTest {
     private static final String TEST_GROUP_NAME = "Gruppe 2";
     private static final int TEST_GROUP_MAX_SIZE = 22;
 
-    @Test
-    @Order(3)
     public void addGroup() {
         Client c = PhoenixClient.create();
-        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
-        
-        // Get single lecture
-        SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
-        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
-        assertTrue(response.toString(), response.getStatus() == 200);
+        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GETALL);
 
-        List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
+        // Get created test lecture to assign to lecture group
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertTrue(response.toString(), response.getStatus() == 200);
+        List<PhoenixLecture> lectures = PhoenixLecture.fromSendableList(response);
         PhoenixLecture lec = lectures.get(0);
 
-        // Add group to lecture
         WebResource ws2 = c.resource(BASE_URI).path(PhoenixLectureGroup.WEB_RESOURCE_ROOT).path(PhoenixLectureGroup.WEB_RESOURCE_CREATE);
 
         // Create information for the group information
@@ -166,5 +151,23 @@ public class LectureTest {
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
 
         assertTrue(response.toString(), response.getStatus() == 200);
+    }
+
+    @Test
+    @Order(4)
+    public void getLecture() {
+        Client c = PhoenixClient.create();
+        WebResource get = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+
+        // Create select object from the phoenix lecture
+        SelectEntity<PhoenixLecture> selectObject = new SelectEntity<PhoenixLecture>();
+        selectObject.addKey("title", TEST_LECTURE_TITLE);
+
+        // Search for the object - can match many
+        ClientResponse response = get.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectObject);
+        assertTrue(response.toString(), response.getStatus() == 200);
+        List<PhoenixLecture> lectures = PhoenixLecture.fromSendableList(response);
+        PhoenixLecture lec = lectures.get(0);
+        assertTrue(lec.getTitle() + " is not " + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
     }
 }

@@ -32,10 +32,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -44,9 +41,7 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
-import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
-import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
@@ -55,25 +50,22 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
-import de.phoenix.rs.key.SelectAllEntity;
-import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.util.RSLists;
 
-@RunWith(OrderedRunner.class)
-public class TaskTest {
+//This lecture test is based on the old api and should not used for an API quickblick
+@Deprecated
+public class OldTaskTest {
 
     private final static String BASE_URI = "http://localhost:7766/rest";
 
     private static TestHttpServer httpServer;
 
-    @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         DatabaseCleaner.getInstance().run();
         // Start Http Server
         httpServer = new TestHttpServer(BASE_URI);
     }
 
-    @AfterClass
     public static void tearDownAfterClass() throws Exception {
         httpServer.stop();
 
@@ -99,8 +91,6 @@ public class TaskTest {
     private final static File TEST_BINARY_FILE = new File("src/test/resources/task/specialNumbers/FirstNumbers.pdf");
     private final static File TEST_PATTERN_FILE = new File("src/test/resources/task/specialNumbers/TaskPattern.java");
 
-    @Test
-    @Order(1)
     public void createTask() {
 
         if (!TEST_BINARY_FILE.exists()) {
@@ -160,14 +150,12 @@ public class TaskTest {
         }
     }
 
-    @Test
-    @Order(2)
     public void getAllTasks() {
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
-        ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL);
+        ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-        List<PhoenixTask> tasks = EntityUtil.extractEntityList(resp);
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(resp);
 
         assertFalse("TaskList is empty!", tasks.isEmpty());
         for (PhoenixTask phoenixTask : tasks) {
@@ -186,25 +174,17 @@ public class TaskTest {
     public void getTaskByTitle() {
 
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
-
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        assertFalse("List is empty!", list.isEmpty());
-        assertTrue("List contains not only one task!", list.size() == 1);
-
-        PhoenixTask task = list.get(0);
+        PhoenixTask task = post.getEntity(PhoenixTask.class);
         assertFalse("No task found!", task == null);
         assertTrue("Task title wrong!", task.getTitle().equals(TEST_TITLE));
     }
 
     private final static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
 
-    @Test
-    @Order(4)
     public void submitSolution() {
 
         if (!TEST_SUBMISSION_FILE.exists()) {
@@ -212,14 +192,12 @@ public class TaskTest {
         }
 
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
-
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        PhoenixTask task = list.get(0);
+        PhoenixTask task = post.getEntity(PhoenixTask.class);
+        assertFalse("No task found!", task == null);
 
         try {
             PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
@@ -234,20 +212,13 @@ public class TaskTest {
         }
     }
 
-    @Test
-    @Order(5)
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
-        WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
-
-        ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertTrue(post.toString(), post.getStatus() == 200);
-
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        PhoenixTask phoenixTask = list.get(0);
+        ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, TEST_TITLE);
+        PhoenixTask phoenixTask = post.getEntity(PhoenixTask.class);
 
         WebResource wrGetSubmissions = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
 
@@ -266,8 +237,6 @@ public class TaskTest {
 
     }
 
-    @Test
-    @Order(6)
     public void getAllTitles() {
         Client c = PhoenixClient.create();
         WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
@@ -283,8 +252,6 @@ public class TaskTest {
 
     }
 
-    @Test
-    @Order(7)
     public void createDuplicateTask() {
         // Create client
         Client c = PhoenixClient.create();
@@ -313,8 +280,6 @@ public class TaskTest {
 
     private final static String AUTOMATIC_TEST_TITLE = "TernarySearch";
 
-    @Test
-    @Order(8)
     public void createAutomaticTask() {
         // Create client
         Client c = PhoenixClient.create();

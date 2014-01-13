@@ -26,7 +26,7 @@ public class ConverterUtil {
     private ConverterUtil() {
 
     }
-    
+
     public static <T extends Convertable<E>, E> List<E> convert(List<T> list) {
         List<E> result = new ArrayList<E>();
         for (T tmp : list) {
