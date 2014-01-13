@@ -32,8 +32,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Test;
-
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -41,7 +39,6 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
-import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;

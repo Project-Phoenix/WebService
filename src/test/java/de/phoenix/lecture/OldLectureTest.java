@@ -32,7 +32,6 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
-import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -41,7 +40,6 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
-import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
@@ -153,8 +151,6 @@ public class OldLectureTest {
         assertTrue(response.toString(), response.getStatus() == 200);
     }
 
-    @Test
-    @Order(4)
     public void getLecture() {
         Client c = PhoenixClient.create();
         WebResource get = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
