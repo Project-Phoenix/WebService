@@ -138,7 +138,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
             criteria.add(Restrictions.eq(criteriaName, o));
     }
 
-    private Response checkOnlyOne(List<T> entities) {
+    protected Response checkOnlyOne(List<T> entities) {
 
         if (entities.isEmpty()) {
             return Response.status(Status.BAD_REQUEST).entity("No entity").build();

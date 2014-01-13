@@ -18,9 +18,6 @@
 
 package de.phoenix.webresource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,10 +27,8 @@ import javax.ws.rs.core.Response;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
-import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
-import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
@@ -62,17 +57,9 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
             return null;
         }
 
-        LectureGroup lectureGroup = new LectureGroup(phoenixEntity);
-        lectureGroup.setLecture(lecture);
+        LectureGroup lectureGroup = new LectureGroup(phoenixEntity, lecture);
         // Store all relevant details of this lecture
 
-        List<Details> details = new ArrayList<Details>();
-        for (PhoenixDetails phoenixDetails : phoenixEntity.getDetails()) {
-            Details detail = new Details(phoenixDetails);
-            details.add(detail);
-        }
-
-        lectureGroup.setDetails(details);
         return lectureGroup;
     }
 

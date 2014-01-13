@@ -18,6 +18,7 @@
 
 package de.phoenix.lecture;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -51,6 +52,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
@@ -134,7 +136,7 @@ public class LectureTest {
     public void addGroup() {
         Client c = PhoenixClient.create();
         WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
-        
+
         // Get single lecture
         SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
@@ -144,7 +146,7 @@ public class LectureTest {
         PhoenixLecture lec = lectures.get(0);
 
         // Add group to lecture
-        WebResource ws2 = c.resource(BASE_URI).path(PhoenixLectureGroup.WEB_RESOURCE_ROOT).path(PhoenixLectureGroup.WEB_RESOURCE_CREATE);
+        WebResource ws2 = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_GROUP);
 
         // Create information for the group information
         LocalTime startTime = new LocalTime(15, 00);
@@ -163,8 +165,35 @@ public class LectureTest {
         // and the assigned lecture
         PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
-        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
 
         assertTrue(response.toString(), response.getStatus() == 200);
+    }
+
+    @Test
+    @Order(4)
+    public void addDetail() {
+        Client c = PhoenixClient.create();
+        WebResource getLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+
+        // Get single lecture
+        SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
+        ClientResponse response = getLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
+        assertTrue(response.toString(), response.getStatus() == 200);
+
+        List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
+        PhoenixLecture lec = lectures.get(0);
+
+        // Create information for the group information
+        LocalTime startTime = new LocalTime(2, 30);
+        LocalTime endTime = new LocalTime(4, 00);
+        LocalDate startDate = new LocalDate(2013, 10, 21);
+        LocalDate endDate = new LocalDate(2014, 01, 27);
+
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
+
+        WebResource addDetailToLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_DETAIL);
+        response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
+        assertEquals(response.getStatus(), 200);
     }
 }

@@ -44,6 +44,8 @@ import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.rs.key.AddToEntity;
+import de.phoenix.rs.key.KeyReader;
 
 public class DatabaseTestData {
 
@@ -201,7 +203,7 @@ public class DatabaseTestData {
     private void createLectures(Client c) throws Exception {
 
         WebResource createLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_CREATE);
-        WebResource createLectureGroupResource = c.resource(BASE_URI).path(PhoenixLectureGroup.WEB_RESOURCE_ROOT).path(PhoenixLectureGroup.WEB_RESOURCE_CREATE);
+        WebResource createLectureGroupResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_GROUP);
 
         // Create einf and its groups
         createEinfLecture(createLectureResource);
@@ -263,7 +265,8 @@ public class DatabaseTestData {
         // and the assigned lecture
         PhoenixLectureGroup group = new PhoenixLectureGroup("Gruppe 2", 22, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, einfLecture);
 
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+        AddToEntity<PhoenixLecture, PhoenixLectureGroup> addGroupToLecture = KeyReader.createAddTo(einfLecture, group);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
         if (response.getStatus() != 200)
             throw new Exception("Status is not 200! " + response);
 
@@ -287,7 +290,8 @@ public class DatabaseTestData {
         // and the assigned lecture
         group = new PhoenixLectureGroup("Gruppe 7", 22, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, einfLecture);
 
-        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+        addGroupToLecture = KeyReader.createAddTo(einfLecture, group);
+        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
         if (response.getStatus() != 200)
             throw new Exception("Status is not 200! " + response);
     }
@@ -342,7 +346,8 @@ public class DatabaseTestData {
         // and the assigned lecture
         PhoenixLectureGroup group = new PhoenixLectureGroup("Gruppe 1", 23, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, audLecture);
 
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+        AddToEntity<PhoenixLecture, PhoenixLectureGroup> addGroupToLecture = KeyReader.createAddTo(audLecture, group);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
         if (response.getStatus() != 200)
             throw new Exception("Status is not 200! " + response);
 
@@ -366,7 +371,8 @@ public class DatabaseTestData {
         // and the assigned lecture
         group = new PhoenixLectureGroup("Gruppe 5", 23, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, audLecture);
 
-        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, group);
+        addGroupToLecture = KeyReader.createAddTo(audLecture, group);
+        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
         if (response.getStatus() != 200)
             throw new Exception("Status is not 200! " + response);
     }

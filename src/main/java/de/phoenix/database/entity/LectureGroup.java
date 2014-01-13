@@ -19,6 +19,7 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -45,6 +46,7 @@ import org.joda.time.LocalTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 
 @Entity
@@ -93,6 +95,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     @JoinColumn(name = "lecture", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @Cascade(CascadeType.SAVE_UPDATE)
     private Lecture lecture;
 
     @OneToMany(mappedBy = "lectureGroup")
@@ -105,11 +108,17 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         this.id = id;
     }
 
-    public LectureGroup(PhoenixLectureGroup phoenixLectureGroup) {
+    public LectureGroup(PhoenixLectureGroup phoenixLectureGroup, Lecture lecture) {
         this.maxMember = phoenixLectureGroup.getMaxMember();
         this.name = phoenixLectureGroup.getName();
         this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime();
         this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday();
+        this.lecture = lecture;
+
+        this.detailsList = new ArrayList<Details>();
+        for (PhoenixDetails phoenixDetails : phoenixLectureGroup.getDetails()) {
+            detailsList.add(new Details(phoenixDetails));
+        }
     }
 
     public Integer getId() {

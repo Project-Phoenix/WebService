@@ -114,6 +114,10 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     public void setLectureGroups(List<LectureGroup> lectureGroups) {
         this.lectureGroupList = lectureGroups;
     }
+    
+    public void addLectureGroup(LectureGroup lectureGroup) {
+        this.lectureGroupList.add(lectureGroup);
+    }
 
     @XmlTransient
     public List<Details> getDetails() {
@@ -122,6 +126,10 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     public void setDetails(List<Details> details) {
         this.detailsList = details;
+    }
+    
+    public void addDetail(Details detail) {
+        this.detailsList.add(detail);
     }
 
     @Override

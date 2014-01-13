@@ -31,13 +31,17 @@ import javax.ws.rs.core.Response;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
+import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
+import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.AddToEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
@@ -126,5 +130,66 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @Override
     protected void setCriteria(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "title", String.class, "name", criteria);
+    }
+
+    @Path("/" + PhoenixLecture.WEB_RESOURCE_ADD_GROUP)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addGroup(AddToEntity<PhoenixLecture, PhoenixLectureGroup> addToEntity) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            List<Lecture> lectures = searchEntity(addToEntity, session);
+            Response response = checkOnlyOne(lectures);
+            if (response.getStatus() != 200)
+                return response;
+
+            Lecture lecture = lectures.get(0);
+
+            List<PhoenixLectureGroup> newPhoenixLectureGroups = addToEntity.getAttachedEntities();
+            Transaction trans = session.beginTransaction();
+            for (PhoenixLectureGroup phoenixLectureGroup : newPhoenixLectureGroups) {
+                lecture.addLectureGroup(new LectureGroup(phoenixLectureGroup, lecture));
+            }
+
+            session.update(lecture);
+            trans.commit();
+
+            return Response.ok().build();
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+    @Path("/" + PhoenixLecture.WEB_RESOURCE_ADD_DETAIL)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addDetail(AddToEntity<PhoenixLecture, PhoenixDetails> addToEntity) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            List<Lecture> lectures = searchEntity(addToEntity, session);
+            Response response = checkOnlyOne(lectures);
+            if (response.getStatus() != 200)
+                return response;
+
+            Lecture lecture = lectures.get(0);
+
+            List<PhoenixDetails> newPhoenixDetails = addToEntity.getAttachedEntities();
+            Transaction trans = session.beginTransaction();
+            for (PhoenixDetails phoenixDetail : newPhoenixDetails) {
+                lecture.addDetail(new Details(phoenixDetail));
+            }
+
+            session.update(lecture);
+            trans.commit();
+
+            return Response.ok().build();
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 }
