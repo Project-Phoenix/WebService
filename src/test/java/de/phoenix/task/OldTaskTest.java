@@ -169,8 +169,6 @@ public class OldTaskTest {
         }
     }
 
-    @Test
-    @Order(3)
     public void getTaskByTitle() {
 
         Client c = PhoenixClient.create();
