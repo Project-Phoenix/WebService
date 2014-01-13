@@ -117,7 +117,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
         try {
 
             List<PhoenixText> texts = new ArrayList<PhoenixText>();
@@ -185,7 +185,7 @@ public class TaskTest {
     public void getTaskByTitle() {
 
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        WebResource wr = PhoenixTask.getResource(c, BASE_URI);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
@@ -211,7 +211,7 @@ public class TaskTest {
         }
 
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        WebResource wr = PhoenixTask.getResource(c, BASE_URI);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
@@ -222,7 +222,7 @@ public class TaskTest {
 
         try {
             PhoenixSubmission sub = new PhoenixSubmission(task, Collections.<File> emptyList(), Collections.singletonList(TEST_SUBMISSION_FILE));
-            wr = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
+            wr = PhoenixSubmission.submitResource(c, BASE_URI);
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
             assertTrue(post.toString(), post.getStatus() == 200);
             PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
@@ -238,7 +238,7 @@ public class TaskTest {
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
-        WebResource wrGetTask = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        WebResource wrGetTask = PhoenixTask.getResource(c, BASE_URI);
 
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
@@ -248,7 +248,7 @@ public class TaskTest {
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask phoenixTask = list.get(0);
 
-        WebResource wrGetSubmissions = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS);
+        WebResource wrGetSubmissions = PhoenixSubmission.getByTaskResource(c, BASE_URI);
 
         post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -269,7 +269,7 @@ public class TaskTest {
     @Order(6)
     public void getAllTitles() {
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
+        WebResource wr = PhoenixTask.getAllTitlesResource(c, BASE_URI);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -288,7 +288,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
         try {
 
             // Empty lists - we have not interest in lists for this test
@@ -318,7 +318,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
         try {
 
             // Empty lists - we have not interest in lists for this test

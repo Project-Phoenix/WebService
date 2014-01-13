@@ -93,8 +93,8 @@ public class DatabaseTestData {
 
     private void createTasks(Client c) throws Exception {
 
-        WebResource createTaskResource = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
-        WebResource submitSolutionResource = c.resource(BASE_URI).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
+        WebResource createTaskResource = PhoenixTask.createResource(c, BASE_URI);
+        WebResource submitSolutionResource = PhoenixSubmission.submitResource(c, BASE_URI);
 
         createSpecialNumberTask(createTaskResource);
         solveSpecialNumbers(submitSolutionResource);
@@ -202,8 +202,8 @@ public class DatabaseTestData {
 
     private void createLectures(Client c) throws Exception {
 
-        WebResource createLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_CREATE);
-        WebResource createLectureGroupResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_GROUP);
+        WebResource createLectureResource = PhoenixLecture.createResource(c, BASE_URI);
+        WebResource createLectureGroupResource = PhoenixLecture.addGroupResource(c, BASE_URI);
 
         // Create einf and its groups
         createEinfLecture(createLectureResource);

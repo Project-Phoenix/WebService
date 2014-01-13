@@ -97,7 +97,7 @@ public class LectureTest {
     @Order(1)
     public void createLecture() throws ParseException {
         Client c = PhoenixClient.create();
-        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_CREATE);
+        WebResource ws = PhoenixLecture.createResource(c, BASE_URI);
 
         LocalTime startTime = new LocalTime(11, 15);
         LocalTime endTime = new LocalTime(12, 45);
@@ -116,7 +116,7 @@ public class LectureTest {
     @Order(2)
     public void getLectures() {
         Client c = PhoenixClient.create();
-        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+        WebResource ws = PhoenixLecture.getResource(c, BASE_URI);
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixLecture>());
         assertTrue(response.toString(), response.getStatus() == 200);
 
@@ -135,7 +135,7 @@ public class LectureTest {
     @Order(3)
     public void addGroup() {
         Client c = PhoenixClient.create();
-        WebResource ws = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+        WebResource ws = PhoenixLecture.getResource(c, BASE_URI);
 
         // Get single lecture
         SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
@@ -146,7 +146,7 @@ public class LectureTest {
         PhoenixLecture lec = lectures.get(0);
 
         // Add group to lecture
-        WebResource ws2 = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_GROUP);
+        WebResource ws2 = PhoenixLecture.addGroupResource(c, BASE_URI);
 
         // Create information for the group information
         LocalTime startTime = new LocalTime(15, 00);
@@ -174,7 +174,7 @@ public class LectureTest {
     @Order(4)
     public void addDetail() {
         Client c = PhoenixClient.create();
-        WebResource getLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_GET);
+        WebResource getLectureResource = PhoenixLecture.getResource(c, BASE_URI);
 
         // Get single lecture
         SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
@@ -192,7 +192,7 @@ public class LectureTest {
 
         PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
-        WebResource addDetailToLectureResource = c.resource(BASE_URI).path(PhoenixLecture.WEB_RESOURCE_ROOT).path(PhoenixLecture.WEB_RESOURCE_ADD_DETAIL);
+        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URI);
         response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
         assertEquals(response.getStatus(), 200);
     }
