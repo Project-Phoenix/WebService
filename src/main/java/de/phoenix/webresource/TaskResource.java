@@ -48,6 +48,7 @@ import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
@@ -264,7 +265,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
             trans.commit();
 
-            return Response.ok(result, MediaType.APPLICATION_JSON).build();
+            return Response.ok(new PhoenixSubmissionResult(result.getStatus(), result.getStatusText()), MediaType.APPLICATION_JSON).build();
         } finally {
             if (session != null)
                 session.close();
