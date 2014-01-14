@@ -147,4 +147,10 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
         return new PhoenixTaskSheet(ConverterUtil.convert(taskList), getCreationDate());
     }
 
+    @Override
+    public void copyValues(PhoenixTaskSheet phoenixEntity) {
+        throw new UnsupportedOperationException("Copy values in TaskSheet not yet implemented!");
+
+    }
+
 }

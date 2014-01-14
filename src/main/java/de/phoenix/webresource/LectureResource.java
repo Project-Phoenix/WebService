@@ -123,11 +123,6 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     }
 
     @Override
-    protected void setValues(Lecture entity, PhoenixLecture phoenixEntity) {
-        entity.setName(phoenixEntity.getTitle());
-    }
-
-    @Override
     protected void setCriteria(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "title", String.class, "name", criteria);
     }

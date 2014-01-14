@@ -232,4 +232,15 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
     public PhoenixDetails convert() {
         return new PhoenixDetails(getRoom(), getWeekday(), new LocalTime(getStartTime()), new LocalTime(getEndTime()), getInterval(), new LocalDate(getStartDate()), new LocalDate(getEndDate()));
     }
+
+    @Override
+    public void copyValues(PhoenixDetails phoenixEntity) {
+        this.setRoom(phoenixEntity.getRoom());
+        this.setWeekday(phoenixEntity.getWeekDay());
+        this.setStartTime(phoenixEntity.getStartTime());
+        this.setEndTime(phoenixEntity.getEndTime());
+        this.setInterval(phoenixEntity.getInverval());
+        this.setStartDate(phoenixEntity.getStartDate());
+        this.setEndDate(phoenixEntity.getStartDate());
+    }
 }

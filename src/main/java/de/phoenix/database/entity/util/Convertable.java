@@ -32,4 +32,6 @@ public interface Convertable<T> {
      * @return New object of type T
      */
     public T convert();
+    
+    public void copyValues(T phoenixEntity);
 }

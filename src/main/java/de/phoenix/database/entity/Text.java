@@ -222,4 +222,11 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     public PhoenixText convert() {
         return new PhoenixText(this.getContent(), this.getCreationDate(), this.getName(), this.getType());
     }
+
+    @Override
+    public void copyValues(PhoenixText phoenixEntity) {
+        this.setName(phoenixEntity.getName());
+        this.setType(phoenixEntity.getType());
+        this.setContent(phoenixEntity.getText());
+    }
 }

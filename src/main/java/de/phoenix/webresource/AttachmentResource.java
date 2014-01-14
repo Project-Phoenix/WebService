@@ -18,7 +18,6 @@
 
 package de.phoenix.webresource;
 
-import java.io.IOException;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
@@ -28,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 
 import de.phoenix.database.entity.Attachment;
 import de.phoenix.rs.entity.PhoenixAttachment;
@@ -55,21 +53,6 @@ public class AttachmentResource extends AbstractPhoenixResource<Attachment, Phoe
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAttachment(SelectEntity<PhoenixAttachment> selectAttachment) {
         return onDelete(selectAttachment);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void setValues(Attachment entity, PhoenixAttachment phoenixEntity) {
-
-        entity.setName(phoenixEntity.getName());
-        entity.setType(phoenixEntity.getType());
-        entity.setCreationDate(phoenixEntity.getCreationDate());
-        try {
-            entity.setFile(Hibernate.createBlob(phoenixEntity.getStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override

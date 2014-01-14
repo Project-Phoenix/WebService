@@ -56,13 +56,6 @@ public class TextResource extends AbstractPhoenixResource<Text, PhoenixText> {
     }
 
     @Override
-    protected void setValues(Text entity, PhoenixText phoenixEntity) {
-        entity.setName(phoenixEntity.getName());
-        entity.setType(phoenixEntity.getType());
-        entity.setContent(phoenixEntity.getText());
-    }
-
-    @Override
     protected void setCriteria(SelectEntity<PhoenixText> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "name", String.class, "title", criteria);
         addParameter(selectEntity, "type", String.class, "type", criteria);

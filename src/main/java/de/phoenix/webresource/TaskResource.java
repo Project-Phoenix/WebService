@@ -218,18 +218,6 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     }
 
     @Override
-    protected void setValues(Task entity, PhoenixTask phoenixEntity) {
-        entity.setTitle(phoenixEntity.getTitle());
-        entity.setDescription(phoenixEntity.getDescription());
-
-        if (phoenixEntity instanceof PhoenixAutomaticTask) {
-            PhoenixAutomaticTask tmp = (PhoenixAutomaticTask) phoenixEntity;
-            entity.setBackend(tmp.getBackend());
-            entity.setAutomaticTest(true);
-        }
-    }
-
-    @Override
     protected void setCriteria(SelectEntity<PhoenixTask> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "title", String.class, "title", criteria);
         addParameter(selectEntity, "description", String.class, "description", criteria);

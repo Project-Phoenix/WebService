@@ -127,7 +127,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
     }
 
     public TaskSubmission(Task task, PhoenixSubmission phoenixSubmission) {
-        
+
         this.task = task;
         this.date = new DateTime();
 
@@ -243,6 +243,12 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
     @Override
     public PhoenixSubmission convert() {
         return new PhoenixSubmission(getDate(), getTask().convert(), getStatus(), getStatusText(), ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()));
+    }
+
+    @Override
+    public void copyValues(PhoenixSubmission phoenixEntity) {
+        this.setStatus(phoenixEntity.getStatus());
+        this.setStatusText(phoenixEntity.getStatusText());
     }
 
 }

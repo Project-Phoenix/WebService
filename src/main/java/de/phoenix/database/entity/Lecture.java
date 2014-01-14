@@ -162,4 +162,10 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     public PhoenixLecture convert() {
         return new PhoenixLecture(getName(), ConverterUtil.convert(getDetails()));
     }
+
+    @Override
+    public void copyValues(PhoenixLecture phoenixEntity) {
+        this.setName(phoenixEntity.getTitle());
+        
+    }
 }

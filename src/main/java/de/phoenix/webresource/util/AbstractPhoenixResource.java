@@ -73,7 +73,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
                 T entity = entities.get(0);
                 E phoenixEntity = updatedEntity.getNewObject();
 
-                setValues(entity, phoenixEntity);
+                entity.copyValues(phoenixEntity);
 
                 session.update(entity);
             }
@@ -85,8 +85,6 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
                 session.close();
         }
     }
-
-    protected abstract void setValues(T entity, E phoenixEntity);
 
     protected Response onDelete(SelectEntity<E> selectEntity) {
         Session session = DatabaseManager.getSession();

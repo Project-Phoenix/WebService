@@ -71,10 +71,4 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
         addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, "name", criteria);
         addParameter(selectEntity, "name", String.class, "name", criteria);
     }
-
-    @Override
-    protected void setValues(LectureGroup entity, PhoenixLectureGroup phoenixEntity) {
-        entity.setName(phoenixEntity.getName());
-    }
-
 }

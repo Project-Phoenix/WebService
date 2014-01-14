@@ -44,6 +44,7 @@ import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
 
 @Entity
@@ -252,5 +253,16 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @Override
     public PhoenixTask convert() {
         return new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
+    }
+
+    @Override
+    public void copyValues(PhoenixTask phoenixEntity) {
+        this.setTitle(phoenixEntity.getTitle());
+        this.setDescription(phoenixEntity.getDescription());
+
+        if (phoenixEntity instanceof PhoenixAutomaticTask) {
+            this.setBackend(((PhoenixAutomaticTask) phoenixEntity).getBackend());
+            this.setAutomaticTest(true);
+        }
     }
 }

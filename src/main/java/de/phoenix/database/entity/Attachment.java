@@ -222,6 +222,7 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
         }
     }
 
+    @Override
     public PhoenixAttachment convert() {
 
         try {
@@ -230,5 +231,19 @@ public class Attachment implements Serializable, Convertable<PhoenixAttachment> 
             e.printStackTrace();
             return null;
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void copyValues(PhoenixAttachment phoenixEntity) {
+        this.setName(phoenixEntity.getName());
+        this.setType(phoenixEntity.getType());
+        this.setCreationDate(phoenixEntity.getCreationDate());
+        try {
+            this.setFile(Hibernate.createBlob(phoenixEntity.getStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

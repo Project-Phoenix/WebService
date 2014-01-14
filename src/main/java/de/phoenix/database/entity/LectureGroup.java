@@ -218,4 +218,9 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     public PhoenixLectureGroup convert() {
         return new PhoenixLectureGroup(getName(), getMaxMember(), getSubmissionDeadlineWeekday(), new LocalTime(getSubmissionDeadlineTime()), ConverterUtil.convert(getDetails()), getLecture().convert());
     }
+
+    @Override
+    public void copyValues(PhoenixLectureGroup phoenixEntity) {
+        this.setName(phoenixEntity.getName());
+    }
 }

@@ -57,18 +57,6 @@ public class DetailsResource extends AbstractPhoenixResource<Details, PhoenixDet
     }
 
     @Override
-    protected void setValues(Details entity, PhoenixDetails phoenixEntity) {
-
-        entity.setRoom(phoenixEntity.getRoom());
-        entity.setWeekday(phoenixEntity.getWeekDay());
-        entity.setStartTime(phoenixEntity.getStartTime());
-        entity.setEndTime(phoenixEntity.getEndTime());
-        entity.setInterval(phoenixEntity.getInverval());
-        entity.setStartDate(phoenixEntity.getStartDate());
-        entity.setEndDate(phoenixEntity.getStartDate());
-    }
-
-    @Override
     protected void setCriteria(SelectEntity<PhoenixDetails> selectEntity, Criteria criteria) {
         addParameter(selectEntity, "room", String.class, "room", criteria);
         addParameter(selectEntity, "weekDay", int.class, "weekday", criteria);
