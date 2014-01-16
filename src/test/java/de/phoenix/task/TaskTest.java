@@ -18,6 +18,7 @@
 
 package de.phoenix.task;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -54,6 +55,7 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
@@ -338,5 +340,30 @@ public class TaskTest {
             e.printStackTrace();
             fail();
         }
+    }
+
+    private static final String TASK_SHEET_TITLE = "Testblatt";
+
+    @Test
+    @Order(9)
+    public void createTaskSheet() {
+        // Create client
+        Client c = PhoenixClient.create();
+        // Get webresource
+        WebResource createTaskSheetResource = PhoenixTaskSheet.createResource(c, BASE_URI);
+        // Create TaskSheet with Test title
+        PhoenixTaskSheet taskSheet = new PhoenixTaskSheet(TASK_SHEET_TITLE);
+        // Send TaskSheet to server -> create
+        ClientResponse response = createTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, taskSheet);
+        assertEquals(response.getStatus(), 200);
+
+        // Get some tasks to assign to database
+        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URI);
+        response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        List<PhoenixTask> tasks = EntityUtil.extractEntityList(response);
+
+        WebResource connectTasksheetWithTasksResource = PhoenixTaskSheet.connectTaskSheetWithTaskResource(c, BASE_URI);
+        response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createConnectWith(taskSheet, tasks));
+        assertEquals(response.getStatus(), 200);
     }
 }

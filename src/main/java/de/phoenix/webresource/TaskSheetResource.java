@@ -18,7 +18,6 @@
 
 package de.phoenix.webresource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -29,51 +28,40 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.joda.time.DateTime;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
+import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
+import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
+import de.phoenix.rs.key.ConnectWithEntity;
+import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_ROOT)
-public class TaskSheetResource {
+public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, PhoenixTaskSheet> {
+
+    public TaskSheetResource() {
+        super(TaskSheetCriteriaFactory.getInstance());
+    }
 
     @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTaskSheet(PhoenixTaskSheet phoenixSheet) {
 
-        Session session = DatabaseManager.getSession();
+        return onCreate(phoenixSheet);
 
-        try {
-            Transaction trans = session.beginTransaction();
-            List<Task> tasks = new ArrayList<Task>();
-            Query findTask = session.getNamedQuery("Task.findByName");
+    }
 
-            for (PhoenixTask pTask : phoenixSheet.getTasks()) {
-                findTask.setParameter("title", pTask.getTitle()).uniqueResult();
-                tasks.add((Task) findTask.uniqueResult());
-            }
-
-            TaskSheet taskSheet = new TaskSheet();
-            taskSheet.setTasks(tasks);
-            taskSheet.setCreationDate(new DateTime());
-
-            session.save(taskSheet);
-            trans.commit();
-
-            return Response.ok().build();
-
-        } finally {
-            if (session != null)
-                session.close();
-        }
+    @Override
+    protected TaskSheet create(PhoenixTaskSheet phoenixEntity, Session session) {
+        TaskSheet taskSheet = new TaskSheet(phoenixEntity);
+        return taskSheet;
     }
 
     @SuppressWarnings("unchecked")
@@ -95,5 +83,29 @@ public class TaskSheetResource {
             if (session != null)
                 session.close();
         }
+    }
+
+    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_GET)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getTaskSheets(SelectEntity<PhoenixTaskSheet> selectEntity) {
+        return onGet(selectEntity);
+    }
+
+    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_CONNECT_TASKSHEET_WITH_TASK)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response connectTasksWithTaskSheet(ConnectWithEntity<PhoenixTaskSheet, PhoenixTask> connectWithEntity) {
+        return onConnect(connectWithEntity, TaskCriteriaFactory.getInstance(), new TaskSheetTaskConnector());
+    }
+
+    private class TaskSheetTaskConnector implements EntityConnector<TaskSheet, Task> {
+
+        @Override
+        public void connect(TaskSheet entity, List<Task> entities) {
+            entity.setTasks(entities);
+        }
+
     }
 }

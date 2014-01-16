@@ -22,9 +22,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -36,6 +37,8 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -56,9 +59,13 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
+    @Column(name = "title", unique = true)
+    private String title;
 
     @Column(name = "creationDate")
     @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
@@ -70,12 +77,19 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
             @JoinColumn(name = "task_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<Task> taskList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskSheet1")
+    @OneToMany(mappedBy = "taskSheet1")
     private List<LectureGroupTaskSheet> lectureGroupTaskSheetList;
 
     public TaskSheet() {
+     
+    }
+    
+    public TaskSheet(PhoenixTaskSheet phoenixTaskSheet) {
+        this.setTitle(phoenixTaskSheet.getTitle());
+        this.setCreationDate(new DateTime());
     }
 
     public TaskSheet(Integer id) {
@@ -88,6 +102,14 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public DateTime getCreationDate() {
@@ -144,7 +166,7 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     @Override
     public PhoenixTaskSheet convert() {
-        return new PhoenixTaskSheet(ConverterUtil.convert(taskList), getCreationDate());
+        return new PhoenixTaskSheet(this.title, ConverterUtil.convert(taskList), getCreationDate());
     }
 
     @Override

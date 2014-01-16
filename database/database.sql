@@ -24,10 +24,12 @@ ENGINE = InnoDB;
 -- Table `phoenix`.`taskSheet`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`taskSheet` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NULL,
   `creationDate` DATETIME NULL,
   PRIMARY KEY (`id`),
-  INDEX `taskSheetKey` (`creationDate` ASC))
+  INDEX `taskSheetKey` (`creationDate` ASC),
+  UNIQUE INDEX `title_UNIQUE` (`title` ASC))
 ENGINE = InnoDB;
 
 
