@@ -103,15 +103,18 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-    protected List<E> onGet(SelectEntity<E> selectEntity) {
+    protected Response onGet(SelectEntity<E> selectEntity) {
         Session session = DatabaseManager.getSession();
         try {
 
             List<T> entities = searchEntity(selectEntity, session);
+            if (entities.isEmpty()) {
+                Response.noContent().build();
+            }
 
             List<E> result = ConverterUtil.convert(entities);
 
-            return result;
+            return Response.ok(result).build();
         } finally {
             if (session != null)
                 session.close();

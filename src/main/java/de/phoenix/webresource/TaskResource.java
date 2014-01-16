@@ -199,7 +199,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getTask(SelectEntity<PhoenixTask> selectEntity) {
-        return Response.ok(onGet(selectEntity)).build();
+        return onGet(selectEntity);
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)

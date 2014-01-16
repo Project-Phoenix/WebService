@@ -119,7 +119,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getLecture(SelectEntity<PhoenixLecture> selectLecture) {
-        return Response.ok(onGet(selectLecture)).build();
+        return onGet(selectLecture);
     }
 
     @Path("/" + PhoenixLecture.WEB_RESOURCE_ADD_GROUP)
