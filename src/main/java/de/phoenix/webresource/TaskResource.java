@@ -32,11 +32,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 
 import de.phoenix.database.DatabaseManager;
@@ -44,6 +42,7 @@ import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
+import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
@@ -66,7 +65,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
 
     public TaskResource() {
-        super(Task.class);
+        super(TaskCriteriaFactory.getInstance());
     }
 
     // TOOO: Remove it , because the Select and Update mechanism is better
@@ -216,18 +215,6 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     public Response delete(SelectEntity<PhoenixTask> selectEntity) {
 
         return onDelete(selectEntity);
-    }
-
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixTask> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "title", String.class, "title", criteria);
-        addParameter(selectEntity, "description", String.class, "description", criteria);
-
-        // Is instance of automatic task
-        if (selectEntity.get("backend", String.class) != null) {
-            addParameter(selectEntity, "backend", String.class, "backend", criteria);
-            criteria.add(Restrictions.eq("backend", true));
-        }
     }
 
     @Path("/" + PhoenixTask.WEB_RESOURCE_ADD_SUBMISSION)

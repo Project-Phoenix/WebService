@@ -18,17 +18,14 @@
 
 package de.phoenix.webresource;
 
-import java.util.Date;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
-
 import de.phoenix.database.entity.Text;
+import de.phoenix.database.entity.criteria.TextCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -36,9 +33,9 @@ import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixText.WEB_RESOURCE_ROOT)
 public class TextResource extends AbstractPhoenixResource<Text, PhoenixText> {
-    
+
     public TextResource() {
-        super(Text.class);
+        super(TextCriteriaFactory.getInstance());
     }
 
     @Path("/" + PhoenixText.WEB_RESOURCE_UPDATE)
@@ -53,13 +50,6 @@ public class TextResource extends AbstractPhoenixResource<Text, PhoenixText> {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteText(SelectEntity<PhoenixText> selectText) {
         return onDelete(selectText);
-    }
-
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixText> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "name", String.class, "title", criteria);
-        addParameter(selectEntity, "type", String.class, "type", criteria);
-        addParameter(selectEntity, "creationDate", Date.class, "creationDate", criteria);
     }
 
 }

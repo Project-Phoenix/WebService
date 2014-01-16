@@ -63,6 +63,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     @Column(name = "id")
     private Integer id;
 
+    // TODO: Rename to title
     @Column(name = "name")
     private String name;
 

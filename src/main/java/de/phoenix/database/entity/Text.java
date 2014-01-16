@@ -70,6 +70,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
     private DateTime creationDate;
 
+    // TODO: Rename to title
     @Column(name = "name")
     private String name;
 

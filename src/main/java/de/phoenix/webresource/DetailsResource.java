@@ -24,12 +24,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
-
 import de.phoenix.database.entity.Details;
+import de.phoenix.database.entity.criteria.DetailsCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -39,7 +35,7 @@ import de.phoenix.webresource.util.AbstractPhoenixResource;
 public class DetailsResource extends AbstractPhoenixResource<Details, PhoenixDetails> {
 
     public DetailsResource() {
-        super(Details.class);
+        super(DetailsCriteriaFactory.getInstance());
     }
 
     @Path("/" + PhoenixDetails.WEB_RESOURCE_UPDATE)
@@ -56,14 +52,4 @@ public class DetailsResource extends AbstractPhoenixResource<Details, PhoenixDet
         return onDelete(selectDetails);
     }
 
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixDetails> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "room", String.class, "room", criteria);
-        addParameter(selectEntity, "weekDay", int.class, "weekday", criteria);
-        addParameter(selectEntity, "startTime", LocalTime.class, "startTime", criteria);
-        addParameter(selectEntity, "endTime", LocalTime.class, "endTime", criteria);
-        addParameter(selectEntity, "interval", Period.class, "interval", criteria);
-        addParameter(selectEntity, "startDate", LocalDate.class, "startDate", criteria);
-        addParameter(selectEntity, "endDate", LocalDate.class, "endDate", criteria);
-    }
 }

@@ -26,9 +26,9 @@ import javax.ws.rs.core.Response.Status;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.DatabaseManager;
+import de.phoenix.database.entity.criteria.CriteriaFactory;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.key.PhoenixEntity;
@@ -37,10 +37,10 @@ import de.phoenix.rs.key.UpdateEntity;
 
 public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extends PhoenixEntity> {
 
-    private final Class<T> clazz;
+    private CriteriaFactory<T, E> criteriaFactory;
 
-    public AbstractPhoenixResource(Class<T> clazz) {
-        this.clazz = clazz;
+    public AbstractPhoenixResource(CriteriaFactory<T, E> criteriaFactory) {
+        this.criteriaFactory = criteriaFactory;
     }
 
     protected Response onCreate(E phoenixEntity) {
@@ -121,19 +121,8 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     @SuppressWarnings("unchecked")
     protected List<T> searchEntity(SelectEntity<E> selectEntity, Session session) {
 
-        Criteria criteria = session.createCriteria(clazz);
-
-        setCriteria(selectEntity, criteria);
-
+        Criteria criteria = criteriaFactory.extractCriteria(selectEntity, session);
         return criteria.list();
-    }
-
-    protected abstract void setCriteria(SelectEntity<E> selectEntity, Criteria criteria);
-
-    protected void addParameter(SelectEntity<E> entity, String entityName, Class<?> clazz, String criteriaName, Criteria criteria) {
-        Object o = entity.get(entityName, clazz);
-        if (o != null)
-            criteria.add(Restrictions.eq(criteriaName, o));
     }
 
     protected Response checkOnlyOne(List<T> entities) {

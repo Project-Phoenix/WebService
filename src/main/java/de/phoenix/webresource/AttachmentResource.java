@@ -18,17 +18,14 @@
 
 package de.phoenix.webresource;
 
-import java.util.Date;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
-
 import de.phoenix.database.entity.Attachment;
+import de.phoenix.database.entity.criteria.AttachmentCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -38,7 +35,7 @@ import de.phoenix.webresource.util.AbstractPhoenixResource;
 public class AttachmentResource extends AbstractPhoenixResource<Attachment, PhoenixAttachment> {
 
     public AttachmentResource() {
-        super(Attachment.class);
+        super(AttachmentCriteriaFactory.getInstance());
     }
 
     @Path("/" + PhoenixAttachment.WEB_RESOURCE_UPDATE)
@@ -53,12 +50,5 @@ public class AttachmentResource extends AbstractPhoenixResource<Attachment, Phoe
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAttachment(SelectEntity<PhoenixAttachment> selectAttachment) {
         return onDelete(selectAttachment);
-    }
-
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixAttachment> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "creationDate", Date.class, "creationDate", criteria);
-        addParameter(selectEntity, "name", String.class, "name", criteria);
-        addParameter(selectEntity, "type", String.class, "type", criteria);
     }
 }

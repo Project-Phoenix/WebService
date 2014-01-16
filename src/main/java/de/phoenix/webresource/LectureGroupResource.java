@@ -24,20 +24,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
+import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
-import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_ROOT)
 public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, PhoenixLectureGroup> {
 
     public LectureGroupResource() {
-        super(LectureGroup.class);
+        super(LectureGroupCriteriaFactory.getInstance());
     }
 
     @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_CREATE)
@@ -61,14 +60,5 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
         // Store all relevant details of this lecture
 
         return lectureGroup;
-    }
-
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "name", String.class, "name", criteria);
-        addParameter(selectEntity, "maxMember", int.class, "maxMember", criteria);
-        addParameter(selectEntity, "submissionDeadLineTime", String.class, "name", criteria);
-        addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, "name", criteria);
-        addParameter(selectEntity, "name", String.class, "name", criteria);
     }
 }

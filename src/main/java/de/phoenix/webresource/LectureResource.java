@@ -29,7 +29,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -37,6 +36,7 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
+import de.phoenix.database.entity.criteria.LectureCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
@@ -50,7 +50,7 @@ import de.phoenix.webresource.util.AbstractPhoenixResource;
 public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLecture> {
 
     public LectureResource() {
-        super(Lecture.class);
+        super(LectureCriteriaFactory.getInstance());
     }
 
     @Path("/" + PhoenixLecture.WEB_RESOURCE_CREATE)
@@ -120,11 +120,6 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getLecture(SelectEntity<PhoenixLecture> selectLecture) {
         return Response.ok(onGet(selectLecture)).build();
-    }
-
-    @Override
-    protected void setCriteria(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria) {
-        addParameter(selectEntity, "title", String.class, "name", criteria);
     }
 
     @Path("/" + PhoenixLecture.WEB_RESOURCE_ADD_GROUP)
