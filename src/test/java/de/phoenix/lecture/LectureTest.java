@@ -42,7 +42,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.org.apache.bcel.internal.generic.Select;
 
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
@@ -236,8 +235,6 @@ public class LectureTest {
         assertTrue(response.toString(), response.getStatus() == 200);
 
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
-        System.out.println(groups);
         assertFalse("Lecture list is empty!", groups.isEmpty());
-        PhoenixLectureGroup lec = groups.get(0);
     }
 }
