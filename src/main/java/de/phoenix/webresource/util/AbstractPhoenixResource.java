@@ -75,9 +75,11 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
                 T entity = entities.get(0);
                 E phoenixEntity = updatedEntity.getNewObject();
 
+                Transaction trans = session.beginTransaction();
                 entity.copyValues(phoenixEntity);
 
                 session.update(entity);
+                trans.commit();
             }
 
             return response;
@@ -95,7 +97,10 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
             Response response = checkOnlyOne(entities);
             if (response.getStatus() == 200) {
                 T entity = entities.get(0);
+
+                Transaction trans = session.beginTransaction();
                 session.delete(entity);
+                trans.commit();
             }
 
             return response;
