@@ -116,7 +116,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
 
             List<T> entities = searchEntity(selectEntity, session);
             if (entities.isEmpty()) {
-                Response.noContent().build();
+                return Response.noContent().build();
             }
 
             List<E> result = ConverterUtil.convert(entities);

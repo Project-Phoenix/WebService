@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
@@ -365,5 +366,14 @@ public class TaskTest {
         WebResource connectTasksheetWithTasksResource = PhoenixTaskSheet.connectTaskSheetWithTaskResource(c, BASE_URI);
         response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createConnectWith(taskSheet, tasks));
         assertEquals(response.getStatus(), 200);
+    }
+
+    @Test
+    @Order(10)
+    public void searchNonExistingTask() {
+        Client c = PhoenixClient.create();
+        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URI);
+        ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTask>().addKey("title", "troll"));
+        assertEquals(Status.NO_CONTENT, response.getClientResponseStatus());
     }
 }
