@@ -374,6 +374,6 @@ public class TaskTest {
         Client c = PhoenixClient.create();
         WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URI);
         ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTask>().addKey("title", "troll"));
-        assertEquals(Status.NO_CONTENT, response.getClientResponseStatus());
+        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
     }
 }

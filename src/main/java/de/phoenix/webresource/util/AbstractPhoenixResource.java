@@ -116,7 +116,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
 
             List<T> entities = searchEntity(selectEntity, session);
             if (entities.isEmpty()) {
-                return Response.noContent().build();
+                return Response.status(Status.NOT_FOUND).build();
             }
 
             List<E> result = ConverterUtil.convert(entities);
@@ -147,7 +147,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
                     Criteria criteria = factory.extractCriteria(selectEntity, session);
                     N foundConnectEntity = (N) criteria.uniqueResult();
                     if (foundConnectEntity == null) {
-                        return Response.status(Status.BAD_REQUEST).entity("Unknown entity!").build();
+                        return Response.status(Status.NOT_FOUND).entity("Unknown entity!").build();
                     }
                     foundConnectEntites.add(foundConnectEntity);
                 }
@@ -174,7 +174,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     protected Response checkOnlyOne(List<T> entities) {
 
         if (entities.isEmpty()) {
-            return Response.status(Status.NO_CONTENT).entity("No entity").build();
+            return Response.status(Status.NOT_FOUND).entity("No entity").build();
         } else if (entities.size() > 1) {
             return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
         } else {

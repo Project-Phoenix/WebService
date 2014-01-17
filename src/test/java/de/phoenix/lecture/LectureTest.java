@@ -217,6 +217,6 @@ public class LectureTest {
 
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URI);
         ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
-        assertEquals(Status.NO_CONTENT, response.getClientResponseStatus());
+        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
     }
 }
