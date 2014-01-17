@@ -19,6 +19,7 @@
 package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.entity.Task;
@@ -38,7 +39,7 @@ public class TaskCriteriaFactory extends CriteriaFactory<Task, PhoenixTask> {
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixTask> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixTask> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "title", String.class, criteria);
         addParameter(selectEntity, "description", String.class, criteria);
 

@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroup` (
   PRIMARY KEY (`id`),
   INDEX `fk_lectureGroup_lecture1_idx` (`lecture` ASC),
   INDEX `lectureGroupKey` (`name` ASC),
+  UNIQUE INDEX `lectureGroupIndex` (`name` ASC, `lecture` ASC),
   CONSTRAINT `fk_lectureGroup_lecture1`
     FOREIGN KEY (`lecture`)
     REFERENCES `phoenix`.`lecture` (`id`)

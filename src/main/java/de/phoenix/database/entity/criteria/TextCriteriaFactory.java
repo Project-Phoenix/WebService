@@ -21,6 +21,7 @@ package de.phoenix.database.entity.criteria;
 import java.util.Date;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 
 import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixText;
@@ -39,7 +40,7 @@ public class TextCriteriaFactory extends CriteriaFactory<Text, PhoenixText> {
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixText> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixText> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "name", String.class, "title", criteria);
         addParameter(selectEntity, "type", String.class, criteria);
         addParameter(selectEntity, "creationDate", Date.class, criteria);

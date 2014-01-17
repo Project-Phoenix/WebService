@@ -19,6 +19,7 @@
 package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.rs.entity.PhoenixLecture;
@@ -37,7 +38,7 @@ public class LectureCriteriaFactory extends CriteriaFactory<Lecture, PhoenixLect
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "title", String.class, "name", criteria);
     }
 }

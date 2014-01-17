@@ -19,8 +19,12 @@
 package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
+import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
+import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.key.SelectEntity;
 
@@ -37,11 +41,20 @@ public class LectureGroupCriteriaFactory extends CriteriaFactory<LectureGroup, P
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "name", String.class, criteria);
         addParameter(selectEntity, "maxMember", int.class, criteria);
         addParameter(selectEntity, "submissionDeadLineTime", String.class, criteria);
         addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, criteria);
         addParameter(selectEntity, "name", String.class, criteria);
+
+        @SuppressWarnings("unchecked")
+        SelectEntity<PhoenixLecture> lectureKey = selectEntity.get("lecture", SelectEntity.class);
+        if (lectureKey != null) {
+            Lecture lecture = search(lectureKey, session, LectureCriteriaFactory.getInstance());
+            if (lecture != null) {
+                criteria.add(Restrictions.eq("lecture", lecture));
+            }
+        }
     }
 }

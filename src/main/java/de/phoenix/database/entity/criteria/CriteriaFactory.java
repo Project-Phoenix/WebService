@@ -37,11 +37,11 @@ public abstract class CriteriaFactory<T extends Convertable<E>, E extends Phoeni
     public Criteria extractCriteria(SelectEntity<E> selectEntity, Session session) {
         Criteria criteria = session.createCriteria(clazz);
 
-        setAttributes(selectEntity, criteria);
+        setAttributes(selectEntity, criteria, session);
         return criteria;
     }
 
-    public abstract void setAttributes(SelectEntity<E> selectEntity, Criteria criteria);
+    public abstract void setAttributes(SelectEntity<E> selectEntity, Criteria criteria, Session session);
 
     protected void addParameter(SelectEntity<E> entity, String entityAttributeName, Class<?> clazz, String criteriaAttributeName, Criteria criteria) {
         Object o = entity.get(entityAttributeName, clazz);
@@ -51,5 +51,11 @@ public abstract class CriteriaFactory<T extends Convertable<E>, E extends Phoeni
 
     protected void addParameter(SelectEntity<E> entity, String attributeName, Class<?> clazz, Criteria criteria) {
         this.addParameter(entity, attributeName, clazz, attributeName, criteria);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <M extends Convertable<N>, N extends PhoenixEntity> M search(SelectEntity<N> bla, Session session, CriteriaFactory<M, N> factory) {
+        Criteria criteria = factory.extractCriteria(bla, session);
+        return (M) criteria.uniqueResult();
     }
 }

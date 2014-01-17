@@ -19,6 +19,7 @@
 package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.TaskSubmission;
@@ -32,7 +33,7 @@ public class TaskSubmissionCriteriaFactory extends CriteriaFactory<TaskSubmissio
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixSubmission> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixSubmission> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "date", DateTime.class, criteria);
         addParameter(selectEntity, "status", int.class, criteria);
         addParameter(selectEntity, "statusText", String.class, criteria);

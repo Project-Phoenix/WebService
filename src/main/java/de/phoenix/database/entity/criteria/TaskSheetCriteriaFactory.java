@@ -19,6 +19,7 @@
 package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 
 import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
@@ -37,7 +38,7 @@ public class TaskSheetCriteriaFactory extends CriteriaFactory<TaskSheet, Phoenix
     }
 
     @Override
-    public void setAttributes(SelectEntity<PhoenixTaskSheet> selectEntity, Criteria criteria) {
+    public void setAttributes(SelectEntity<PhoenixTaskSheet> selectEntity, Criteria criteria, Session session) {
         addParameter(selectEntity, "title", String.class, criteria);
     }
 

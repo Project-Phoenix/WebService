@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.org.apache.bcel.internal.generic.Select;
 
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
@@ -218,5 +219,25 @@ public class LectureTest {
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URI);
         ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
         assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
+    }
+
+    @Test
+    @Order(6)
+    public void getGroupsForALecture() {
+        Client c = PhoenixClient.create();
+        WebResource ws = PhoenixLectureGroup.getResource(c, BASE_URI);
+
+        SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
+        SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
+
+        groupSelector.addKey("lecture", lectureSelector);
+
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        assertTrue(response.toString(), response.getStatus() == 200);
+
+        List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
+        System.out.println(groups);
+        assertFalse("Lecture list is empty!", groups.isEmpty());
+        PhoenixLectureGroup lec = groups.get(0);
     }
 }

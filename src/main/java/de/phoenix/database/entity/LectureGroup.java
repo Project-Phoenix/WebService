@@ -93,7 +93,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     @Cascade(CascadeType.SAVE_UPDATE)
     private List<Details> detailsList;
 
-    @JoinColumn(name = "lecture", referencedColumnName = "id")
+    @JoinColumn(name = "lecture", referencedColumnName = "id", unique = true)
     @ManyToOne(optional = false)
     @Cascade(CascadeType.SAVE_UPDATE)
     private Lecture lecture;

@@ -21,6 +21,7 @@ package de.phoenix.webresource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -30,6 +31,7 @@ import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_ROOT)
@@ -60,5 +62,13 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
         // Store all relevant details of this lecture
 
         return lectureGroup;
+    }
+
+    @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_GET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLectureGroup(SelectEntity<PhoenixLectureGroup> selectEntity) {
+        return onGet(selectEntity);
     }
 }
