@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.DatabaseCleaner;
@@ -52,6 +53,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.key.AddToEntity;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
@@ -195,5 +197,26 @@ public class LectureTest {
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URI);
         response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
         assertEquals(response.getStatus(), 200);
+    }
+
+    @Test
+    @Order(5)
+    public void addDetailToNotExistingLecture() {
+        Client c = PhoenixClient.create();
+
+        // Create information for the group information
+        LocalTime startTime = new LocalTime(2, 30);
+        LocalTime endTime = new LocalTime(4, 00);
+        LocalDate startDate = new LocalDate(2013, 10, 21);
+        LocalDate endDate = new LocalDate(2014, 01, 27);
+
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
+
+        // Add something to a non existing lecture
+        AddToEntity<PhoenixLecture, PhoenixDetails> addDetailToLecture = new AddToEntity<PhoenixLecture, PhoenixDetails>(detail).addKey("title", "troll");
+
+        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URI);
+        ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
+        assertEquals(Status.NO_CONTENT, response.getClientResponseStatus());
     }
 }

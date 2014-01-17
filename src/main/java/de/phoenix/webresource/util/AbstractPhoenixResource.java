@@ -174,7 +174,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     protected Response checkOnlyOne(List<T> entities) {
 
         if (entities.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("No entity").build();
+            return Response.status(Status.NO_CONTENT).entity("No entity").build();
         } else if (entities.size() > 1) {
             return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
         } else {
