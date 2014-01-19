@@ -44,7 +44,7 @@ public abstract class CriteriaFactory<T extends Convertable<E>, E extends Phoeni
     public abstract void setAttributes(SelectEntity<E> selectEntity, Criteria criteria, Session session);
 
     protected void addParameter(SelectEntity<E> entity, String entityAttributeName, Class<?> clazz, String criteriaAttributeName, Criteria criteria) {
-        Object o = entity.get(entityAttributeName, clazz);
+        Object o = entity.get(entityAttributeName);
         if (o != null)
             criteria.add(Restrictions.eq(criteriaAttributeName, o));
     }

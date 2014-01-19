@@ -44,7 +44,7 @@ public class TaskCriteriaFactory extends CriteriaFactory<Task, PhoenixTask> {
         addParameter(selectEntity, "description", String.class, criteria);
 
         // Is instance of automatic task
-        if (selectEntity.get("backend", String.class) != null) {
+        if (selectEntity.get("backend") != null) {
             addParameter(selectEntity, "backend", String.class, criteria);
             criteria.add(Restrictions.eq("backend", true));
         }

@@ -48,8 +48,7 @@ public class LectureGroupCriteriaFactory extends CriteriaFactory<LectureGroup, P
         addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, criteria);
         addParameter(selectEntity, "name", String.class, criteria);
 
-        @SuppressWarnings("unchecked")
-        SelectEntity<PhoenixLecture> lectureKey = selectEntity.get("lecture", SelectEntity.class);
+        SelectEntity<PhoenixLecture> lectureKey = selectEntity.get("lecture");
         if (lectureKey != null) {
             Lecture lecture = search(lectureKey, session, LectureCriteriaFactory.getInstance());
             if (lecture != null) {
