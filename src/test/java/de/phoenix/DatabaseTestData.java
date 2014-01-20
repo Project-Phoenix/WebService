@@ -18,6 +18,8 @@
 
 package de.phoenix;
 
+import static de.phoenix.database.EntityTest.BASE_URL;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,8 +53,6 @@ public class DatabaseTestData {
 
     private final static DatabaseTestData instance = new DatabaseTestData();
 
-    private final static String BASE_URI = "http://localhost:7766/rest";
-
     private PhoenixTask specialNumbersTask = null;
     private PhoenixTask ternarySearchTask = null;
 
@@ -67,34 +67,21 @@ public class DatabaseTestData {
     }
 
     public void createTestData() {
-        System.out.println("Creating test data...");
-        TestHttpServer httpServer = null;
-        try {
-            httpServer = new TestHttpServer(BASE_URI);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
 
         Client client = PhoenixClient.create();
 
         try {
             createTasks(client);
             createLectures(client);
-
-            System.out.println("Finished creating test data!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Something went wrong!");
         }
-
-        httpServer.stop();
     }
 
     private void createTasks(Client c) throws Exception {
 
-        WebResource createTaskResource = PhoenixTask.createResource(c, BASE_URI);
-        WebResource submitSolutionResource = PhoenixTask.submitResource(c, BASE_URI);
+        WebResource createTaskResource = PhoenixTask.createResource(c, BASE_URL);
+        WebResource submitSolutionResource = PhoenixTask.submitResource(c, BASE_URL);
 
         createSpecialNumberTask(createTaskResource);
         solveSpecialNumbers(submitSolutionResource);
@@ -203,8 +190,8 @@ public class DatabaseTestData {
 
     private void createLectures(Client c) throws Exception {
 
-        WebResource createLectureResource = PhoenixLecture.createResource(c, BASE_URI);
-        WebResource createLectureGroupResource = PhoenixLecture.addGroupResource(c, BASE_URI);
+        WebResource createLectureResource = PhoenixLecture.createResource(c, BASE_URL);
+        WebResource createLectureGroupResource = PhoenixLecture.addGroupResource(c, BASE_URL);
 
         // Create einf and its groups
         createEinfLecture(createLectureResource);

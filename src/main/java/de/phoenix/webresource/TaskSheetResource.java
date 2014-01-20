@@ -18,6 +18,7 @@
 
 package de.phoenix.webresource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -27,8 +28,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.joda.time.DateTime;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
@@ -38,7 +44,7 @@ import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
-import de.phoenix.rs.key.ConnectWithEntity;
+import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
@@ -93,19 +99,50 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
         return onGet(selectEntity);
     }
 
+    // TODO: Move to other method name?
     @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_CONNECT_TASKSHEET_WITH_TASK)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response connectTasksWithTaskSheet(ConnectWithEntity<PhoenixTaskSheet, PhoenixTask> connectWithEntity) {
-        return onConnect(connectWithEntity, TaskCriteriaFactory.getInstance(), new TaskSheetTaskConnector());
-    }
+    public Response connectTasksWithTaskSheet(ConnectionEntity connectionEntity) {
 
-    private class TaskSheetTaskConnector implements EntityConnector<TaskSheet, Task> {
+        Session session = DatabaseManager.getSession();
+        try {
+            Transaction trans = session.beginTransaction();
 
-        @Override
-        public void connect(TaskSheet entity, List<Task> entities) {
-            entity.setTasks(entities);
+            TaskSheet taskSheet = new TaskSheet();
+
+            taskSheet.setTitle((String) connectionEntity.getAttribute("title"));
+            taskSheet.setCreationDate(DateTime.now());
+
+            // Search Tasks
+            List<SelectEntity<PhoenixTask>> taskSelectors = connectionEntity.getSelectEntities(PhoenixTask.class);
+            TaskCriteriaFactory taskCriteriaFactory = TaskCriteriaFactory.getInstance();
+            List<Task> tasks = new ArrayList<Task>(taskSelectors.size());
+
+            for (SelectEntity<PhoenixTask> selectEntity : taskSelectors) {
+                Criteria criteria = taskCriteriaFactory.extractCriteria(selectEntity, session);
+                try {
+                    Task task = (Task) criteria.uniqueResult();
+                    if (task == null) {
+                        return Response.status(Status.NOT_FOUND).entity("No entity").build();
+                    }
+                    tasks.add(task);
+                } catch (HibernateException e) {
+                    return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
+                }
+            }
+
+            taskSheet.setTasks(tasks);
+            
+            session.save(taskSheet);
+            trans.commit();
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
 
+        return Response.ok().build();
     }
 }

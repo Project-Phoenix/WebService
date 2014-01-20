@@ -19,22 +19,28 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
-import javax.persistence.CascadeType;
+
+import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 
 @Entity
 @Table(name = "lectureGroupTaskSheet")
@@ -42,87 +48,82 @@ import javax.xml.bind.annotation.XmlTransient;
 //@formatter:off
 @NamedQueries({
     @NamedQuery(name = "LectureGroupTaskSheet.findAll", query = "SELECT l FROM LectureGroupTaskSheet l"),
-    @NamedQuery(name = "LectureGroupTaskSheet.findByGroup", query = "SELECT l FROM LectureGroupTaskSheet l WHERE l.lectureGroupTaskSheetPK.group = :group"),
-    @NamedQuery(name = "LectureGroupTaskSheet.findByTaskSheet", query = "SELECT l FROM LectureGroupTaskSheet l WHERE l.lectureGroupTaskSheetPK.taskSheet = :taskSheet"),
+    @NamedQuery(name = "LectureGroupTaskSheet.findById", query = "SELECT l FROM LectureGroupTaskSheet l WHERE l.id = :id"),
     @NamedQuery(name = "LectureGroupTaskSheet.findByDefaultDeadline", query = "SELECT l FROM LectureGroupTaskSheet l WHERE l.defaultDeadline = :defaultDeadline"),
     @NamedQuery(name = "LectureGroupTaskSheet.findByDefaultReleaseDate", query = "SELECT l FROM LectureGroupTaskSheet l WHERE l.defaultReleaseDate = :defaultReleaseDate")})
 //@formatter:on
-public class LectureGroupTaskSheet implements Serializable {
+public class LectureGroupTaskSheet implements Serializable, Convertable<PhoenixLectureGroupTaskSheet> {
 
     private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    protected LectureGroupTaskSheetPK lectureGroupTaskSheetPK;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "defaultDeadline")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date defaultDeadline;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime defaultDeadline;
 
     @Column(name = "defaultReleaseDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date defaultReleaseDate;
+    @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime defaultReleaseDate;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lectureGroupTaskSheet")
-    private List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDatesList;
+    @OneToMany(mappedBy = "lectureGroupTaskSheet")
+    private List<TaskSubmissionDates> taskSubmissionDatesList;
 
-    @JoinColumn(name = "taskSheet", referencedColumnName = "id", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private TaskSheet taskSheet1;
-
-    @JoinColumn(name = "group", referencedColumnName = "id", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "lectureGroup", referencedColumnName = "id")
+    @ManyToOne
     private LectureGroup lectureGroup;
+
+    @JoinColumn(name = "taskSheet", referencedColumnName = "id")
+    @ManyToOne
+    private TaskSheet taskSheet;
 
     public LectureGroupTaskSheet() {
     }
 
-    public LectureGroupTaskSheet(LectureGroupTaskSheetPK lectureGroupTaskSheetPK) {
-        this.lectureGroupTaskSheetPK = lectureGroupTaskSheetPK;
+    public LectureGroupTaskSheet(Integer id) {
+        this.id = id;
     }
 
-    public LectureGroupTaskSheet(int group, int taskSheet) {
-        this.lectureGroupTaskSheetPK = new LectureGroupTaskSheetPK(group, taskSheet);
+    public LectureGroupTaskSheet(DateTime defaultDeadline, DateTime defaultReleaseDate) {
+        this.defaultDeadline = defaultDeadline;
+        this.defaultReleaseDate = defaultReleaseDate;
     }
 
-    public LectureGroupTaskSheetPK getLectureGroupTaskSheetPK() {
-        return lectureGroupTaskSheetPK;
+    public Integer getId() {
+        return id;
     }
 
-    public void setLectureGroupTaskSheetPK(LectureGroupTaskSheetPK lectureGroupTaskSheetPK) {
-        this.lectureGroupTaskSheetPK = lectureGroupTaskSheetPK;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Date getDefaultDeadline() {
+    public DateTime getDefaultDeadline() {
         return defaultDeadline;
     }
 
-    public void setDefaultDeadline(Date defaultDeadline) {
+    public void setDefaultDeadline(DateTime defaultDeadline) {
         this.defaultDeadline = defaultDeadline;
     }
 
-    public Date getDefaultReleaseDate() {
+    public DateTime getDefaultReleaseDate() {
         return defaultReleaseDate;
     }
 
-    public void setDefaultReleaseDate(Date defaultReleaseDate) {
+    public void setDefaultReleaseDate(DateTime defaultReleaseDate) {
         this.defaultReleaseDate = defaultReleaseDate;
     }
 
     @XmlTransient
-    public List<LectureGroupTaskSheetDates> getLectureGroupTaskSheetDates() {
-        return lectureGroupTaskSheetDatesList;
+    public List<TaskSubmissionDates> getTaskSubmissionDates() {
+        return taskSubmissionDatesList;
     }
 
-    public void setLectureGroupTaskSheetDates(List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDates) {
-        this.lectureGroupTaskSheetDatesList = lectureGroupTaskSheetDates;
-    }
-
-    public TaskSheet getTaskSheet() {
-        return taskSheet1;
-    }
-
-    public void setTaskSheet(TaskSheet taskSheet) {
-        this.taskSheet1 = taskSheet;
+    public void setTaskSubmissionDates(List<TaskSubmissionDates> taskSubmissionDates) {
+        this.taskSubmissionDatesList = taskSubmissionDates;
     }
 
     public LectureGroup getLectureGroup() {
@@ -133,10 +134,18 @@ public class LectureGroupTaskSheet implements Serializable {
         this.lectureGroup = lectureGroup;
     }
 
+    public TaskSheet getTaskSheet() {
+        return taskSheet;
+    }
+
+    public void setTaskSheet(TaskSheet taskSheet) {
+        this.taskSheet = taskSheet;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (lectureGroupTaskSheetPK != null ? lectureGroupTaskSheetPK.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -148,7 +157,7 @@ public class LectureGroupTaskSheet implements Serializable {
             return false;
         }
         LectureGroupTaskSheet other = (LectureGroupTaskSheet) object;
-        if ((this.lectureGroupTaskSheetPK == null && other.lectureGroupTaskSheetPK != null) || (this.lectureGroupTaskSheetPK != null && !this.lectureGroupTaskSheetPK.equals(other.lectureGroupTaskSheetPK))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -156,7 +165,19 @@ public class LectureGroupTaskSheet implements Serializable {
 
     @Override
     public String toString() {
-        return "de.phoenix.database.entityt.LectureGroupTaskSheet[ lectureGroupTaskSheetPK=" + lectureGroupTaskSheetPK + " ]";
+        return "de.phoenix.database.entity.LectureGroupTaskSheet[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixLectureGroupTaskSheet convert() {
+        return new PhoenixLectureGroupTaskSheet(defaultDeadline, defaultReleaseDate, this.taskSheet.convert(), this.lectureGroup.convert());
+    }
+
+    @Override
+    public void copyValues(PhoenixLectureGroupTaskSheet phoenixEntity) {
+        this.defaultDeadline = phoenixEntity.getDefaultDeadline();
+        this.defaultReleaseDate = phoenixEntity.getDefaultReleaseDate();
+
     }
 
 }

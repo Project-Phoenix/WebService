@@ -136,30 +136,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`lectureGroupTaskSheet`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheet` (
-  `group` INT NOT NULL,
-  `taskSheet` INT NOT NULL,
-  `defaultDeadline` DATETIME NULL,
-  `defaultReleaseDate` DATETIME NULL,
-  PRIMARY KEY (`group`, `taskSheet`),
-  INDEX `fk_lectureGroupTaskSheet_taskSheet1_idx` (`taskSheet` ASC),
-  INDEX `fk_lectureGroupTaskSheet_group1_idx` (`group` ASC),
-  CONSTRAINT `fk_lectureGroupTaskSheet_group1`
-    FOREIGN KEY (`group`)
-    REFERENCES `phoenix`.`lectureGroup` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_lectureGroupTaskSheet_taskSheet1`
-    FOREIGN KEY (`taskSheet`)
-    REFERENCES `phoenix`.`taskSheet` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`taskAttachments`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`taskAttachments` (
@@ -248,31 +224,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`lectureGroupTaskSheetDates`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheetDates` (
-  `groupTaskSheet_group` INT NOT NULL,
-  `groupTaskSheet_taskSheet` INT NOT NULL,
-  `task_id` INT NOT NULL,
-  `deadline` DATETIME NULL,
-  `releaseDate` DATETIME NULL,
-  PRIMARY KEY (`groupTaskSheet_group`, `groupTaskSheet_taskSheet`, `task_id`),
-  INDEX `fk_lectureGroupTaskSheetDates_task1_idx` (`task_id` ASC),
-  INDEX `fk_lectureGroupTaskSheetDates_groupTaskSheet1_idx` (`groupTaskSheet_group` ASC, `groupTaskSheet_taskSheet` ASC),
-  CONSTRAINT `fk_lectureGroupTaskSheetDates_groupTaskSheet1`
-    FOREIGN KEY (`groupTaskSheet_group` , `groupTaskSheet_taskSheet`)
-    REFERENCES `phoenix`.`lectureGroupTaskSheet` (`group` , `taskSheet`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_lectureGroupTaskSheetDates_task1`
-    FOREIGN KEY (`task_id`)
-    REFERENCES `phoenix`.`task` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`taskSubmission`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmission` (
@@ -353,6 +304,56 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskTests` (
   CONSTRAINT `fk_task_has_text_text1`
     FOREIGN KEY (`text_id`)
     REFERENCES `phoenix`.`text` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`lectureGroupTaskSheet`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheet` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `defaultDeadline` DATETIME NULL,
+  `defaultReleaseDate` DATETIME NULL,
+  `taskSheet` INT NULL,
+  `lectureGroup` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_lectureGroupTaskSheet_taskSheet2_idx` (`taskSheet` ASC),
+  INDEX `fk_lectureGroupTaskSheet_lectureGroup1_idx` (`lectureGroup` ASC),
+  CONSTRAINT `fk_lectureGroupTaskSheet_taskSheet2`
+    FOREIGN KEY (`taskSheet`)
+    REFERENCES `phoenix`.`taskSheet` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_lectureGroupTaskSheet_lectureGroup1`
+    FOREIGN KEY (`lectureGroup`)
+    REFERENCES `phoenix`.`lectureGroup` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`taskSubmissionDates`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmissionDates` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `deadline` DATETIME NULL,
+  `releasedate` DATETIME NULL,
+  `lectureGroupTaskSheet` INT NULL,
+  `task` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_taskSubmissionDates_lectureGroupTaskSheet1_idx` (`lectureGroupTaskSheet` ASC),
+  INDEX `fk_taskSubmissionDates_task1_idx` (`task` ASC),
+  CONSTRAINT `fk_taskSubmissionDates_lectureGroupTaskSheet1`
+    FOREIGN KEY (`lectureGroupTaskSheet`)
+    REFERENCES `phoenix`.`lectureGroupTaskSheet` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_taskSubmissionDates_task1`
+    FOREIGN KEY (`task`)
+    REFERENCES `phoenix`.`task` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

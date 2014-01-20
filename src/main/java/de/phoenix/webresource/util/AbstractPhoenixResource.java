@@ -18,7 +18,6 @@
 
 package de.phoenix.webresource.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -32,7 +31,6 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.criteria.CriteriaFactory;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
-import de.phoenix.rs.key.ConnectWithEntity;
 import de.phoenix.rs.key.PhoenixEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -128,41 +126,41 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected <N extends Convertable<M>, M extends PhoenixEntity> Response onConnect(ConnectWithEntity<E, M> connectEntity, CriteriaFactory<N, M> factory, EntityConnector<T, N> connector) {
-
-        Session session = DatabaseManager.getSession();
-        try {
-
-            List<T> entities = searchEntity(connectEntity, session);
-            Response response = checkOnlyOne(entities);
-
-            if (response.getStatus() == 200) {
-                T entity = entities.get(0);
-
-                List<SelectEntity<M>> connectEntities = connectEntity.getToConnectEntities();
-                List<N> foundConnectEntites = new ArrayList<N>(connectEntities.size());
-
-                for (SelectEntity<M> selectEntity : connectEntities) {
-                    Criteria criteria = factory.extractCriteria(selectEntity, session);
-                    N foundConnectEntity = (N) criteria.uniqueResult();
-                    if (foundConnectEntity == null) {
-                        return Response.status(Status.NOT_FOUND).entity("Unknown entity!").build();
-                    }
-                    foundConnectEntites.add(foundConnectEntity);
-                }
-                connector.connect(entity, foundConnectEntites);
-                Transaction trans = session.beginTransaction();
-                session.update(entity);
-                trans.commit();
-            }
-
-            return response;
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
+//    @SuppressWarnings("unchecked")
+//    protected <N extends Convertable<M>, M extends PhoenixEntity> Response onConnect(ConnectionEntity<E, M> connectEntity, CriteriaFactory<N, M> factory, EntityConnector<T, N> connector) {
+//
+//        Session session = DatabaseManager.getSession();
+//        try {
+//
+//            List<T> entities = searchEntity(connectEntity, session);
+//            Response response = checkOnlyOne(entities);
+//
+//            if (response.getStatus() == 200) {
+//                T entity = entities.get(0);
+//
+//                List<SelectEntity<M>> connectEntities = connectEntity.getToConnectEntities();
+//                List<N> foundConnectEntites = new ArrayList<N>(connectEntities.size());
+//
+//                for (SelectEntity<M> selectEntity : connectEntities) {
+//                    Criteria criteria = factory.extractCriteria(selectEntity, session);
+//                    N foundConnectEntity = (N) criteria.uniqueResult();
+//                    if (foundConnectEntity == null) {
+//                        return Response.status(Status.NOT_FOUND).entity("Unknown entity!").build();
+//                    }
+//                    foundConnectEntites.add(foundConnectEntity);
+//                }
+//                connector.connect(entity, foundConnectEntites, connectEntity);
+//                Transaction trans = session.beginTransaction();
+//                session.update(entity);
+//                trans.commit();
+//            }
+//
+//            return response;
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//    }
 
     @SuppressWarnings("unchecked")
     protected List<T> searchEntity(SelectEntity<E> selectEntity, Session session) {
@@ -182,8 +180,8 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-    public interface EntityConnector<T, N extends Convertable<? extends PhoenixEntity>> {
-        public void connect(T entity, List<N> entities);
-    }
+//    public interface EntityConnector<T, N extends Convertable<? extends PhoenixEntity>> {
+//        public T connect(List<N> entities, ConnectionEntity<?, ?> connectEntity);
+//    }
 
 }

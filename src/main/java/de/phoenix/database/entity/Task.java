@@ -114,7 +114,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     private List<TaskSubmission> taskSubmissionList;
 
     @OneToMany(mappedBy = "task")
-    private List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDatesList;
+    private List<TaskSubmissionDates> taskSubmissionDatesList;
 
     public Task() {
     }
@@ -216,12 +216,12 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     }
 
     @XmlTransient
-    public List<LectureGroupTaskSheetDates> getLectureGroupTaskSheetDates() {
-        return lectureGroupTaskSheetDatesList;
+    public List<TaskSubmissionDates> getLectureGroupTaskSheetDates() {
+        return taskSubmissionDatesList;
     }
 
-    public void setLectureGroupTaskSheetDates(List<LectureGroupTaskSheetDates> lectureGroupTaskSheetDates) {
-        this.lectureGroupTaskSheetDatesList = lectureGroupTaskSheetDates;
+    public void setLectureGroupTaskSheetDates(List<TaskSubmissionDates> taskSubmissionDates) {
+        this.taskSubmissionDatesList = taskSubmissionDates;
     }
 
     @Override

@@ -27,10 +27,10 @@
 		<mapping class="de.phoenix.database.entity.Lecture" />
 		<mapping class="de.phoenix.database.entity.LectureGroup" />
 		<mapping class="de.phoenix.database.entity.LectureGroupTaskSheet" />
-		<mapping class="de.phoenix.database.entity.LectureGroupTaskSheetDates" />
 		<mapping class="de.phoenix.database.entity.Task" />
 		<mapping class="de.phoenix.database.entity.TaskSheet" />
 		<mapping class="de.phoenix.database.entity.TaskSubmission" />
+		<mapping class="de.phoenix.database.entity.TaskSubmissionDates" />
 		<mapping class="de.phoenix.database.entity.Text" />
 
 	</session-factory>

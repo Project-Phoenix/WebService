@@ -80,13 +80,13 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
     @Cascade(CascadeType.SAVE_UPDATE)
     private List<Task> taskList;
 
-    @OneToMany(mappedBy = "taskSheet1")
+    @OneToMany(mappedBy = "taskSheet")
     private List<LectureGroupTaskSheet> lectureGroupTaskSheetList;
 
     public TaskSheet() {
-     
+
     }
-    
+
     public TaskSheet(PhoenixTaskSheet phoenixTaskSheet) {
         this.setTitle(phoenixTaskSheet.getTitle());
         this.setCreationDate(new DateTime());

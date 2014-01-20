@@ -18,6 +18,7 @@
 
 package de.phoenix.task;
 
+import static de.phoenix.database.EntityTest.BASE_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,8 +34,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -43,9 +42,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 
-import de.phoenix.DatabaseCleaner;
-import de.phoenix.DatabaseTestData;
-import de.phoenix.TestHttpServer;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
@@ -56,7 +52,6 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
-import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
@@ -64,38 +59,6 @@ import de.phoenix.rs.key.SelectEntity;
 
 @RunWith(OrderedRunner.class)
 public class TaskTest {
-
-    private final static String BASE_URI = "http://localhost:7766/rest";
-
-    private static TestHttpServer httpServer;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        DatabaseCleaner.getInstance().run();
-        // Start Http Server
-        httpServer = new TestHttpServer(BASE_URI);
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        httpServer.stop();
-
-        DatabaseCleaner.getInstance().run();
-        DatabaseTestData.getInstance().createTestData();
-        deleteAllClassFiles();
-    }
-
-    private static void deleteAllClassFiles() {
-        File dir = new File(".");
-        File[] files = dir.listFiles();
-        if (files == null)
-            return;
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
-            if (file.getName().endsWith(".class"))
-                file.delete();
-        }
-    }
 
     private final static String TEST_TITLE = "Befreundete Zahlen";
     private final static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/specialNumbers/TaskDescription.html");
@@ -121,7 +84,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
         try {
 
             List<PhoenixText> texts = new ArrayList<PhoenixText>();
@@ -167,7 +130,7 @@ public class TaskTest {
     @Order(2)
     public void getAllTasks() {
         Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URI).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        WebResource wr = c.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
         ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
 
         List<PhoenixTask> tasks = EntityUtil.extractEntityList(resp);
@@ -189,7 +152,7 @@ public class TaskTest {
     public void getTaskByTitle() {
 
         Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
@@ -215,7 +178,7 @@ public class TaskTest {
         }
 
         Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
@@ -226,7 +189,7 @@ public class TaskTest {
 
         try {
             PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
-            wr = PhoenixTask.submitResource(c, BASE_URI);
+            wr = PhoenixTask.submitResource(c, BASE_URL);
             post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
 
             assertTrue(post.toString(), post.getStatus() == 200);
@@ -243,7 +206,7 @@ public class TaskTest {
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
-        WebResource wrGetTask = PhoenixTask.getResource(c, BASE_URI);
+        WebResource wrGetTask = PhoenixTask.getResource(c, BASE_URL);
 
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
@@ -253,7 +216,7 @@ public class TaskTest {
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask phoenixTask = list.get(0);
 
-        WebResource wrGetSubmissions = PhoenixSubmission.getByTaskResource(c, BASE_URI);
+        WebResource wrGetSubmissions = PhoenixSubmission.getByTaskResource(c, BASE_URL);
 
         post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -274,7 +237,7 @@ public class TaskTest {
     @Order(6)
     public void getAllTitles() {
         Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getAllTitlesResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.getAllTitlesResource(c, BASE_URL);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertTrue(post.toString(), post.getStatus() == 200);
@@ -293,7 +256,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
         try {
 
             // Empty lists - we have not interest in lists for this test
@@ -323,7 +286,7 @@ public class TaskTest {
         // Create client
         Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URI);
+        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
         try {
 
             // Empty lists - we have not interest in lists for this test
@@ -343,36 +306,11 @@ public class TaskTest {
         }
     }
 
-    private static final String TASK_SHEET_TITLE = "Testblatt";
-
     @Test
     @Order(9)
-    public void createTaskSheet() {
-        // Create client
-        Client c = PhoenixClient.create();
-        // Get webresource
-        WebResource createTaskSheetResource = PhoenixTaskSheet.createResource(c, BASE_URI);
-        // Create TaskSheet with Test title
-        PhoenixTaskSheet taskSheet = new PhoenixTaskSheet(TASK_SHEET_TITLE);
-        // Send TaskSheet to server -> create
-        ClientResponse response = createTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, taskSheet);
-        assertEquals(response.getStatus(), 200);
-
-        // Get some tasks to assign to database
-        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URI);
-        response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
-        List<PhoenixTask> tasks = EntityUtil.extractEntityList(response);
-
-        WebResource connectTasksheetWithTasksResource = PhoenixTaskSheet.connectTaskSheetWithTaskResource(c, BASE_URI);
-        response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createConnectWith(taskSheet, tasks));
-        assertEquals(response.getStatus(), 200);
-    }
-
-    @Test
-    @Order(10)
     public void searchNonExistingTask() {
         Client c = PhoenixClient.create();
-        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URI);
+        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URL);
         ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTask>().addKey("title", "troll"));
         assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
     }

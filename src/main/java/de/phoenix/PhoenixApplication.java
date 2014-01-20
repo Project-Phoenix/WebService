@@ -58,7 +58,6 @@ public class PhoenixApplication extends Application {
         classSet.add(TaskSheetResource.class);
         classSet.add(LectureResource.class);
         classSet.add(LectureGroupResource.class);
-
         classSet.add(TextResource.class);
         classSet.add(AttachmentResource.class);
 
