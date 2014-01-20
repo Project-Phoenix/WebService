@@ -18,52 +18,15 @@
 
 package de.phoenix;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
 
-import de.phoenix.rs.JacksonConfigurator;
-import de.phoenix.webresource.AccountResource;
-import de.phoenix.webresource.AttachmentResource;
-import de.phoenix.webresource.LectureGroupResource;
-import de.phoenix.webresource.LectureResource;
-import de.phoenix.webresource.SubmissionResource;
-import de.phoenix.webresource.TaskResource;
-import de.phoenix.webresource.TaskSheetResource;
-import de.phoenix.webresource.TextResource;
-import de.phoenix.webresource.TokenResource;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 
 @ApplicationPath("/rest")
-public class PhoenixApplication extends Application {
-
-    // TODO: Is this necessary?
+public class PhoenixApplication extends PackagesResourceConfig {
 
     public PhoenixApplication() {
-        super();
-        // Main Constructor - called once in the application lifecycle
-    }
-
-    // Add all webresource to the set so jersey know what resources are existing
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
-
-        classSet.add(HelloWorld.class);
-        classSet.add(SubmissionResource.class);
-        classSet.add(TokenResource.class);
-        classSet.add(AccountResource.class);
-        classSet.add(TaskResource.class);
-        classSet.add(TaskSheetResource.class);
-        classSet.add(LectureResource.class);
-        classSet.add(LectureGroupResource.class);
-        classSet.add(TextResource.class);
-        classSet.add(AttachmentResource.class);
-
-        classSet.add(JacksonConfigurator.class);
-
-        return classSet;
+        super("de.phoenix.webresource", "de.phoenix.rs");
     }
 
 }
