@@ -23,6 +23,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -109,5 +110,13 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
         }
 
         return Response.ok().build();
+    }
+
+    @Path("/" + PhoenixLectureGroupTaskSheet.WEB_RESOURCE_GET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response get(SelectEntity<PhoenixLectureGroupTaskSheet> selectEntity) {
+        return onGet(selectEntity);
     }
 }

@@ -133,7 +133,7 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
             }
 
             taskSheet.setTasks(tasks);
-            
+
             session.save(taskSheet);
             trans.commit();
 

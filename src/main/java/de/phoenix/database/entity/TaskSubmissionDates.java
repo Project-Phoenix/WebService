@@ -36,6 +36,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
+
 @Entity
 @Table(name = "taskSubmissionDates")
 @XmlRootElement
@@ -46,7 +49,7 @@ import org.joda.time.DateTime;
     @NamedQuery(name = "TaskSubmissionDates.findByDeadline", query = "SELECT t FROM TaskSubmissionDates t WHERE t.deadline = :deadline"),
     @NamedQuery(name = "TaskSubmissionDates.findByReleasedate", query = "SELECT t FROM TaskSubmissionDates t WHERE t.releasedate = :releasedate")})
 //@formatter:on
-public class TaskSubmissionDates implements Serializable {
+public class TaskSubmissionDates implements Serializable, Convertable<PhoenixTaskSubmissionDates> {
 
     private static final long serialVersionUID = 1L;
 
@@ -143,6 +146,17 @@ public class TaskSubmissionDates implements Serializable {
     @Override
     public String toString() {
         return "de.phoenix.database.entity.TaskSubmissionDates[ id=" + id + " ]";
+    }
+
+    @Override
+    public PhoenixTaskSubmissionDates convert() {
+        return new PhoenixTaskSubmissionDates(deadline, releasedate, this.lectureGroupTaskSheet.convert(), this.task.convert());
+    }
+
+    @Override
+    public void copyValues(PhoenixTaskSubmissionDates phoenixEntity) {
+        this.deadline = phoenixEntity.getDeadline();
+        this.releasedate = phoenixEntity.getReleaseDate();
     }
 
 }

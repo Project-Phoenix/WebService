@@ -42,8 +42,10 @@ import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
+import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
 import de.phoenix.rs.entity.connection.LectureGroupTaskSheetConnection;
 import de.phoenix.rs.entity.connection.TaskSheetConnection;
+import de.phoenix.rs.entity.connection.TaskSubmissionDatesConnection;
 import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
@@ -91,6 +93,38 @@ public class TaskSheetTest {
 
         WebResource createLectureGroupTaskSheet = PhoenixLectureGroupTaskSheet.createResource(c, BASE_URL);
         response = createLectureGroupTaskSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, connectionEntity);
+        assertEquals(Status.OK, response.getClientResponseStatus());
+    }
+
+    @Test
+    @Order(3)
+    public void setSubmissionDateForTask() {
+        Client c = PhoenixClient.create();
+
+        WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(c, BASE_URL);
+        ClientResponse response = getAllGroupsResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixLectureGroup>());
+        List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
+        PhoenixLectureGroup group = groups.get(0);
+
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(c, BASE_URL);
+        response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTaskSheet>().addKey("title", TASK_SHEET_TITLE));
+        PhoenixTaskSheet taskSheet = (PhoenixTaskSheet) EntityUtil.extractEntityList(response).get(0);
+
+        SelectEntity<PhoenixLectureGroupTaskSheet> selectEntity = new SelectEntity<PhoenixLectureGroupTaskSheet>();
+        selectEntity.addKey("lectureGroup", group);
+        selectEntity.addKey("taskSheet", taskSheet);
+
+        WebResource getLectureGroupTaskSheetResource = PhoenixLectureGroupTaskSheet.getResource(c, BASE_URL);
+        response = getLectureGroupTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectEntity);
+
+        List<PhoenixLectureGroupTaskSheet> groupTaskSheets = EntityUtil.extractEntityList(response);
+        PhoenixLectureGroupTaskSheet groupTaskSheet = groupTaskSheets.get(0);
+
+        PhoenixTask task = groupTaskSheet.getTaskSheet().getTasks().get(0);
+        ConnectionEntity connectionEntity = new TaskSubmissionDatesConnection(DateTime.now().plusDays(3), DateTime.now(), groupTaskSheet, task);
+
+        WebResource createTaskSubmissionDateResource = PhoenixTaskSubmissionDates.createResource(c, BASE_URL);
+        response = createTaskSubmissionDateResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, connectionEntity);
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
