@@ -184,8 +184,7 @@ public class TaskTest {
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        PhoenixTask task = list.get(0);
+        PhoenixTask task = EntityUtil.extractEntity(post);
 
         try {
             PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
@@ -213,8 +212,7 @@ public class TaskTest {
         ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
         assertTrue(post.toString(), post.getStatus() == 200);
 
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        PhoenixTask phoenixTask = list.get(0);
+        PhoenixTask phoenixTask = EntityUtil.extractEntity(post);
 
         WebResource wrGetSubmissions = PhoenixSubmission.getByTaskResource(c, BASE_URL);
 

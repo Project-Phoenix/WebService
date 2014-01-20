@@ -107,8 +107,7 @@ public class LectureTest {
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
         assertTrue(response.toString(), response.getStatus() == 200);
 
-        List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
-        PhoenixLecture lec = lectures.get(0);
+        PhoenixLecture lec = EntityUtil.extractEntity(response);
 
         // Add group to lecture
         WebResource ws2 = PhoenixLecture.addGroupResource(c, BASE_URL);
@@ -152,8 +151,7 @@ public class LectureTest {
         ClientResponse response = getLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
         assertTrue(response.toString(), response.getStatus() == 200);
 
-        List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
-        PhoenixLecture lec = lectures.get(0);
+        PhoenixLecture lec = EntityUtil.extractEntity(response);
 
         // Create information for the group information
         LocalTime startTime = new LocalTime(2, 30);
