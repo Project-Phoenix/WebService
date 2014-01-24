@@ -18,46 +18,25 @@
 
 package de.phoenix;
 
-import static de.phoenix.database.EntityTest.BASE_URL;
-
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import javax.ws.rs.core.MediaType;
+import org.hibernate.jdbc.Work;
 
-import org.joda.time.DateTimeConstants;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-
-import de.phoenix.rs.PhoenixClient;
-import de.phoenix.rs.entity.PhoenixAttachment;
-import de.phoenix.rs.entity.PhoenixDetails;
-import de.phoenix.rs.entity.PhoenixLecture;
-import de.phoenix.rs.entity.PhoenixLectureGroup;
-import de.phoenix.rs.entity.PhoenixSubmission;
-import de.phoenix.rs.entity.PhoenixTask;
-import de.phoenix.rs.entity.PhoenixText;
-import de.phoenix.rs.key.AddToEntity;
-import de.phoenix.rs.key.KeyReader;
+import de.phoenix.database.DatabaseManager;
 
 public class DatabaseTestData {
 
     private final static DatabaseTestData instance = new DatabaseTestData();
-
-    private PhoenixTask specialNumbersTask = null;
-    private PhoenixTask ternarySearchTask = null;
-
-    private PhoenixLecture audLecture = null;
-    private PhoenixLecture einfLecture = null;
 
     private DatabaseTestData() {
     }
@@ -68,300 +47,182 @@ public class DatabaseTestData {
 
     public void createTestData() {
 
-        Client client = PhoenixClient.create();
+        DatabaseManager.getSession().doWork(new Work() {
+            @Override
+            public void execute(Connection connection) throws SQLException {
 
-        try {
-            createTasks(client);
-            createLectures(client);
-        } catch (Exception e) {
-            e.printStackTrace();
+                System.out.println("Prepare database");
+                Statement stmt = connection.createStatement();
+                stmt.execute("SET UNIQUE_CHECKS=0");
+                stmt.execute("SET FOREIGN_KEY_CHECKS=0");
+                ResultSet resultSet = stmt.executeQuery("SELECT @@sql_mode;");
+                resultSet.next();
+                String oldMode = resultSet.getString(1);
+                stmt.execute("SET SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES'");
+                stmt.close();
+
+                System.out.println("Start executing dump");
+                ScriptRunner r = new ScriptRunner(connection);
+                try {
+                    r.runScript(new FileReader(new File("src/test/resources/testdata.sql")));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Finished executing dump!");
+
+                stmt = connection.createStatement();
+                stmt.execute("SET UNIQUE_CHECKS=1");
+                stmt.execute("SET FOREIGN_KEY_CHECKS=1");
+                stmt.execute("SET SQL_MODE='" + oldMode + "'");
+                stmt.close();
+            };
+        });
+
+        System.out.println("Finished!");
+
+    }
+
+    private class ScriptRunner {
+
+        private static final String DEFAULT_DELIMITER = ";";
+
+        private Connection connection;
+
+        private PrintWriter logWriter = new PrintWriter(System.out);
+        private PrintWriter errorLogWriter = new PrintWriter(System.err);
+
+        private String delimiter = DEFAULT_DELIMITER;
+        private boolean fullLineDelimiter = false;
+
+        /**
+         * Default constructor
+         */
+        public ScriptRunner(Connection connection) {
+            this.connection = connection;
         }
-    }
 
-    private void createTasks(Client c) throws Exception {
+        /**
+         * Runs an SQL script (read in using the Reader parameter)
+         * 
+         * @param reader
+         *            - the source of the script
+         */
+        public void runScript(Reader reader) throws IOException, SQLException {
+            try {
+                boolean originalAutoCommit = connection.getAutoCommit();
+                try {
 
-        WebResource createTaskResource = PhoenixTask.createResource(c, BASE_URL);
-        WebResource submitSolutionResource = PhoenixTask.submitResource(c, BASE_URL);
-
-        createSpecialNumberTask(createTaskResource);
-        solveSpecialNumbers(submitSolutionResource);
-
-        createTernarySearchTask(createTaskResource);
-        solveTernarySearch(submitSolutionResource);
-
-    }
-
-    // Create a task named SpecialNumbers
-    private void createSpecialNumberTask(WebResource resource) throws Exception {
-
-        String title = "Befreundete Zahlen";
-        File descriptionFile = new File("src/test/resources/task/specialNumbers/TaskDescription.html");
-        File attachmentFile = new File("src/test/resources/task/specialNumbers/FirstNumbers.pdf");
-        File patternFile = new File("src/test/resources/task/specialNumbers/TaskPattern.java");
-
-        List<PhoenixText> texts = new ArrayList<PhoenixText>();
-        PhoenixText textFile = new PhoenixText(patternFile, patternFile.getName());
-        texts.add(textFile);
-
-        List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
-        PhoenixAttachment binaryFile = new PhoenixAttachment(attachmentFile, attachmentFile.getName());
-        attachments.add(binaryFile);
-
-        String description = getText(descriptionFile);
-
-        PhoenixTask task = new PhoenixTask(attachments, texts, description, title);
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
-        if (post.getStatus() != 200)
-            throw new Exception("Status is not 200!");
-        specialNumbersTask = task;
-    }
-
-    // Create a task named Ternary Search
-    private void createTernarySearchTask(WebResource resource) throws Exception {
-
-        String title = "Ternaere Suche";
-        File descriptionFile = new File("src/test/resources/task/ternarySearch/TaskDescription.html");
-        File patternFile = new File("src/test/resources/task/ternarySearch/TaskPattern.java");
-
-        List<PhoenixText> texts = new ArrayList<PhoenixText>();
-        PhoenixText textFile = new PhoenixText(patternFile, patternFile.getName());
-        texts.add(textFile);
-
-        List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
-
-        String description = getText(descriptionFile);
-
-        PhoenixTask task = new PhoenixTask(attachments, texts, description, title);
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
-        if (post.getStatus() != 200)
-            throw new Exception("Status is not 200!");
-        ternarySearchTask = task;
-    }
-
-    private void solveSpecialNumbers(WebResource resource) throws Exception {
-
-        // Empty attachment list
-        List<File> attachments = new ArrayList<File>();
-
-        // Add single solution to the text file list
-        List<File> textFiles = new ArrayList<File>();
-        textFiles.add(new File("src/test/resources/task/specialNumbers/SpecialNumbers.java"));
-
-        PhoenixSubmission sub = new PhoenixSubmission(attachments, textFiles);
-
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(this.specialNumbersTask, sub));
-        if (post.getStatus() != 200)
-            throw new Exception("Status is not 200!");
-    }
-
-    private void solveTernarySearch(WebResource resource) throws Exception {
-
-        // Empty attachment list
-        List<File> attachments = new ArrayList<File>();
-
-        // Add single solution to the text file list
-        List<File> textFiles = new ArrayList<File>();
-        textFiles.add(new File("src/test/resources/task/ternarySearch/TernarySearch.java"));
-
-        PhoenixSubmission sub = new PhoenixSubmission(attachments, textFiles);
-        ClientResponse post = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(this.ternarySearchTask, sub));
-        if (post.getStatus() != 200)
-            throw new Exception("Status is not 200!");
-    }
-
-    private String getText(File file) {
-        StringBuilder sBuilder = new StringBuilder((int) file.length());
-        try {
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-            byte[] buffer = new byte[2048];
-            int read = 0;
-            while ((read = bis.read(buffer)) != -1) {
-                sBuilder.append(new String(buffer, 0, read, Charset.forName("UTF-8")));
+                    runScript(connection, reader);
+                } finally {
+                    connection.setAutoCommit(originalAutoCommit);
+                }
+            } catch (IOException e) {
+                throw e;
+            } catch (SQLException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException("Error running script.  Cause: " + e, e);
             }
+        }
 
-            bis.close();
-            return sBuilder.toString();
+        /**
+         * Runs an SQL script (read in using the Reader parameter) using the
+         * connection passed in
+         * 
+         * @param conn
+         *            - the connection to use for the script
+         * @param reader
+         *            - the source of the script
+         * @throws SQLException
+         *             if any SQL errors occur
+         * @throws IOException
+         *             if there is an error reading from the Reader
+         */
+        private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
+            StringBuffer command = null;
+            try {
+                LineNumberReader lineReader = new LineNumberReader(reader);
+                String line = null;
+                while ((line = lineReader.readLine()) != null) {
+                    if (command == null) {
+                        command = new StringBuffer();
+                    }
+                    String trimmedLine = line.trim();
+                    if (trimmedLine.startsWith("--")) {
+                        println(trimmedLine);
+                    } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
+                        // Do nothing
+                    } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
+                        // Do nothing
+                    } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter()) || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
+                        command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
+                        command.append(" ");
+                        Statement statement = conn.createStatement();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+                        try {
+                            statement.execute(command.toString());
+                        } catch (SQLException e) {
+                            e.fillInStackTrace();
+                            printlnError("Error executing: " + command);
+                            printlnError(e);
+                        }
+
+                        conn.commit();
+
+                        command = null;
+                        try {
+                            statement.close();
+                        } catch (Exception e) {
+                            // Ignore to workaround a bug in Jakarta DBCP
+                        }
+                        Thread.yield();
+                    } else {
+                        command.append(line);
+                        command.append(" ");
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                e.fillInStackTrace();
+                printlnError("Error executing: " + command);
+                printlnError(e);
+                throw e;
+            } catch (IOException e) {
+                e.fillInStackTrace();
+                printlnError("Error executing: " + command);
+                printlnError(e);
+                throw e;
+            } finally {
+                flush();
+            }
+        }
+
+        private String getDelimiter() {
+            return delimiter;
+        }
+
+        private void println(Object o) {
+            if (logWriter != null) {
+                logWriter.println(o);
+            }
+        }
+
+        private void printlnError(Object o) {
+            if (errorLogWriter != null) {
+                errorLogWriter.println(o);
+            }
+        }
+
+        private void flush() {
+            if (logWriter != null) {
+                logWriter.flush();
+            }
+            if (errorLogWriter != null) {
+                errorLogWriter.flush();
+            }
         }
     }
 
-    private void createLectures(Client c) throws Exception {
-
-        WebResource createLectureResource = PhoenixLecture.createResource(c, BASE_URL);
-        WebResource createLectureGroupResource = PhoenixLecture.addGroupResource(c, BASE_URL);
-
-        // Create einf and its groups
-        createEinfLecture(createLectureResource);
-        createEinfGroups(createLectureGroupResource);
-
-        // Create aud and its groups
-        createAuDLecture(createLectureResource);
-        createAuDGroups(createLectureGroupResource);
-    }
-
-    private void createEinfLecture(WebResource resource) throws Exception {
-
-        List<PhoenixDetails> details = new ArrayList<PhoenixDetails>();
-
-        // First date of Einf - The monday every week
-        LocalTime startTime = new LocalTime(11, 15);
-        LocalTime endTime = new LocalTime(12, 45);
-        LocalDate startDate = new LocalDate(2013, 10, 14);
-        LocalDate endDate = new LocalDate(2014, 1, 31);
-        PhoenixDetails detail = new PhoenixDetails("G16-H5", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Second date of Einf - The thursday every two weeks
-        startTime = new LocalTime(11, 15);
-        endTime = new LocalTime(12, 45);
-        startDate = new LocalDate(2013, 10, 24);
-        endDate = new LocalDate(2014, 1, 31);
-        detail = new PhoenixDetails("G16-H5", DateTimeConstants.THURSDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
-        details.add(detail);
-
-        PhoenixLecture lecture = new PhoenixLecture("Einf", details);
-
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
-
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-        this.einfLecture = lecture;
-    }
-
-    private void createEinfGroups(WebResource resource) throws Exception {
-
-        List<PhoenixDetails> details = new ArrayList<PhoenixDetails>();
-
-        // First group
-        LocalTime startTime = new LocalTime(15, 00);
-        LocalTime endTime = new LocalTime(16, 30);
-        LocalDate startDate = new LocalDate(2013, 10, 21);
-        LocalDate endDate = new LocalDate(2014, 01, 27);
-
-        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Create a test group with
-        // name = Gruppe 2
-        // members = 22
-        // default submission day is Monday
-        // default submission time on Monday is 10 o'clock
-        // In the room G29-k058 and other details described above
-        // and the assigned lecture
-        PhoenixLectureGroup group = new PhoenixLectureGroup("Gruppe 2", 22, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, einfLecture);
-
-        AddToEntity<PhoenixLecture, PhoenixLectureGroup> addGroupToLecture = KeyReader.createAddTo(einfLecture, group);
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-
-        // Second group
-        details = new ArrayList<PhoenixDetails>();
-
-        startTime = new LocalTime(15, 15);
-        endTime = new LocalTime(16, 45);
-        startDate = new LocalDate(2013, 10, 23);
-        endDate = new LocalDate(2014, 01, 29);
-
-        detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Create a test group with
-        // name = Gruppe 7
-        // members = 22
-        // default submission day is Monday
-        // default submission time on Monday is 10 o'clock
-        // In the room G29-k058 and other details described above
-        // and the assigned lecture
-        group = new PhoenixLectureGroup("Gruppe 7", 22, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, einfLecture);
-
-        addGroupToLecture = KeyReader.createAddTo(einfLecture, group);
-        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-    }
-
-    private void createAuDLecture(WebResource resource) throws Exception {
-        List<PhoenixDetails> details = new ArrayList<PhoenixDetails>();
-
-        // First date of AuD - The monday every week
-        LocalTime startTime = new LocalTime(11, 15);
-        LocalTime endTime = new LocalTime(12, 45);
-        LocalDate startDate = new LocalDate(2013, 4, 8);
-        LocalDate endDate = new LocalDate(2014, 7, 8);
-        PhoenixDetails detail = new PhoenixDetails("G50-H3", DateTimeConstants.TUESDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Second date of AuD - The thursday every two weeks
-        startTime = new LocalTime(11, 15);
-        endTime = new LocalTime(12, 45);
-        startDate = new LocalDate(2014, 4, 10);
-        endDate = new LocalDate(2014, 7, 8);
-        detail = new PhoenixDetails("G50-H3", DateTimeConstants.THURSDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
-        details.add(detail);
-
-        PhoenixLecture lecture = new PhoenixLecture("AuD", details);
-
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
-
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-        this.audLecture = lecture;
-    }
-
-    private void createAuDGroups(WebResource resource) throws Exception {
-
-        List<PhoenixDetails> details = new ArrayList<PhoenixDetails>();
-
-        // First group
-        LocalTime startTime = new LocalTime(9, 15);
-        LocalTime endTime = new LocalTime(10, 45);
-        LocalDate startDate = new LocalDate(2014, 4, 5);
-        LocalDate endDate = new LocalDate(2014, 7, 8);
-
-        PhoenixDetails detail = new PhoenixDetails("G29-E037", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Create a test group with
-        // name = Gruppe 1
-        // members = 22
-        // default submission day is Monday
-        // default submission time on Monday is 10 o'clock
-        // In the room G29-E037 and other details described above
-        // and the assigned lecture
-        PhoenixLectureGroup group = new PhoenixLectureGroup("Gruppe 1", 23, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, audLecture);
-
-        AddToEntity<PhoenixLecture, PhoenixLectureGroup> addGroupToLecture = KeyReader.createAddTo(audLecture, group);
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-
-        // Second group
-        details = new ArrayList<PhoenixDetails>();
-
-        startTime = new LocalTime(11, 15);
-        endTime = new LocalTime(12, 45);
-        startDate = new LocalDate(2014, 4, 15);
-        endDate = new LocalDate(2014, 7, 9);
-
-        detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
-        details.add(detail);
-
-        // Create a test group with
-        // name = Gruppe 7
-        // members = 22
-        // default submission day is Monday
-        // default submission time on Monday is 10 o'clock
-        // In the room G29-k058 and other details described above
-        // and the assigned lecture
-        group = new PhoenixLectureGroup("Gruppe 5", 23, DateTimeConstants.MONDAY, new LocalTime(10, 00), details, audLecture);
-
-        addGroupToLecture = KeyReader.createAddTo(audLecture, group);
-        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addGroupToLecture);
-        if (response.getStatus() != 200)
-            throw new Exception("Status is not 200! " + response);
-    }
 }
