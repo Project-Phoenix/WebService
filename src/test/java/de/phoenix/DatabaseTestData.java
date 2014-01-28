@@ -19,12 +19,14 @@
 package de.phoenix;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,7 +66,7 @@ public class DatabaseTestData {
                 System.out.println("Start executing dump");
                 ScriptRunner r = new ScriptRunner(connection);
                 try {
-                    r.runScript(new FileReader(new File("src/test/resources/testdata.sql")));
+                    r.runScript(new InputStreamReader(new FileInputStream(new File("src/test/resources/testdata.sql")), Charset.forName("UTF-8")));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
