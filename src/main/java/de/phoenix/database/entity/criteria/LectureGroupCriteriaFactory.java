@@ -51,9 +51,7 @@ public class LectureGroupCriteriaFactory extends CriteriaFactory<LectureGroup, P
         SelectEntity<PhoenixLecture> lectureKey = selectEntity.get("lecture");
         if (lectureKey != null) {
             Lecture lecture = search(lectureKey, session, LectureCriteriaFactory.getInstance());
-            if (lecture != null) {
-                criteria.add(Restrictions.eq("lecture", lecture));
-            }
+            criteria.add(Restrictions.eq("lecture", lecture));
         }
     }
 }

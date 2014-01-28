@@ -51,17 +51,13 @@ public class TaskSubmissionDatesCriteriaFactory extends CriteriaFactory<TaskSubm
         SelectEntity<PhoenixLectureGroupTaskSheet> taskSheetKey = selectEntity.get("lectureGroupTaskSheet");
         if (taskSheetKey != null) {
             LectureGroupTaskSheet taskSheet = search(taskSheetKey, session, LectureGroupTaskSheetCriteriaFactory.getInstance());
-            if (taskSheet != null) {
-                criteria.add(Restrictions.eq("lectureGroupTaskSheet", taskSheet));
-            }
+            criteria.add(Restrictions.eq("lectureGroupTaskSheet", taskSheet));
         }
 
         SelectEntity<PhoenixTask> taskKey = selectEntity.get("task");
         if (taskKey != null) {
             Task task = search(taskKey, session, TaskCriteriaFactory.getInstance());
-            if (task != null) {
-                criteria.add(Restrictions.eq("task", task));
-            }
+            criteria.add(Restrictions.eq("task", task));
         }
     }
 

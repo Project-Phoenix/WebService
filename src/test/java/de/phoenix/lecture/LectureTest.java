@@ -21,8 +21,10 @@ package de.phoenix.lecture;
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +58,7 @@ import de.phoenix.rs.key.SelectEntity;
 @RunWith(OrderedRunner.class)
 public class LectureTest {
 
-    private final String TEST_LECTURE_TITLE = "Einf";
+    private final String TEST_LECTURE_TITLE = "Einführung in die Informatik";
 
     @Test
     @Order(1)
@@ -189,7 +191,8 @@ public class LectureTest {
 
     @Test
     @Order(6)
-    public void getGroupsForALecture() {
+    public void getGroupsForALecture() throws IllegalArgumentException, IOException {
+
         Client c = PhoenixClient.create();
         WebResource ws = PhoenixLectureGroup.getResource(c, BASE_URL);
 
@@ -203,5 +206,25 @@ public class LectureTest {
 
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
         assertFalse("Lecture list is empty!", groups.isEmpty());
+    }
+    
+    @Test
+    @Order(7)
+    public void getNoGroupsForNotALecture() throws IllegalArgumentException, IOException {
+
+        Client c = PhoenixClient.create();
+        WebResource ws = PhoenixLectureGroup.getResource(c, BASE_URL);
+
+        SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
+        // Not existing lecture
+        SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>().addKey("title", "NichtExistent");
+
+        groupSelector.addKey("lecture", lectureSelector);
+
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
+
+        List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
+        assertNull("Elements in group", groups);
     }
 }

@@ -51,17 +51,14 @@ public class LectureGroupTaskSheetCriteriaFactory extends CriteriaFactory<Lectur
         SelectEntity<PhoenixTaskSheet> taskSheetKey = selectEntity.get("taskSheet");
         if (taskSheetKey != null) {
             TaskSheet taskSheet = search(taskSheetKey, session, TaskSheetCriteriaFactory.getInstance());
-            if (taskSheet != null) {
-                criteria.add(Restrictions.eq("taskSheet", taskSheet));
-            }
+            criteria.add(Restrictions.eq("taskSheet", taskSheet));
+
         }
 
         SelectEntity<PhoenixLectureGroup> lectureGroupKey = selectEntity.get("lectureGroup");
         if (lectureGroupKey != null) {
             LectureGroup lectureGroup = search(lectureGroupKey, session, LectureGroupCriteriaFactory.getInstance());
-            if (lectureGroup != null) {
-                criteria.add(Restrictions.eq("lectureGroup", lectureGroup));
-            }
+            criteria.add(Restrictions.eq("lectureGroup", lectureGroup));
         }
     }
 
