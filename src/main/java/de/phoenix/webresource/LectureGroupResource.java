@@ -71,4 +71,12 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
     public Response getLectureGroup(SelectEntity<PhoenixLectureGroup> selectEntity) {
         return onGet(selectEntity);
     }
+
+    @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_DELETE)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteLectureGroup(SelectEntity<PhoenixLectureGroup> selectEntity) {
+        return onDelete(selectEntity);
+    }
 }
