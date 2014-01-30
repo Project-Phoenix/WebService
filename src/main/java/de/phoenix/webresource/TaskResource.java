@@ -18,9 +18,7 @@
 
 package de.phoenix.webresource;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -38,19 +36,14 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.exception.ConstraintViolationException;
 
 import de.phoenix.database.DatabaseManager;
-import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
-import de.phoenix.database.entity.Text;
 import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
-import de.phoenix.rs.entity.PhoenixAttachment;
-import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
-import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.AddToEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -120,7 +113,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTask(PhoenixTask phoenixTask) {
         try {
-            return onCreate(phoenixTask);
+            return onCreate(phoenixTask, TaskCreator.INSTANCE);
         } catch (ConstraintViolationException e) {
             if (isDuplicateEntryError(e)) {
                 return Response.status(Status.BAD_REQUEST).entity("Duplicate task title!").build();
@@ -137,42 +130,14 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         return e.getErrorCode() == DUPLICATE_SQL_ERROR && e.getSQLState().equals(DUPLICATE_SQL_STATE);
     }
 
-    @Override
-    protected Task create(PhoenixTask phoenixTask, Session session) {
-        boolean isAutomaticTask = (phoenixTask instanceof PhoenixAutomaticTask);
+    private static class TaskCreator implements EntityCreator<Task, PhoenixTask> {
 
-        List<Attachment> attachments = new ArrayList<Attachment>();
-        for (PhoenixAttachment attachment : phoenixTask.getAttachments()) {
-            Attachment at;
-            try {
-                at = new Attachment(attachment);
-            } catch (IOException e) {
-                return null;
-            }
-            attachments.add(at);
+        private final static TaskCreator INSTANCE = new TaskCreator();
+
+        @Override
+        public Task create(PhoenixTask phoenixTask, Session session) {
+            return new Task(phoenixTask);
         }
-
-        List<Text> texts = new ArrayList<Text>();
-        for (PhoenixText text : phoenixTask.getPattern()) {
-            Text te = new Text(text);
-            texts.add(te);
-        }
-
-        Task task = new Task(phoenixTask.getTitle(), phoenixTask.getDescription(), attachments, texts);
-        if (isAutomaticTask) {
-            PhoenixAutomaticTask autoTask = (PhoenixAutomaticTask) phoenixTask;
-            task.setBackend(autoTask.getBackend());
-            task.setAutomaticTest(true);
-
-            List<Text> tests = new ArrayList<Text>();
-            for (PhoenixText test : autoTask.getTests()) {
-                Text te = new Text(test);
-                tests.add(te);
-            }
-            task.setTests(tests);
-        }
-
-        return task;
     }
 
     @SuppressWarnings("unchecked")

@@ -60,14 +60,17 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTaskSheet(PhoenixTaskSheet phoenixSheet) {
 
-        return onCreate(phoenixSheet);
-
+        return onCreate(phoenixSheet, TaskSheetCreator.INSTANCE);
     }
 
-    @Override
-    protected TaskSheet create(PhoenixTaskSheet phoenixEntity, Session session) {
-        TaskSheet taskSheet = new TaskSheet(phoenixEntity);
-        return taskSheet;
+    private static class TaskSheetCreator implements EntityCreator<TaskSheet, PhoenixTaskSheet> {
+
+        private final static TaskSheetCreator INSTANCE = new TaskSheetCreator();
+
+        @Override
+        public TaskSheet create(PhoenixTaskSheet phoenixEntity, Session session) {
+            return new TaskSheet(phoenixEntity);
+        }
     }
 
     @SuppressWarnings("unchecked")

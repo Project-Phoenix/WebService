@@ -43,12 +43,12 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         this.criteriaFactory = criteriaFactory;
     }
 
-    protected Response onCreate(E phoenixEntity) {
+    protected Response onCreate(E phoenixEntity, EntityCreator<T, E> creator) {
         Session session = DatabaseManager.getSession();
         try {
             Transaction trans = session.beginTransaction();
 
-            T entity = create(phoenixEntity, session);
+            T entity = creator.create(phoenixEntity, session);
             session.save(entity);
 
             trans.commit();
@@ -59,8 +59,11 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-    protected T create(E phoenixEntity, Session session) {
-        throw new UnsupportedOperationException("Not supportet!");
+    /**
+     * Command pattern
+     */
+    protected interface EntityCreator<T extends Convertable<E>, E> {
+        public T create(E phoenixEntity, Session session);
     }
 
     protected Response onUpdate(UpdateEntity<E> updatedEntity) {
@@ -126,42 +129,6 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
-//    @SuppressWarnings("unchecked")
-//    protected <N extends Convertable<M>, M extends PhoenixEntity> Response onConnect(ConnectionEntity<E, M> connectEntity, CriteriaFactory<N, M> factory, EntityConnector<T, N> connector) {
-//
-//        Session session = DatabaseManager.getSession();
-//        try {
-//
-//            List<T> entities = searchEntity(connectEntity, session);
-//            Response response = checkOnlyOne(entities);
-//
-//            if (response.getStatus() == 200) {
-//                T entity = entities.get(0);
-//
-//                List<SelectEntity<M>> connectEntities = connectEntity.getToConnectEntities();
-//                List<N> foundConnectEntites = new ArrayList<N>(connectEntities.size());
-//
-//                for (SelectEntity<M> selectEntity : connectEntities) {
-//                    Criteria criteria = factory.extractCriteria(selectEntity, session);
-//                    N foundConnectEntity = (N) criteria.uniqueResult();
-//                    if (foundConnectEntity == null) {
-//                        return Response.status(Status.NOT_FOUND).entity("Unknown entity!").build();
-//                    }
-//                    foundConnectEntites.add(foundConnectEntity);
-//                }
-//                connector.connect(entity, foundConnectEntites, connectEntity);
-//                Transaction trans = session.beginTransaction();
-//                session.update(entity);
-//                trans.commit();
-//            }
-//
-//            return response;
-//        } finally {
-//            if (session != null)
-//                session.close();
-//        }
-//    }
-
     @SuppressWarnings("unchecked")
     protected List<T> searchEntity(SelectEntity<E> selectEntity, Session session) {
 
@@ -179,9 +146,4 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
             return Response.ok().build();
         }
     }
-
-//    public interface EntityConnector<T, N extends Convertable<? extends PhoenixEntity>> {
-//        public T connect(List<N> entities, ConnectionEntity<?, ?> connectEntity);
-//    }
-
 }

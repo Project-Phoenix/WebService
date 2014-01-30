@@ -46,22 +46,24 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createGroup(PhoenixLectureGroup phoenixLectureGroup) {
 
-        return onCreate(phoenixLectureGroup);
+        return onCreate(phoenixLectureGroup, LectureGroupCreator.INSTANCE);
     }
 
-    @Override
-    protected LectureGroup create(PhoenixLectureGroup phoenixEntity, Session session) {
+    private static class LectureGroupCreator implements EntityCreator<LectureGroup, PhoenixLectureGroup> {
 
-        Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixEntity.getLecture().getTitle()).uniqueResult();
+        private final static LectureGroupCreator INSTANCE = new LectureGroupCreator();
 
-        if (lecture == null) {
-            return null;
+        @Override
+        public LectureGroup create(PhoenixLectureGroup phoenixLectureGroup, Session session) {
+            // Search for lecture
+            Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixLectureGroup.getLecture().getTitle()).uniqueResult();
+
+            if (lecture == null) {
+                return null;
+            }
+
+            return new LectureGroup(phoenixLectureGroup, lecture);
         }
-
-        LectureGroup lectureGroup = new LectureGroup(phoenixEntity, lecture);
-        // Store all relevant details of this lecture
-
-        return lectureGroup;
     }
 
     @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_GET)

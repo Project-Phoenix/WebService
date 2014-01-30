@@ -18,7 +18,9 @@
 
 package de.phoenix.database.entity;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -44,8 +46,10 @@ import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixText;
 
 @Entity
 @Table(name = "task")
@@ -123,11 +127,37 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
         this.id = id;
     }
 
-    public Task(String title, String description, List<Attachment> attachmentList, List<Text> textList) {
-        this.title = title;
-        this.description = description;
-        this.attachmentList = attachmentList;
-        this.textList = textList;
+    public Task(PhoenixTask phoenixTask) {
+        this.title = phoenixTask.getTitle();
+        this.description = phoenixTask.getDescription();
+
+        List<PhoenixAttachment> phoenixAttachments = phoenixTask.getAttachments();
+        this.attachmentList = new ArrayList<Attachment>(phoenixAttachments.size());
+        for (PhoenixAttachment phoenixAttachment : phoenixAttachments) {
+            try {
+                this.attachmentList.add(new Attachment(phoenixAttachment));
+            } catch (IOException e) {
+                throw new RuntimeException("IO error");
+            }
+        }
+
+        List<PhoenixText> phoenixTexts = phoenixTask.getPattern();
+        this.textList = new ArrayList<Text>(phoenixTexts.size());
+        for (PhoenixText phoenixText : phoenixTask.getPattern()) {
+            this.textList.add(new Text(phoenixText));
+        }
+
+        if (phoenixTask instanceof PhoenixAutomaticTask) {
+            PhoenixAutomaticTask autoTask = (PhoenixAutomaticTask) phoenixTask;
+            this.backend = autoTask.getBackend();
+            this.isAutomaticTest = true;
+
+            List<PhoenixText> tests = autoTask.getTests();
+            this.testList = new ArrayList<Text>(tests.size());
+            for (PhoenixText test : autoTask.getTests()) {
+                this.testList.add(new Text(test));
+            }
+        }
     }
 
     public Integer getId() {

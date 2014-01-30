@@ -18,7 +18,6 @@
 
 package de.phoenix.webresource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -58,22 +57,17 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLecture(PhoenixLecture phoenixLecture) {
 
-        return onCreate(phoenixLecture);
+        return onCreate(phoenixLecture, LectureCreator.INSTANCE);
     }
 
-    @Override
-    protected Lecture create(PhoenixLecture phoenixEntity, Session session) {
-        // Store all relevant details of this lecture
-        List<Details> details = new ArrayList<Details>();
-        for (PhoenixDetails phoenixDetails : phoenixEntity.getLectureDetails()) {
-            Details detail = new Details(phoenixDetails);
-            details.add(detail);
+    private static class LectureCreator implements EntityCreator<Lecture, PhoenixLecture> {
+
+        private final static LectureCreator INSTANCE = new LectureCreator();
+
+        @Override
+        public Lecture create(PhoenixLecture phoenixEntity, Session session) {
+            return new Lecture(phoenixEntity);
         }
-
-        Lecture lecture = new Lecture(phoenixEntity);
-        lecture.setDetails(details);
-
-        return lecture;
     }
 
     // TODO: Remove next version

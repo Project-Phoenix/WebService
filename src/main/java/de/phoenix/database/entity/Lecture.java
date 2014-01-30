@@ -19,6 +19,7 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -42,6 +43,7 @@ import org.hibernate.annotations.CascadeType;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 
 @Entity
@@ -89,6 +91,13 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     public Lecture(PhoenixLecture lecture) {
         this.name = lecture.getTitle();
+
+        List<PhoenixDetails> phoenixDetails = lecture.getLectureDetails();
+        this.detailsList = new ArrayList<Details>(phoenixDetails.size());
+
+        for (PhoenixDetails phoenixDetail : phoenixDetails) {
+            this.detailsList.add(new Details(phoenixDetail));
+        }
     }
 
     public Integer getId() {
@@ -115,7 +124,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     public void setLectureGroups(List<LectureGroup> lectureGroups) {
         this.lectureGroupList = lectureGroups;
     }
-    
+
     public void addLectureGroup(LectureGroup lectureGroup) {
         this.lectureGroupList.add(lectureGroup);
     }
@@ -128,7 +137,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     public void setDetails(List<Details> details) {
         this.detailsList = details;
     }
-    
+
     public void addDetail(Details detail) {
         this.detailsList.add(detail);
     }
@@ -167,6 +176,6 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     @Override
     public void copyValues(PhoenixLecture phoenixEntity) {
         this.setName(phoenixEntity.getTitle());
-        
+
     }
 }
