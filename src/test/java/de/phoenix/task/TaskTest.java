@@ -205,18 +205,16 @@ public class TaskTest {
     public void getSubmissionForTask() throws IOException {
 
         Client c = PhoenixClient.create();
-        WebResource wrGetTask = PhoenixTask.getResource(c, BASE_URL);
 
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
+        SelectEntity<PhoenixTask> taskSelector = new SelectEntity<PhoenixTask>();
+        taskSelector.addKey("title", TEST_TITLE);
 
-        ClientResponse post = wrGetTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertTrue(post.toString(), post.getStatus() == 200);
+        WebResource wrGetSubmissions = PhoenixSubmission.getResource(c, BASE_URL);
 
-        PhoenixTask phoenixTask = EntityUtil.extractEntity(post);
+        SelectEntity<PhoenixSubmission> submissionSelector = new SelectEntity<PhoenixSubmission>();
+        submissionSelector.addKey("task", taskSelector);
 
-        WebResource wrGetSubmissions = PhoenixSubmission.getByTaskResource(c, BASE_URL);
-
-        post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, phoenixTask);
+        ClientResponse post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, submissionSelector);
         assertTrue(post.toString(), post.getStatus() == 200);
 
         List<PhoenixSubmission> submissions = EntityUtil.extractEntityList(post);

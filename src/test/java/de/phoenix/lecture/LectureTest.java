@@ -135,7 +135,8 @@ public class LectureTest {
 
         assertTrue(response.toString(), response.getStatus() == 200);
 
-        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "2", TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+        // Create second group
+        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
 
@@ -207,7 +208,7 @@ public class LectureTest {
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
         assertFalse("Lecture list is empty!", groups.isEmpty());
     }
-    
+
     @Test
     @Order(7)
     public void getNoGroupsForNotALecture() throws IllegalArgumentException, IOException {
@@ -226,5 +227,28 @@ public class LectureTest {
 
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
         assertNull("Elements in group", groups);
+    }
+
+    @Test
+    @Order(8)
+    public void deleteLectureGroup() {
+        Client c = PhoenixClient.create();
+        WebResource ws = PhoenixLectureGroup.deleteResource(c, BASE_URL);
+
+        // Create Lecture Group Selector
+        SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
+        // Add Lecture Group Key - the name
+        groupSelector.addKey("name", TEST_GROUP_NAME);
+
+        // Create Lecture Selector
+        SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>();
+        // Add Lecture Key - the title
+        lectureSelector.addKey("title", TEST_LECTURE_TITLE);
+        // Add lecture selector to group selector (only groups from this lecture are selected)
+        groupSelector.addKey("lecture", lectureSelector);
+
+        // Send delete response
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        assertEquals(Status.OK, response.getClientResponseStatus());
     }
 }

@@ -20,13 +20,22 @@ package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
+import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.key.SelectEntity;
 
 public class TaskSubmissionCriteriaFactory extends CriteriaFactory<TaskSubmission, PhoenixSubmission> {
+
+    private final static TaskSubmissionCriteriaFactory instance = new TaskSubmissionCriteriaFactory();
+
+    public static TaskSubmissionCriteriaFactory getInstance() {
+        return instance;
+    }
 
     public TaskSubmissionCriteriaFactory() {
         super(TaskSubmission.class);
@@ -37,5 +46,11 @@ public class TaskSubmissionCriteriaFactory extends CriteriaFactory<TaskSubmissio
         addParameter(selectEntity, "date", DateTime.class, criteria);
         addParameter(selectEntity, "status", int.class, criteria);
         addParameter(selectEntity, "statusText", String.class, criteria);
+
+        SelectEntity<PhoenixTask> lectureKey = selectEntity.get("task");
+        if (lectureKey != null) {
+            Task task = search(lectureKey, session, TaskCriteriaFactory.getInstance());
+            criteria.add(Restrictions.eq("task", task));
+        }
     }
 }

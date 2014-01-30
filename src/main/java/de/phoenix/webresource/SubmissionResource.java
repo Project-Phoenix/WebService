@@ -37,6 +37,7 @@ import de.phoenix.database.entity.Attachment;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
+import de.phoenix.database.entity.criteria.TaskSubmissionCriteriaFactory;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
@@ -44,16 +45,22 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.submission.DefaultSubmissionController;
 import de.phoenix.submission.SubmissionController;
 import de.phoenix.submission.SubmissionResult;
+import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 /**
  * Webresource for uploading and getting submissions from user.
  * 
  */
 @Path("/" + PhoenixSubmission.WEB_RESOURCE_ROOT)
-public class SubmissionResource {
+public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, PhoenixSubmission> {
+
+    public SubmissionResource() {
+        super(TaskSubmissionCriteriaFactory.getInstance());
+    }
 
     private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
 
@@ -152,5 +159,21 @@ public class SubmissionResource {
 
         }
 
+    }
+
+    @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSubmissions(SelectEntity<PhoenixSubmission> selectEntity) {
+        return onGet(selectEntity);
+    }
+
+    @Path("/" + PhoenixSubmission.WEB_RESOURCE_DELETE)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteSubmission(SelectEntity<PhoenixSubmission> selectEntity) {
+        return onDelete(selectEntity);
     }
 }
