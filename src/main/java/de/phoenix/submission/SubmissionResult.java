@@ -18,9 +18,8 @@
 
 package de.phoenix.submission;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -29,7 +28,7 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult;
 public class SubmissionResult extends PhoenixSubmissionResult {
 
     @JsonIgnore
-    private List<Object> temponaryResult = new ArrayList<Object>();
+    private Map<String, Object> temponaryResult = new HashMap<String, Object>();
 
     public SubmissionResult() {
         super();
@@ -41,15 +40,15 @@ public class SubmissionResult extends PhoenixSubmissionResult {
 
     public SubmissionResult(SubmissionStatus newStatus, String newStatusText, SubmissionResult oldResult) {
         this(newStatus, newStatusText);
-        add(oldResult.temponaryResult.toArray());
+        this.temponaryResult.putAll(oldResult.temponaryResult);
     }
 
     @JsonIgnore
-    public List<Object> getTemponaryResult() {
+    public Map<String, Object> getTemponaryResult() {
         return temponaryResult;
     }
 
-    public void add(Object... obj) {
-        this.temponaryResult.addAll(Arrays.asList(obj));
+    public void add(String id, Object obj) {
+        this.temponaryResult.put(id, obj);
     }
 }

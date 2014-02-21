@@ -25,6 +25,7 @@ public class DefaultSubmissionController extends SubmissionController {
      */
     public DefaultSubmissionController() {
         super();
+        addHandler(new SubmissionSourceValidator());
         addHandler(new SubmissionJavaCompiler());
     }
 

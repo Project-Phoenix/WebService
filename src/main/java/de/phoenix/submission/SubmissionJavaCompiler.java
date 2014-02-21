@@ -18,61 +18,45 @@
 
 package de.phoenix.submission;
 
-import java.net.URI;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.SimpleJavaFileObject;
+import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
+import de.phoenix.submission.compiler.CharSequenceCompiler;
+import de.phoenix.submission.compiler.CharSequenceCompilerException;
 
 public class SubmissionJavaCompiler implements SubmissionHandler {
 
-    private JavaCompiler compiler;
-
     public SubmissionJavaCompiler() {
-        this.compiler = ToolProvider.getSystemJavaCompiler();
-        if (this.compiler == null) {
+        if (ToolProvider.getSystemJavaCompiler() == null) {
             throw new RuntimeException("No compiler was found - this handler will always return SubmissionStatus Errors!");
         }
     }
+
     @Override
     public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorStatus) {
-        if (this.compiler == null) {
-            return new SubmissionResult(SubmissionStatus.ERROR, "No compiler found");
+
+        CharSequenceCompiler<Object> compiler = new CharSequenceCompiler<Object>();
+        Map<String, CharSequence> classesToCompile = prepareTexts(submission.getTexts());
+        Map<String, Class<Object>> compiledClasses = null;
+
+        try {
+            compiledClasses = compiler.compile(classesToCompile);
+        } catch (CharSequenceCompilerException e) {
+            List<Diagnostic<? extends JavaFileObject>> diagnostics = e.getDiagnostics().getDiagnostics();
+            return new SubmissionResult(SubmissionStatus.ERROR, diagnostics.toString());
         }
 
-        // Convert texts to compileable obbjects
-        List<SimpleJavaFileObject> compileObjects = prepareTexts(submission.getTexts());
-        // Collector for compilation information
-        DiagnosticCollector<Object> dia = new DiagnosticCollector<Object>();
-        // Create task to compile
-        CompilationTask task = compiler.getTask(null, null, dia, null, null, compileObjects);
-        // Start compiling
-        boolean result = task.call();
-
-        // Print out results - if compilation was successfull, nothing happens
-        List<Diagnostic<? extends Object>> diagnostics = dia.getDiagnostics();
-        StringBuilder sBuilder = new StringBuilder();
-        for (Diagnostic<? extends Object> diagnostic : diagnostics) {
-            sBuilder.append(diagnostic);
-            sBuilder.append("\n");
-        }
-
-        if (result) {
-            SubmissionResult res = new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!", predecessorStatus);
-            // TODO: Add compiled classes to access from later handler
-            return res;
-
-        } else
-            return new SubmissionResult(SubmissionStatus.ERROR, sBuilder.toString());
+        SubmissionResult res = new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!", predecessorStatus);
+        res.add("compiledClasses", compiledClasses);
+        return res;
     }
     /**
      * Convert the texts to compiable objects
@@ -81,34 +65,12 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
      *            The texts containing source code
      * @return The list containing compiable objects
      */
-    private List<SimpleJavaFileObject> prepareTexts(List<Text> texts) {
-
-        List<SimpleJavaFileObject> list = new ArrayList<SimpleJavaFileObject>(texts.size());
+    private Map<String, CharSequence> prepareTexts(List<Text> texts) {
+        Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>(texts.size(), 1.0f);
         for (Text text : texts) {
-            list.add(new JavaObject(text.getName() + "." + text.getType(), text.getContent()));
+            classesToCompile.put(text.getName(), text.getContent());
         }
 
-        return list;
+        return classesToCompile;
     }
-
-    /**
-     * Wrapper class for compiable objects created just be strings without an
-     * existing file source
-     */
-    private static class JavaObject extends SimpleJavaFileObject {
-
-        private String content;
-
-        public JavaObject(String className, String content) {
-            super(URI.create(className), Kind.SOURCE);
-            this.content = content;
-        }
-
-        @Override
-        public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-            return content;
-        }
-
-    }
-
 }
