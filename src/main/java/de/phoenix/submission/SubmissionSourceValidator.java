@@ -41,7 +41,7 @@ public class SubmissionSourceValidator implements SubmissionHandler {
         for (Text text : texts) {
             ContentValidatorResult result = engine.validate(text.getContent());
             if (!result.isValid()) {
-                return new SubmissionResult(SubmissionStatus.ERROR, result.getReason());
+                throw new UserSubmissionException(result.getReason());
             }
         }
 

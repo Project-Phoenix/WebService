@@ -60,9 +60,13 @@ public class SubmissionController {
     public SubmissionResult controllSolution(TaskSubmission submission) {
         SubmissionResult status = new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
         for (SubmissionHandler handler : submissionHandler) {
-            status = handler.controlSubmission(submission, status);
-            if (status.equals(SubmissionStatus.ERROR))
-                break;
+            try {
+                status = handler.controlSubmission(submission, status);
+            } catch (UserSubmissionException e) {
+                return new SubmissionResult(SubmissionStatus.ERROR, e.getMessage());
+            } catch (SubmissionException e) {
+                return new SubmissionResult(SubmissionStatus.ERROR, "Inform your admin - something went wrong you cannot fix yourself! Sry");
+            }
         }
         return status;
     }

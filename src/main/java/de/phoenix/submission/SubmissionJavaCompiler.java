@@ -42,18 +42,23 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
 
     @Override
     public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorStatus) {
+        CharSequenceCompiler<Object> compiler;
+        try {
+            compiler = new CharSequenceCompiler<Object>();
+        } catch (IllegalStateException e) {
+            // Thrown when the compiler is not found
+            throw new SubmissionException("Can't find compiler!");
+        }
 
-        CharSequenceCompiler<Object> compiler = new CharSequenceCompiler<Object>();
         Map<String, CharSequence> classesToCompile = prepareTexts(submission.getTexts());
         Map<String, Class<Object>> compiledClasses = null;
 
         try {
             compiledClasses = compiler.compile(classesToCompile);
         } catch (CharSequenceCompilerException e) {
+            // Compile error - collect all errors and send back to user
             List<Diagnostic<? extends JavaFileObject>> diagnostics = e.getDiagnostics().getDiagnostics();
-            System.out.println("lol");
-            System.out.println(diagnostics);
-            return new SubmissionResult(SubmissionStatus.ERROR, diagnostics.toString());
+            throw new UserSubmissionException(diagnostics.toString());
         }
 
         SubmissionResult res = new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!", predecessorStatus);
@@ -61,6 +66,7 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
         res.add("compiler", compiler);
         return res;
     }
+
     /**
      * Convert the texts to compiable objects
      * 

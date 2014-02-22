@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Project-Phoenix
+ * Copyright (C) 2014 Project-Phoenix
  * 
  * This file is part of WebService.
  * 
@@ -18,17 +18,11 @@
 
 package de.phoenix.submission;
 
-public class DefaultSubmissionController extends SubmissionController {
+public class SubmissionException extends RuntimeException {
 
-    /**
-     * Default submission controller. First check if the source contains
-     * forbidden code fragements, then compile and after this unit test it
-     */
-    public DefaultSubmissionController() {
-        super();
-        addHandler(new SubmissionSourceValidator());
-        addHandler(new SubmissionJavaCompiler());
-        addHandler(new SubmissionJUnit());
+    private static final long serialVersionUID = 6615991443656374550L;
+
+    public SubmissionException(String reason) {
+        super(reason);
     }
-
 }

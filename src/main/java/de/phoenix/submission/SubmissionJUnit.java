@@ -43,8 +43,9 @@ public class SubmissionJUnit implements SubmissionHandler {
 
         CharSequenceCompiler<Object> compiler = predecessorResult.getTemponaryObject("compiler");
         if (compiler == null) {
-            throw new RuntimeException("Can't find compiler");
+            throw new SubmissionException("JUnit core cannot find compiler! Forget to attach the compiler to the chain?");
         }
+
         Task task = submission.getTask();
 
         List<Text> tests = task.getTests();
@@ -52,10 +53,10 @@ public class SubmissionJUnit implements SubmissionHandler {
             return new SubmissionResult(SubmissionStatus.OK, "No tests - everything ok");
         }
         if (tests.size() > 1) {
-            throw new RuntimeException("Currently only one test is supported!");
+            throw new SubmissionException("Currently only one test is supported!");
         }
         if (submission.getTexts().size() > 1) {
-            throw new RuntimeException("Currently only one submitted class is supported!");
+            throw new SubmissionException("Currently only one submitted class is supported!");
         }
 
         Text test = tests.get(0);
@@ -71,7 +72,7 @@ public class SubmissionJUnit implements SubmissionHandler {
 
         } catch (CharSequenceCompilerException e) {
             List<Diagnostic<? extends JavaFileObject>> diagnostics = e.getDiagnostics().getDiagnostics();
-            return new SubmissionResult(SubmissionStatus.ERROR, diagnostics.toString());
+            throw new UserSubmissionException(diagnostics.toString());
         }
     }
 
