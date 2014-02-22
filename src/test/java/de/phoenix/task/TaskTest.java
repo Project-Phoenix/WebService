@@ -171,7 +171,7 @@ public class TaskTest {
 
     @Test
     @Order(4)
-    public void submitSolution() {
+    public void submitSolutionForManuelTask() {
 
         if (!TEST_SUBMISSION_FILE.exists()) {
             fail("Submission File does not exists!");
@@ -285,17 +285,23 @@ public class TaskTest {
         WebResource wr = PhoenixTask.createResource(c, BASE_URL);
         try {
 
-            // Empty lists - we have not interest in lists for this test
-            List<PhoenixText> texts = new ArrayList<PhoenixText>();
+            // The pattern for the submission
+            List<PhoenixText> pattern = new ArrayList<PhoenixText>();
+            pattern.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearch.java"), "TernarySearch.java"));
+
+            // No attachments
             List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
 
             // No interest in description
             String description = "";
 
-            PhoenixTask task = new PhoenixAutomaticTask(attachments, texts, description, AUTOMATIC_TEST_TITLE, "java", new ArrayList<PhoenixText>());
+            List<PhoenixText> tests = new ArrayList<PhoenixText>();
+            tests.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
+
+            PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", tests);
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
 
-            assertTrue(post.toString(), post.getStatus() == 200);
+            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -304,6 +310,35 @@ public class TaskTest {
 
     @Test
     @Order(9)
+    public void submitSolutionForAutoTask() {
+
+        Client c = PhoenixClient.create();
+        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", AUTOMATIC_TEST_TITLE);
+
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+
+        PhoenixTask task = EntityUtil.extractEntity(post);
+
+        try {
+            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyTernarySearch.java")));
+            wr = PhoenixTask.submitResource(c, BASE_URL);
+            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+
+            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
+
+            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+            assertEquals(SubmissionStatus.OK, res.getStatus());
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    @Order(10)
     public void searchNonExistingTask() {
         Client c = PhoenixClient.create();
         WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URL);

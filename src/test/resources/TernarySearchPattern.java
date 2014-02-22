@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Project-Phoenix
+ * Copyright (C) 2014 Project-Phoenix
  * 
  * This file is part of WebService.
  * 
@@ -16,18 +16,13 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix.submission;
+import org.junit.Assert.*;
 
-public class DefaultSubmissionController extends SubmissionController {
+public class TernarySearchPattern {
 
-    /**
-     * Default submission controller. First compiles the sources
-     */
-    public DefaultSubmissionController() {
-        super();
-        addHandler(new SubmissionSourceValidator());
-        addHandler(new SubmissionJavaCompiler());
-        addHandler(new SubmissionJUnit());
+    public void test() {
+        int[] testArray = {1,2,3,4,5,6,7,8,9,10};
+        int pos = ${CLASS}.ternaryRec(testArray, 5);
+        assertEquals(4, pos);
     }
-
 }

@@ -51,11 +51,14 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
             compiledClasses = compiler.compile(classesToCompile);
         } catch (CharSequenceCompilerException e) {
             List<Diagnostic<? extends JavaFileObject>> diagnostics = e.getDiagnostics().getDiagnostics();
+            System.out.println("lol");
+            System.out.println(diagnostics);
             return new SubmissionResult(SubmissionStatus.ERROR, diagnostics.toString());
         }
 
         SubmissionResult res = new SubmissionResult(SubmissionStatus.COMPILED, "Kompiliert!", predecessorStatus);
         res.add("compiledClasses", compiledClasses);
+        res.add("compiler", compiler);
         return res;
     }
     /**
