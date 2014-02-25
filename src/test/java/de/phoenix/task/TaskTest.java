@@ -56,6 +56,7 @@ import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.submission.DisallowedContent;
 
 @RunWith(OrderedRunner.class)
 public class TaskTest {
@@ -294,11 +295,13 @@ public class TaskTest {
 
             // No interest in description
             String description = "";
-
+            
             List<PhoenixText> tests = new ArrayList<PhoenixText>();
             tests.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
 
             PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", tests);
+            DisallowedContent disallowedContent = new DisallowedContent().disallow("java.io").disallow("java.nio");
+            task.setDisallowedContent(disallowedContent);
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
 
             assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());

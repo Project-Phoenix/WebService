@@ -44,12 +44,15 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.submission.DisallowedContent;
 
 @Entity
 @Table(name = "task")
@@ -120,6 +123,10 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @OneToMany(mappedBy = "task")
     private List<TaskSubmissionDates> taskSubmissionDatesList;
 
+    @Lob
+    @Column(name = "disallowedContent")
+    private String disallowedContent;
+
     public Task() {
     }
 
@@ -130,6 +137,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     public Task(PhoenixTask phoenixTask) {
         this.title = phoenixTask.getTitle();
         this.description = phoenixTask.getDescription();
+        this.setDisallowedContent(phoenixTask.getDisallowedContent());
 
         List<PhoenixAttachment> phoenixAttachments = phoenixTask.getAttachments();
         this.attachmentList = new ArrayList<Attachment>(phoenixAttachments.size());
@@ -254,6 +262,25 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
         this.taskSubmissionDatesList = taskSubmissionDates;
     }
 
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
+    public void setDisallowedContent(DisallowedContent content) {
+        try {
+            this.disallowedContent = JSON_MAPPER.writeValueAsString(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DisallowedContent getDisallowedContent() {
+        try {
+            return JSON_MAPPER.readValue(disallowedContent, DisallowedContent.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -282,7 +309,9 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
 
     @Override
     public PhoenixTask convert() {
-        return new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
+        PhoenixTask pTask =  new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
+        pTask.setDisallowedContent(getDisallowedContent());
+        return pTask;
     }
 
     @Override

@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS `task` (
   `description` longtext,
   `isAutomaticTest` tinyint(1) DEFAULT '0',
   `backend` varchar(45) DEFAULT NULL,
+  `disallowedContent` LONGTEXT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `title_UNIQUE` (`title`),
   KEY `title` (`title`)

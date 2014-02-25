@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`task` (
   `description` LONGTEXT NULL,
   `isAutomaticTest` TINYINT(1) NULL DEFAULT FALSE,
   `backend` VARCHAR(45) NULL,
+  `disallowedContent` LONGTEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `title` (`title` ASC),
   UNIQUE INDEX `title_UNIQUE` (`title` ASC))
