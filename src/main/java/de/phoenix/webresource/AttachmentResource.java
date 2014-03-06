@@ -31,21 +31,21 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixAttachment.WEB_RESOURCE_ROOT)
+@Path(PhoenixAttachment.WEB_RESOURCE_ROOT)
 public class AttachmentResource extends AbstractPhoenixResource<Attachment, PhoenixAttachment> {
 
     public AttachmentResource() {
         super(AttachmentCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixAttachment.WEB_RESOURCE_UPDATE)
+    @Path(PhoenixAttachment.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAttachment(UpdateEntity<PhoenixAttachment> updatedAttachment) {
         return onUpdate(updatedAttachment);
     }
 
-    @Path("/" + PhoenixAttachment.WEB_RESOURCE_DELETE)
+    @Path(PhoenixAttachment.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAttachment(SelectEntity<PhoenixAttachment> selectAttachment) {

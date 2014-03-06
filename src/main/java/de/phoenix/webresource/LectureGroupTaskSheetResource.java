@@ -48,14 +48,14 @@ import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixLectureGroupTaskSheet.WEB_RESOURCE_ROOT)
+@Path(PhoenixLectureGroupTaskSheet.WEB_RESOURCE_ROOT)
 public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<LectureGroupTaskSheet, PhoenixLectureGroupTaskSheet> {
 
     public LectureGroupTaskSheetResource() {
         super(LectureGroupTaskSheetCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixLectureGroupTaskSheet.WEB_RESOURCE_CREATE)
+    @Path(PhoenixLectureGroupTaskSheet.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLectureGroupTaskSheet(ConnectionEntity connectionEntity) {
@@ -112,7 +112,7 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
         return Response.ok().build();
     }
 
-    @Path("/" + PhoenixLectureGroupTaskSheet.WEB_RESOURCE_GET)
+    @Path(PhoenixLectureGroupTaskSheet.WEB_RESOURCE_GET)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

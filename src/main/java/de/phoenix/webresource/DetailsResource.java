@@ -31,21 +31,21 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixDetails.WEB_RESOURCE_ROOT)
+@Path(PhoenixDetails.WEB_RESOURCE_ROOT)
 public class DetailsResource extends AbstractPhoenixResource<Details, PhoenixDetails> {
 
     public DetailsResource() {
         super(DetailsCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixDetails.WEB_RESOURCE_UPDATE)
+    @Path(PhoenixDetails.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateDetails(UpdateEntity<PhoenixDetails> updatedDetails) {
         return onUpdate(updatedDetails);
     }
 
-    @Path("/" + PhoenixDetails.WEB_RESOURCE_DELETE)
+    @Path(PhoenixDetails.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteDetails(SelectEntity<PhoenixDetails> selectDetails) {

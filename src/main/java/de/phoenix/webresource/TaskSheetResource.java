@@ -48,14 +48,14 @@ import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixTaskSheet.WEB_RESOURCE_ROOT)
+@Path(PhoenixTaskSheet.WEB_RESOURCE_ROOT)
 public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, PhoenixTaskSheet> {
 
     public TaskSheetResource() {
         super(TaskSheetCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_CREATE)
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTaskSheet(PhoenixTaskSheet phoenixSheet) {
@@ -74,7 +74,7 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_GETALL)
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_GETALL)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllSheets() {
@@ -94,7 +94,7 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
         }
     }
 
-    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_GET)
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_GET)
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -103,7 +103,7 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
     }
 
     // TODO: Move to other method name?
-    @Path("/" + PhoenixTaskSheet.WEB_RESOURCE_CONNECT_TASKSHEET_WITH_TASK)
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_CONNECT_TASKSHEET_WITH_TASK)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response connectTasksWithTaskSheet(ConnectionEntity connectionEntity) {

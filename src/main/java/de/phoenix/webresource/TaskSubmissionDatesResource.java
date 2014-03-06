@@ -45,14 +45,14 @@ import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixTaskSubmissionDates.WEB_RESOURCE_ROOT)
+@Path(PhoenixTaskSubmissionDates.WEB_RESOURCE_ROOT)
 public class TaskSubmissionDatesResource extends AbstractPhoenixResource<TaskSubmissionDates, PhoenixTaskSubmissionDates> {
 
     public TaskSubmissionDatesResource() {
         super(TaskSubmissionDatesCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixTaskSubmissionDates.WEB_RESOURCE_CREATE)
+    @Path(PhoenixTaskSubmissionDates.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLectureGroupTaskSheet(ConnectionEntity connectionEntity) {
@@ -86,7 +86,7 @@ public class TaskSubmissionDatesResource extends AbstractPhoenixResource<TaskSub
             } catch (HibernateException e) {
                 return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
             }
-            
+
             TaskSubmissionDates dates = new TaskSubmissionDates();
             dates.setLectureGroupTaskSheet(taskSheet);
             dates.setTask(task);

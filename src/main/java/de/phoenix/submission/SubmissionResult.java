@@ -47,10 +47,10 @@ public class SubmissionResult extends PhoenixSubmissionResult {
     public Map<String, Object> getTemponaryResult() {
         return temponaryResult;
     }
-    
+
     @SuppressWarnings("unchecked")
     @JsonIgnore
-    public <T> T getTemponaryObject(String key) throws ClassCastException{
+    public <T> T getTemponaryObject(String key) throws ClassCastException {
         return (T) temponaryResult.get(key);
     }
 

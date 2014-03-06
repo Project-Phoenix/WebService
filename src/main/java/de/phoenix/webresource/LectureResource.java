@@ -45,14 +45,14 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixLecture.WEB_RESOURCE_ROOT)
+@Path(PhoenixLecture.WEB_RESOURCE_ROOT)
 public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLecture> {
 
     public LectureResource() {
         super(LectureCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_CREATE)
+    @Path(PhoenixLecture.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLecture(PhoenixLecture phoenixLecture) {
@@ -72,7 +72,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
 
     // TODO: Remove next version
     @SuppressWarnings("unchecked")
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_GETALL)
+    @Path(PhoenixLecture.WEB_RESOURCE_GETALL)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
@@ -94,21 +94,21 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
         }
     }
 
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_UPDATE)
+    @Path(PhoenixLecture.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateLecture(UpdateEntity<PhoenixLecture> updateLecture) {
         return onUpdate(updateLecture);
     }
 
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_DELETE)
+    @Path(PhoenixLecture.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteLecture(SelectEntity<PhoenixLecture> selectLecture) {
         return onDelete(selectLecture);
     }
 
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_GET)
+    @Path(PhoenixLecture.WEB_RESOURCE_GET)
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -146,7 +146,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
                 session.close();
         }
     }
-    @Path("/" + PhoenixLecture.WEB_RESOURCE_ADD_DETAIL)
+    @Path(PhoenixLecture.WEB_RESOURCE_ADD_DETAIL)
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

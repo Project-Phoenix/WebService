@@ -31,21 +31,21 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixText.WEB_RESOURCE_ROOT)
+@Path(PhoenixText.WEB_RESOURCE_ROOT)
 public class TextResource extends AbstractPhoenixResource<Text, PhoenixText> {
 
     public TextResource() {
         super(TextCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixText.WEB_RESOURCE_UPDATE)
+    @Path(PhoenixText.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response update(UpdateEntity<PhoenixText> updatedText) {
         return onUpdate(updatedText);
     }
 
-    @Path("/" + PhoenixText.WEB_RESOURCE_DELETE)
+    @Path(PhoenixText.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteText(SelectEntity<PhoenixText> selectText) {

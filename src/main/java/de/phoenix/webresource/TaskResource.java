@@ -52,7 +52,7 @@ import de.phoenix.submission.SubmissionController;
 import de.phoenix.submission.SubmissionResult;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixTask.WEB_RESOURCE_ROOT)
+@Path(PhoenixTask.WEB_RESOURCE_ROOT)
 public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
     private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
@@ -63,7 +63,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
     // TOOO: Remove it , because the Select and Update mechanism is better
     @SuppressWarnings("unchecked")
-    @Path("/" + PhoenixTask.WEB_RESOURCE_GETALL)
+    @Path(PhoenixTask.WEB_RESOURCE_GETALL)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
@@ -84,7 +84,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         }
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_GETBYTITLE)
+    @Path(PhoenixTask.WEB_RESOURCE_GETBYTITLE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         }
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_CREATE)
+    @Path(PhoenixTask.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTask(PhoenixTask phoenixTask) {
@@ -141,7 +141,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/" + PhoenixTask.WEB_RESOURCE_GETALL_TITLES)
+    @Path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES)
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTitles() {
@@ -159,7 +159,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         }
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_GET)
+    @Path(PhoenixTask.WEB_RESOURCE_GET)
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -167,14 +167,14 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         return onGet(selectEntity);
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_UPDATE)
+    @Path(PhoenixTask.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response update(UpdateEntity<PhoenixTask> updateEntity) {
         return onUpdate(updateEntity);
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_DELETE)
+    @Path(PhoenixTask.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response delete(SelectEntity<PhoenixTask> selectEntity) {
@@ -182,7 +182,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         return onDelete(selectEntity);
     }
 
-    @Path("/" + PhoenixTask.WEB_RESOURCE_ADD_SUBMISSION)
+    @Path(PhoenixTask.WEB_RESOURCE_ADD_SUBMISSION)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

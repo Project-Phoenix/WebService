@@ -309,7 +309,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
 
     @Override
     public PhoenixTask convert() {
-        PhoenixTask pTask =  new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
+        PhoenixTask pTask = new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());
         pTask.setDisallowedContent(getDisallowedContent());
         return pTask;
     }

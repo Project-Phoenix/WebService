@@ -34,14 +34,14 @@ import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
-@Path("/" + PhoenixLectureGroup.WEB_RESOURCE_ROOT)
+@Path(PhoenixLectureGroup.WEB_RESOURCE_ROOT)
 public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, PhoenixLectureGroup> {
 
     public LectureGroupResource() {
         super(LectureGroupCriteriaFactory.getInstance());
     }
 
-    @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_CREATE)
+    @Path(PhoenixLectureGroup.WEB_RESOURCE_CREATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createGroup(PhoenixLectureGroup phoenixLectureGroup) {
@@ -66,7 +66,7 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
         }
     }
 
-    @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_GET)
+    @Path(PhoenixLectureGroup.WEB_RESOURCE_GET)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -74,7 +74,7 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
         return onGet(selectEntity);
     }
 
-    @Path("/" + PhoenixLectureGroup.WEB_RESOURCE_DELETE)
+    @Path(PhoenixLectureGroup.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

@@ -55,7 +55,7 @@ import de.phoenix.webresource.util.AbstractPhoenixResource;
  * Webresource for uploading and getting submissions from user.
  * 
  */
-@Path("/" + PhoenixSubmission.WEB_RESOURCE_ROOT)
+@Path(PhoenixSubmission.WEB_RESOURCE_ROOT)
 public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, PhoenixSubmission> {
 
     public SubmissionResource() {
@@ -64,7 +64,7 @@ public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, 
 
     private final static SubmissionController CONTROLLER = new DefaultSubmissionController();
 
-    @Path("/" + PhoenixSubmission.WEB_RESOURCE_SUBMIT)
+    @Path(PhoenixSubmission.WEB_RESOURCE_SUBMIT)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -131,7 +131,7 @@ public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, 
         }
     }
 
-    @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS)
+    @Path(PhoenixSubmission.WEB_RESOURCE_GET_TASK_SUBMISSIONS)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -161,7 +161,7 @@ public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, 
 
     }
 
-    @Path("/" + PhoenixSubmission.WEB_RESOURCE_GET)
+    @Path(PhoenixSubmission.WEB_RESOURCE_GET)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -169,7 +169,7 @@ public class SubmissionResource extends AbstractPhoenixResource<TaskSubmission, 
         return onGet(selectEntity);
     }
 
-    @Path("/" + PhoenixSubmission.WEB_RESOURCE_DELETE)
+    @Path(PhoenixSubmission.WEB_RESOURCE_DELETE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

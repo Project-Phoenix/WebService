@@ -1,10 +1,9 @@
 package de.phoenix.submission.validate;
 
-
 public interface ContentValidator {
 
     public ContentValidatorResult validateCode(String code);
-    
+
     public static class ContentValidatorResult {
 
         private final String reason;
