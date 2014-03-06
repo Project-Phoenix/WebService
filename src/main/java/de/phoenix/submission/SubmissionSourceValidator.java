@@ -31,10 +31,15 @@ public class SubmissionSourceValidator implements SubmissionHandler {
 
     @Override
     public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorResult) {
+        DisallowedContent disallowedContent = submission.getTask().getDisallowedContent();
+        if (disallowedContent == null) {
+            return new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted", predecessorResult);
+        }
 
         ContentValidateEngine engine = new ContentValidateEngine();
-        // TODO: Do this dynamically from the test !
-        engine.registerContentChecker(new CharSequenceValidator("java.net", "javax.net", "java.io", "java.nio"));
+        for (String disallowedString : disallowedContent.getDisallowedContent()) {
+            engine.registerContentChecker(new CharSequenceValidator(disallowedString));
+        }
 
         // Check if the submission contains forbidden text
         List<Text> texts = submission.getTexts();

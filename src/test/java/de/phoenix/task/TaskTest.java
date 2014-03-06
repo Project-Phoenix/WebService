@@ -339,9 +339,37 @@ public class TaskTest {
             fail();
         }
     }
-
+    
     @Test
     @Order(10)
+    public void submitSolutionWithInvalidContent() {
+        Client c = PhoenixClient.create();
+        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", AUTOMATIC_TEST_TITLE);
+
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+
+        PhoenixTask task = EntityUtil.extractEntity(post);
+
+        try {
+            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyMaliciousTernarySearch.java")));
+            wr = PhoenixTask.submitResource(c, BASE_URL);
+            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+
+            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
+            System.out.println(res);
+            assertEquals(SubmissionStatus.ERROR, res.getStatus());
+            assertEquals("Code can not use java.io", res.getStatusText());
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    @Order(11)
     public void searchNonExistingTask() {
         Client c = PhoenixClient.create();
         WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URL);
