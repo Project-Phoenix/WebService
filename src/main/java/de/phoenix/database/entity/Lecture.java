@@ -66,7 +66,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     private Integer id;
 
     // TODO: Rename to title
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @OneToMany(mappedBy = "lecture")

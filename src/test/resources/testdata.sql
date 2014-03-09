@@ -1,28 +1,8 @@
-DROP TABLE IF EXISTS `attachment`;
-CREATE TABLE IF NOT EXISTS `attachment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `file` longblob,
-  `creationDate` datetime DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `type` varchar(45) DEFAULT NULL,
-  `sha1` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `attachmentKey` (`creationDate`,`name`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-DROP TABLE IF EXISTS `details`;
-CREATE TABLE IF NOT EXISTS `details` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `room` varchar(45) DEFAULT NULL,
-  `weekday` int(11) DEFAULT NULL,
-  `startTime` time DEFAULT NULL,
-  `endTime` time DEFAULT NULL,
-  `interval` varchar(45) DEFAULT NULL,
-  `startDate` date DEFAULT NULL,
-  `endDate` date DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `detailsKey` (`room`,`weekday`,`startTime`,`endTime`,`interval`,`startDate`,`endDate`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `attachment`;
+ALTER TABLE `details` AUTO_INCREMENT=1;
 
+TRUNCATE TABLE `details`;
+ALTER TABLE `details` AUTO_INCREMENT=1; 
 INSERT INTO `details` (`id`, `room`, `weekday`, `startTime`, `endTime`, `interval`, `startDate`, `endDate`) VALUES
 	(1, 'G16-H5', 1, '12:15:00', '13:45:00', 'P1Y', '2013-10-14', '2014-01-31'),
 	(2, 'G16-H5', 4, '12:15:00', '13:45:00', 'P1Y', '2013-10-21', '2014-01-31'),
@@ -36,49 +16,19 @@ INSERT INTO `details` (`id`, `room`, `weekday`, `startTime`, `endTime`, `interva
 	(5, 'G29-K059', 2, '10:15:00', '11:45:00', 'P1Y', '2013-10-21', '2014-01-31'),
 	(8, 'G29-K059', 3, '10:15:00', '11:45:00', 'P1Y', '2013-10-21', '2014-01-31');
 
-
-DROP TABLE IF EXISTS `lecture`;
-CREATE TABLE IF NOT EXISTS `lecture` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `lectureKey` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `lecture`;
+ALTER TABLE `lecture` AUTO_INCREMENT=1; 
 INSERT INTO `lecture` (`id`, `name`) VALUES
 	(1, 'Einführung in die Informatik');
 
-
-DROP TABLE IF EXISTS `lectureDetails`;
-CREATE TABLE IF NOT EXISTS `lectureDetails` (
-  `lecture_id` int(11) NOT NULL,
-  `additionalInfo_id` int(11) NOT NULL,
-  PRIMARY KEY (`lecture_id`,`additionalInfo_id`),
-  KEY `fk_lectureDetails_additionalInfo1_idx` (`additionalInfo_id`),
-  KEY `fk_lectureDetails_lecture1_idx` (`lecture_id`),
-  CONSTRAINT `fk_lectureDetails_lecture1` FOREIGN KEY (`lecture_id`) REFERENCES `lecture` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_lectureDetails_additionalInfo1` FOREIGN KEY (`additionalInfo_id`) REFERENCES `details` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `lectureDetails`;
+ALTER TABLE `lectureDetails` AUTO_INCREMENT=1;
 INSERT INTO `lectureDetails` (`lecture_id`, `additionalInfo_id`) VALUES
 	(1, 1),
 	(1, 2);
 
-DROP TABLE IF EXISTS `lectureGroup`;
-CREATE TABLE IF NOT EXISTS `lectureGroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `maxMember` int(11) DEFAULT NULL,
-  `submissionDeadlineTime` time DEFAULT NULL,
-  `submissionDeadlineWeekday` tinyint(4) DEFAULT NULL,
-  `lecture` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `lectureGroupIndex` (`name`,`lecture`),
-  KEY `fk_lectureGroup_lecture1_idx` (`lecture`),
-  KEY `lectureGroupKey` (`name`),
-  CONSTRAINT `fk_lectureGroup_lecture1` FOREIGN KEY (`lecture`) REFERENCES `lecture` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `lectureGroup`;
+ALTER TABLE `lectureGroup` AUTO_INCREMENT=1;
 INSERT INTO `lectureGroup` (`id`, `name`, `maxMember`, `submissionDeadlineTime`, `submissionDeadlineWeekday`, `lecture`) VALUES
 	(1, 'Gruppe 1', 24, '11:00:00', 1, 1),
 	(2, 'Gruppe 2', 22, '11:00:00', 1, 1),
@@ -90,17 +40,8 @@ INSERT INTO `lectureGroup` (`id`, `name`, `maxMember`, `submissionDeadlineTime`,
 	(9, 'Gruppe 8', 22, '11:00:00', 1, 1),
 	(10, 'Gruppe 9', 22, '11:00:00', 1, 1);
 
-DROP TABLE IF EXISTS `lectureGroupDetails`;
-CREATE TABLE IF NOT EXISTS `lectureGroupDetails` (
-  `group_id` int(11) NOT NULL,
-  `additionalInfo_id` int(11) NOT NULL,
-  PRIMARY KEY (`group_id`,`additionalInfo_id`),
-  KEY `fk_lectureGroupDetails_additionalInfo1_idx` (`additionalInfo_id`),
-  KEY `fk_lectureGroupDetails_group1_idx` (`group_id`),
-  CONSTRAINT `fk_lectureGroupDetails_group1` FOREIGN KEY (`group_id`) REFERENCES `lectureGroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_lectureGroupDetails_additionalInfo1` FOREIGN KEY (`additionalInfo_id`) REFERENCES `details` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `lectureGroupDetails`;
+ALTER TABLE `lectureGroupDetails` AUTO_INCREMENT=1;
 INSERT INTO `lectureGroupDetails` (`group_id`, `additionalInfo_id`) VALUES
 	(1, 3),
 	(2, 4),
@@ -112,33 +53,11 @@ INSERT INTO `lectureGroupDetails` (`group_id`, `additionalInfo_id`) VALUES
 	(9, 10),
 	(10, 11);
 
-DROP TABLE IF EXISTS `lectureGroupTaskSheet`;
-CREATE TABLE IF NOT EXISTS `lectureGroupTaskSheet` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `defaultDeadline` datetime DEFAULT NULL,
-  `defaultReleaseDate` datetime DEFAULT NULL,
-  `taskSheet` int(11) DEFAULT NULL,
-  `lectureGroup` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_lectureGroupTaskSheet_taskSheet2_idx` (`taskSheet`),
-  KEY `fk_lectureGroupTaskSheet_lectureGroup1_idx` (`lectureGroup`),
-  CONSTRAINT `fk_lectureGroupTaskSheet_taskSheet2` FOREIGN KEY (`taskSheet`) REFERENCES `taskSheet` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_lectureGroupTaskSheet_lectureGroup1` FOREIGN KEY (`lectureGroup`) REFERENCES `lectureGroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `lectureGroupTaskSheet`;
+ALTER TABLE `lectureGroupTaskSheet` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `task`;
-CREATE TABLE IF NOT EXISTS `task` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
-  `description` longtext,
-  `isAutomaticTest` tinyint(1) DEFAULT '0',
-  `backend` varchar(45) DEFAULT NULL,
-  `disallowedContent` LONGTEXT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `title_UNIQUE` (`title`),
-  KEY `title` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `task`;
+ALTER TABLE `task` AUTO_INCREMENT=1;
 INSERT INTO `task` (`id`, `title`, `description`, `isAutomaticTest`, `backend`) VALUES
 	(1, 'Perfekte Zahl', 'Eine <strong>natürliche Zahl</strong> <em>n</em> heißt perfekt oder vollkommen, wenn die Summe ihrer Teiler gleich n ist. Dabei sind die Teiler echt kleiner als <em>n</em>\r\n<p>. Beispielsweise ist 6 = 1 + 2 + 3 eine perfekte Zahl.</p>\r\n<p>&nbsp;</p>\r\nGeben Sie einen Algorithmus als <strong>Pseudocode</strong> an, der für eine gegebene Zahl bestimmt, ob sie perfekt ist.', 0, NULL),
 	(2, 'Kubikwurzel nach Heron', 'Erweitern Sie die Lösungsidee für die Berechnung der Quadratwurzel nach Heron (siehe Vorlesungsfolien, Teil01, Folie 10) für die Berechnung der Kubikwurzel. Beschreiben Sie diesen Algorithmus im <strong>Pseudocode</strong>\r\n<p>.</p>\r\n<p>&nbsp;</p>\r\n<p>\r\nTipp:</p>\r\nAnstatt der Länge der Seite eines Quadrats mit Flächeninhalt <em>a</em> (Quadratwurzel in Vorlesung) benötigt man für die dritte Wurzel von <em>v</em> die Länge der Seite eines Kubus mit Rauminhalt <em>v</em>. Entwerfen Sie einen Algorithmus <strong>kubik</strong>, der einen Quader solange verändert bis annähernd alle Seiten gleich lang sind.', 0, NULL),
@@ -157,28 +76,11 @@ INSERT INTO `task` (`id`, `title`, `description`, `isAutomaticTest`, `backend`) 
 	(17, 'Fibonacci-Zahlen', 'Eine besondere Folge von Zahlen sind die Fibonacci-Zahlen, die rekursiv definiert werden können als\r\n<p>&nbsp;</p>\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td><em>fib</em>(x) =</td>\r\n<td>if (x = 0) ∨ (x = 1) then 1</td>\r\n</tr>\r\n<tr>\r\n<td></td>\r\n<td>else <em>fib</em>(x-2) + <em>fib</em>(x-1)</td>\r\n</tr>\r\n<tr>\r\n<td></td>\r\n<td>fi</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<ol type="a" start="1">\r\n<li>Schreiben Sie eine rekursive Methode \r\n<br /><br /><strong>public static BigInteger fib1(int n)</strong><br /><br />\r\nzur Berechnung der x-ten Fibonacci-Zahl.\r\nGeben Sie im Hauptprogramm die ersten 15 Fibonacci-Zahlen aus.</li>\r\n<li>Zeigen Sie am Beispiel <em>fib1(5)</em>, wie die Anzahl der Aufrufe dieser Methode wächst (Baumrekursion) (Lösung als Block-Kommentar).</li>\r\n<li>Formulieren Sie eine iterative Methode \r\n<br /><br /><strong>public static BigInteger fib2(int n)</strong><br /><br />\r\nzur Berechnung der Fibonacci-Zahlen und zeigen Sie am Beispiel <em>fib2(5)</em>, dass <em>fib2</em> effizienter arbeitet als <em>fib1</em>.\r\n<br /> Hinweis: Merken Sie sich jeweils die beiden Vorgänger in gesonderten Variablen.</li>\r\n<li>Berechnen Sie innerhalb der main-Methode nach beiden Varianten die Fibonacci-Zahl von <em>n = 23</em> und zählen Sie dabei die notwendigen Schleifendurchläufe.</li></ol>', 0, NULL),
 	(18, 'Russische Bauernmultiplikation', 'Die Russische Bauernmultiplikation (auch Ägyptisches Multiplizieren oder Abessinische Bauernregel genannt) ist ein einfaches Verfahren zur Multiplikation zweier <strong>natürlicher Zahlen</strong>.\r\n<p>\r\n\r\nEs war schon im Altertum bekannt, in Deutschland wurde es bis ins Mittelalter verwendet. In Russland war es bis weit in die Neuzeit üblich, daher der Name.</p>\r\nDas Verfahren hat den Vorteil, dass man im Prinzip nur halbieren, verdoppeln und addieren muss.\r\n<div>&nbsp;\r\n<p>Die Berechnung erfolgt nach folgendem Algorithmus:</p>\r\n<ol type="1" start="1">\r\n<li>Man schreibt die beiden zu multiplizierenden Zahlen nebeneinander.</li>\r\n<li>Auf der linken Seite werden die Zahlen jeweils halbiert (Reste abgerundet) und die Ergebnisse untereinander geschrieben, bis man zur 1 gelangt.</li>\r\n<li>Auf der rechten Seite werden die Zahlen jeweils verdoppelt und untereinander geschrieben.</li>\r\n<li>Die rechts stehenden (verdoppelten) Zahlen werden gestrichen, wenn die links stehende Zahl gerade ist.</li>\r\n<li>Die Summe der nicht gestrichenen rechts stehenden Zahlen ergibt das gesuchte Produkt.</li></ol>\r\n<p>\r\nÜberprüfen Sie diesen Algorithmus an einem selbst gewählten Beispiel.</p>\r\nSchreiben Sie in Java eine&nbsp;<strong>iterative</strong>&nbsp;Methode&nbsp;<br /><br /><strong>public static int farmerMultIter(int x, int y)</strong><br /><br />und eine&nbsp;<strong>rekursive</strong>&nbsp;Methode&nbsp;<br /><br /><strong>public static int farmerMultRek(int x, int y)</strong><br /><br />für diesen Algorithmus.\r\n<div>&nbsp;</div>\r\n</div>', 0, NULL);
 
-DROP TABLE IF EXISTS `taskAttachments`;
-CREATE TABLE IF NOT EXISTS `taskAttachments` (
-  `task_id` int(11) NOT NULL,
-  `attachment_id` int(11) NOT NULL,
-  PRIMARY KEY (`task_id`,`attachment_id`),
-  KEY `fk_taskAttachments_attachment1_idx` (`attachment_id`),
-  KEY `fk_taskAttachments_task1_idx` (`task_id`),
-  CONSTRAINT `fk_taskAttachments_task1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskAttachments_attachment1` FOREIGN KEY (`attachment_id`) REFERENCES `attachment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskAttachments`;
+ALTER TABLE `taskAttachments` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `taskPattern`;
-CREATE TABLE IF NOT EXISTS `taskPattern` (
-  `task_id` int(11) NOT NULL,
-  `text_id` int(11) NOT NULL,
-  PRIMARY KEY (`task_id`,`text_id`),
-  KEY `fk_taskPattern_text1_idx` (`text_id`),
-  KEY `fk_taskPatternt_task1_idx` (`task_id`),
-  CONSTRAINT `fk_taskPattern_task1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskPattern_text1` FOREIGN KEY (`text_id`) REFERENCES `text` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `taskPattern`;
+ALTER TABLE `taskPattern` AUTO_INCREMENT=1;
 INSERT INTO `taskPattern` (`task_id`, `text_id`) VALUES
 	(4, 1),
 	(6, 2),
@@ -193,33 +95,16 @@ INSERT INTO `taskPattern` (`task_id`, `text_id`) VALUES
 	(17, 11),
 	(18, 12);
 
-DROP TABLE IF EXISTS `taskSheet`;
-CREATE TABLE IF NOT EXISTS `taskSheet` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
-  `creationDate` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `title_UNIQUE` (`title`),
-  KEY `taskSheetKey` (`creationDate`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `taskSheet`;
+ALTER TABLE `taskSheet` AUTO_INCREMENT=1;
 INSERT INTO `taskSheet` (`id`, `title`, `creationDate`) VALUES
 	(1, 'Blatt01', '2014-01-24 00:18:21'),
 	(2, 'Blatt02', '2014-01-24 00:18:36'),
 	(3, 'Blatt03', '2014-01-24 00:18:44'),
 	(4, 'Blatt04', '2014-01-24 00:18:52');
 
-DROP TABLE IF EXISTS `taskSheetTasks`;
-CREATE TABLE IF NOT EXISTS `taskSheetTasks` (
-  `taskSheet_id` int(11) NOT NULL,
-  `task_id` int(11) NOT NULL,
-  PRIMARY KEY (`taskSheet_id`,`task_id`),
-  KEY `fk_taskSheetTasks_task1_idx` (`task_id`),
-  KEY `fk_taskSheetTasks_taskSheet1_idx` (`taskSheet_id`),
-  CONSTRAINT `fk_taskSheetTasks_taskSheet1` FOREIGN KEY (`taskSheet_id`) REFERENCES `taskSheet` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskSheetTasks_task1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `taskSheetTasks`;
+ALTER TABLE `taskSheetTasks` AUTO_INCREMENT=1;
 INSERT INTO `taskSheetTasks` (`taskSheet_id`, `task_id`) VALUES
 	(1, 1),
 	(1, 2),
@@ -238,78 +123,23 @@ INSERT INTO `taskSheetTasks` (`taskSheet_id`, `task_id`) VALUES
 	(4, 17),
 	(4, 18);
 
-DROP TABLE IF EXISTS `taskSubmission`;
-CREATE TABLE IF NOT EXISTS `taskSubmission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` datetime NOT NULL,
-  `task` int(11) NOT NULL,
-  `status` int(11) DEFAULT NULL,
-  `statusText` longtext,
-  PRIMARY KEY (`id`),
-  KEY `fk_taskSubmission_task1_idx` (`task`),
-  KEY `submissionKey` (`date`,`status`,`statusText`(50)),
-  CONSTRAINT `fk_taskSubmission_task1` FOREIGN KEY (`task`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskSubmission`;
+ALTER TABLE `taskSubmission` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `taskSubmissionAttachment`;
-CREATE TABLE IF NOT EXISTS `taskSubmissionAttachment` (
-  `taskSubmission_id` int(11) NOT NULL,
-  `attachment_id` int(11) NOT NULL,
-  PRIMARY KEY (`taskSubmission_id`,`attachment_id`),
-  KEY `fk_taskSubmission_has_attachment_attachment1_idx` (`attachment_id`),
-  KEY `fk_taskSubmission_has_attachment_taskSubmission1_idx` (`taskSubmission_id`),
-  CONSTRAINT `fk_taskSubmission_has_attachment_taskSubmission1` FOREIGN KEY (`taskSubmission_id`) REFERENCES `taskSubmission` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskSubmission_has_attachment_attachment1` FOREIGN KEY (`attachment_id`) REFERENCES `attachment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskSubmissionAttachment`;
+ALTER TABLE `taskSubmissionAttachment` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `taskSubmissionDates`;
-CREATE TABLE IF NOT EXISTS `taskSubmissionDates` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `deadline` datetime DEFAULT NULL,
-  `releasedate` datetime DEFAULT NULL,
-  `lectureGroupTaskSheet` int(11) DEFAULT NULL,
-  `task` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_taskSubmissionDates_lectureGroupTaskSheet1_idx` (`lectureGroupTaskSheet`),
-  KEY `fk_taskSubmissionDates_task1_idx` (`task`),
-  CONSTRAINT `fk_taskSubmissionDates_lectureGroupTaskSheet1` FOREIGN KEY (`lectureGroupTaskSheet`) REFERENCES `lectureGroupTaskSheet` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskSubmissionDates_task1` FOREIGN KEY (`task`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskSubmissionDates`;
+ALTER TABLE `taskSubmissionDates` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `taskSubmissionText`;
-CREATE TABLE IF NOT EXISTS `taskSubmissionText` (
-  `taskSubmission_id` int(11) NOT NULL,
-  `text_id` int(11) NOT NULL,
-  PRIMARY KEY (`taskSubmission_id`,`text_id`),
-  KEY `fk_taskSubmission_has_text_text1_idx` (`text_id`),
-  KEY `fk_taskSubmission_has_text_taskSubmission1_idx` (`taskSubmission_id`),
-  CONSTRAINT `fk_taskSubmission_has_text_taskSubmission1` FOREIGN KEY (`taskSubmission_id`) REFERENCES `taskSubmission` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_taskSubmission_has_text_text1` FOREIGN KEY (`text_id`) REFERENCES `text` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskSubmissionText`;
+ALTER TABLE `taskSubmissionText` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `taskTests`;
-CREATE TABLE IF NOT EXISTS `taskTests` (
-  `task_id` int(11) NOT NULL,
-  `text_id` int(11) NOT NULL,
-  PRIMARY KEY (`task_id`,`text_id`),
-  KEY `fk_task_has_text_text1_idx` (`text_id`),
-  KEY `fk_task_has_text_task1_idx` (`task_id`),
-  CONSTRAINT `fk_task_has_text_task1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_task_has_text_text1` FOREIGN KEY (`text_id`) REFERENCES `text` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+TRUNCATE TABLE `taskTests`;
+ALTER TABLE `taskTests` AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `text`;
-CREATE TABLE IF NOT EXISTS `text` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `content` longtext,
-  `creationDate` datetime DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `type` varchar(45) DEFAULT NULL,
-  `sha1` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `textKey` (`creationDate`,`name`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
-
+TRUNCATE TABLE `text`;
+ALTER TABLE `text` AUTO_INCREMENT=1;
 INSERT INTO `text` (`id`, `content`, `creationDate`, `name`, `type`, `sha1`) VALUES
 	(1, 'public class Prime {\r\n\r\n      public static boolean isPrime(int n){\r\n      // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n\r\n     public static int nextPrime(int n){\r\n     // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n  \r\n     public static void main(String[] args) {\r\n     // hier bitte Testrahmen einfuegen\r\n\r\n    }\r\n}', '2014-01-23 23:59:51', 'Prime', 'java', 'f6c4c0f42e8f61733e5117f779ede24ada20974e'),
 	(2, 'public class Median {\r\n   public static int median(int a, int b, int c){\r\n   // hier bitte Quelltext einfuegen\r\n\r\n   }\r\n   public static int median2(int a, int b, int c){\r\n   // hier bitte Quelltext einfuegen\r\n\r\n   }\r\n   public static void main(String[] args) {\r\n   // hier bitte Testrahmen einfuegen\r\n   }\r\n}', '2014-01-24 00:02:16', 'Media', 'java', '33bfd6329fa61a2dc1c6d80fc62d04176a5e87c5'),

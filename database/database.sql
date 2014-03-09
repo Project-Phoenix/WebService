@@ -71,7 +71,8 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `lectureKey` (`name` ASC))
+  INDEX `lectureKey` (`name` ASC),
+  UNIQUE INDEX `lectureUniqueKey` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -322,6 +323,7 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheet` (
   PRIMARY KEY (`id`),
   INDEX `fk_lectureGroupTaskSheet_taskSheet2_idx` (`taskSheet` ASC),
   INDEX `fk_lectureGroupTaskSheet_lectureGroup1_idx` (`lectureGroup` ASC),
+  UNIQUE INDEX `lectureGroupTaskSheetKey` (`taskSheet` ASC, `lectureGroup` ASC),
   CONSTRAINT `fk_lectureGroupTaskSheet_taskSheet2`
     FOREIGN KEY (`taskSheet`)
     REFERENCES `phoenix`.`taskSheet` (`id`)
