@@ -2,6 +2,7 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
+DROP SCHEMA IF EXISTS `phoenix` ;
 CREATE SCHEMA IF NOT EXISTS `phoenix` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE `phoenix` ;
 
@@ -56,11 +57,11 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`text` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `content` LONGTEXT NULL,
   `creationDate` DATETIME NULL,
-  `name` VARCHAR(255) NULL,
+  `title` VARCHAR(255) NULL,
   `type` VARCHAR(45) NULL,
   `sha1` VARCHAR(40) NULL,
   PRIMARY KEY (`id`),
-  INDEX `textKey` (`creationDate` ASC, `name` ASC, `type` ASC))
+  INDEX `textKey` (`creationDate` ASC, `title` ASC, `type` ASC))
 ENGINE = InnoDB;
 
 
@@ -69,10 +70,10 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`lecture` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL,
+  `title` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `lectureKey` (`name` ASC),
-  UNIQUE INDEX `lectureUniqueKey` (`name` ASC))
+  INDEX `lectureKey` (`title` ASC),
+  UNIQUE INDEX `lectureUniqueKey` (`title` ASC))
 ENGINE = InnoDB;
 
 

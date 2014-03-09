@@ -50,7 +50,7 @@ import de.phoenix.util.hash.SHA1Hasher;
     @NamedQuery(name = "Text.findAll", query = "SELECT t FROM Text t"),
     @NamedQuery(name = "Text.findById", query = "SELECT t FROM Text t WHERE t.id = :id"),
     @NamedQuery(name = "Text.findByCreationDate", query = "SELECT t FROM Text t WHERE t.creationDate = :creationDate"),
-    @NamedQuery(name = "Text.findByName", query = "SELECT t FROM Text t WHERE t.name = :name"),
+    @NamedQuery(name = "Text.findByTitle", query = "SELECT t FROM Text t WHERE t.title = :title"),
     @NamedQuery(name = "Text.findByType", query = "SELECT t FROM Text t WHERE t.type = :type")})
 //@formatter:on
 public class Text implements Serializable, Convertable<PhoenixText> {
@@ -70,9 +70,8 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     @Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
     private DateTime creationDate;
 
-    // TODO: Rename to title
-    @Column(name = "name")
-    private String name;
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "type")
     private String type;
@@ -100,7 +99,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
 
     public Text(String content, DateTime creationDate, String name, String type) {
         this.creationDate = creationDate;
-        this.name = name;
+        this.title = name;
         this.type = type;
         this.setContent(content);
     }
@@ -108,7 +107,7 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     public Text(String content, DateTime creationDate, String name, String type, String sha1) {
         this.content = content;
         this.creationDate = creationDate;
-        this.name = name;
+        this.title = name;
         this.type = type;
         this.sha1 = sha1;
     }
@@ -142,12 +141,12 @@ public class Text implements Serializable, Convertable<PhoenixText> {
         this.creationDate = creationDate;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getType() {
@@ -221,12 +220,12 @@ public class Text implements Serializable, Convertable<PhoenixText> {
 
     @Override
     public PhoenixText convert() {
-        return new PhoenixText(this.getContent(), this.getCreationDate(), this.getName(), this.getType());
+        return new PhoenixText(this.getContent(), this.getCreationDate(), this.getTitle(), this.getType());
     }
 
     @Override
     public void copyValues(PhoenixText phoenixEntity) {
-        this.setName(phoenixEntity.getName());
+        this.setTitle(phoenixEntity.getName());
         this.setType(phoenixEntity.getType());
         this.setContent(phoenixEntity.getText());
     }

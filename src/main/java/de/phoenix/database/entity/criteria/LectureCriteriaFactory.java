@@ -39,6 +39,6 @@ public class LectureCriteriaFactory extends CriteriaFactory<Lecture, PhoenixLect
 
     @Override
     public void setAttributes(SelectEntity<PhoenixLecture> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "title", String.class, "name", criteria);
+        addParameter(selectEntity, "title", String.class, criteria);
     }
 }

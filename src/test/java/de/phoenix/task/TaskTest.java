@@ -359,7 +359,6 @@ public class TaskTest {
 
             assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
             PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
-            System.out.println(res);
             assertEquals(SubmissionStatus.ERROR, res.getStatus());
             assertEquals("Code can not use java.io", res.getStatusText());
         } catch (IOException e) {

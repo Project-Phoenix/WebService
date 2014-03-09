@@ -77,7 +77,7 @@ public class SubmissionJUnit implements SubmissionHandler {
     }
 
     private JUnitTest prepareJunit(Text test, Text submittedClass, int timeout) {
-        return JUnitTest.create(test.getName(), test.getContent()).setClassTag(submittedClass.getName()).setTimeOut(timeout).build();
+        return JUnitTest.create(test.getTitle(), test.getContent()).setClassTag(submittedClass.getTitle()).setTimeOut(timeout).build();
     }
 
 }

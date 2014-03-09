@@ -18,7 +18,7 @@ INSERT INTO `details` (`id`, `room`, `weekday`, `startTime`, `endTime`, `interva
 
 TRUNCATE TABLE `lecture`;
 ALTER TABLE `lecture` AUTO_INCREMENT=1; 
-INSERT INTO `lecture` (`id`, `name`) VALUES
+INSERT INTO `lecture` (`id`, `title`) VALUES
 	(1, 'Einführung in die Informatik');
 
 TRUNCATE TABLE `lectureDetails`;
@@ -140,7 +140,7 @@ ALTER TABLE `taskTests` AUTO_INCREMENT=1;
 
 TRUNCATE TABLE `text`;
 ALTER TABLE `text` AUTO_INCREMENT=1;
-INSERT INTO `text` (`id`, `content`, `creationDate`, `name`, `type`, `sha1`) VALUES
+INSERT INTO `text` (`id`, `content`, `creationDate`, `title`, `type`, `sha1`) VALUES
 	(1, 'public class Prime {\r\n\r\n      public static boolean isPrime(int n){\r\n      // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n\r\n     public static int nextPrime(int n){\r\n     // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n  \r\n     public static void main(String[] args) {\r\n     // hier bitte Testrahmen einfuegen\r\n\r\n    }\r\n}', '2014-01-23 23:59:51', 'Prime', 'java', 'f6c4c0f42e8f61733e5117f779ede24ada20974e'),
 	(2, 'public class Median {\r\n   public static int median(int a, int b, int c){\r\n   // hier bitte Quelltext einfuegen\r\n\r\n   }\r\n   public static int median2(int a, int b, int c){\r\n   // hier bitte Quelltext einfuegen\r\n\r\n   }\r\n   public static void main(String[] args) {\r\n   // hier bitte Testrahmen einfuegen\r\n   }\r\n}', '2014-01-24 00:02:16', 'Media', 'java', '33bfd6329fa61a2dc1c6d80fc62d04176a5e87c5'),
 	(3, 'public class NPalindrome{\r\n\r\n   public static int numDigits(int n) {\r\n      // hier Quelltext einfuegen\r\n   }\r\n\r\n   public static int getDigit(int n, int index){\r\n      // hier Quelltext einfuegen	\r\n   }\r\n	\r\n   public static boolean isPalindrome(int n){\r\n      // hier Quelltext einfuegen\r\n   }\r\n  \r\n   public static void main(String[] args) {\r\n     // hier bitte Testrahmen einfuegen\r\n\r\n   }\r\n}\r\n\r\n', '2014-01-24 00:02:58', 'NPalindrome', 'java', 'f838d70c6de4e7a2a55556ecf84adaff33dc0761'),

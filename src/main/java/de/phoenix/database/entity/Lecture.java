@@ -53,7 +53,7 @@ import de.phoenix.rs.entity.PhoenixLecture;
 @NamedQueries({
     @NamedQuery(name = "Lecture.findAll", query = "SELECT l FROM Lecture l"),
     @NamedQuery(name = "Lecture.findById", query = "SELECT l FROM Lecture l WHERE l.id = :id"),
-    @NamedQuery(name = "Lecture.findByName", query = "SELECT l FROM Lecture l WHERE l.name = :name")})
+    @NamedQuery(name = "Lecture.findByTitle", query = "SELECT l FROM Lecture l WHERE l.title = :title")})
 //@formatter:on
 public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
@@ -65,9 +65,8 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     @Column(name = "id")
     private Integer id;
 
-    // TODO: Rename to title
-    @Column(name = "name", unique = true)
-    private String name;
+    @Column(name = "title", unique = true)
+    private String title;
 
     @OneToMany(mappedBy = "lecture")
     @Cascade(CascadeType.SAVE_UPDATE)
@@ -90,7 +89,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     }
 
     public Lecture(PhoenixLecture lecture) {
-        this.name = lecture.getTitle();
+        this.title = lecture.getTitle();
 
         List<PhoenixDetails> phoenixDetails = lecture.getLectureDetails();
         this.detailsList = new ArrayList<Details>(phoenixDetails.size());
@@ -108,12 +107,12 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     @XmlTransient
@@ -170,12 +169,11 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     @Override
     public PhoenixLecture convert() {
-        return new PhoenixLecture(getName(), ConverterUtil.convert(getDetails()));
+        return new PhoenixLecture(getTitle(), ConverterUtil.convert(getDetails()));
     }
 
     @Override
     public void copyValues(PhoenixLecture phoenixEntity) {
-        this.setName(phoenixEntity.getTitle());
-
+        this.setTitle(phoenixEntity.getTitle());
     }
 }

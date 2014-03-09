@@ -77,7 +77,7 @@ public class SubmissionJavaCompiler implements SubmissionHandler {
     private Map<String, CharSequence> prepareTexts(List<Text> texts) {
         Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>(texts.size(), 1.0f);
         for (Text text : texts) {
-            classesToCompile.put(text.getName(), text.getContent());
+            classesToCompile.put(text.getTitle(), text.getContent());
         }
 
         return classesToCompile;
