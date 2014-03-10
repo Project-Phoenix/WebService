@@ -4,35 +4,38 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-	<session-factory>
-		<!-- Database connection settings -->
-		<property name="connection.datasource">PhoenixJDBCResource</property>
+    <session-factory>
+        <!-- Database connection settings -->
+        <property name="connection.datasource">PhoenixJDBCResource</property>
 
-		<!-- SQL dialect -->
-		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.characterEncoding">UTF-8</property>
+        <property name="hibernate.connection.useUnicode">true</property>
 
-		<!-- Enable Hibernate's automatic session context management -->
-		<property name="current_session_context_class">thread</property>
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
-		<!-- Disable the second-level cache -->
-		<property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
 
-		<!-- Echo all executed SQL to stdout -->
-		<property name="show_sql">false</property>
+        <!-- Disable the second-level cache -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 
-		<property name="hbm2ddl.auto">validate</property>
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">false</property>
 
-		<mapping class="de.phoenix.database.entity.Attachment" />
-		<mapping class="de.phoenix.database.entity.Details" />
-		<mapping class="de.phoenix.database.entity.Lecture" />
-		<mapping class="de.phoenix.database.entity.LectureGroup" />
-		<mapping class="de.phoenix.database.entity.LectureGroupTaskSheet" />
-		<mapping class="de.phoenix.database.entity.Task" />
-		<mapping class="de.phoenix.database.entity.TaskSheet" />
-		<mapping class="de.phoenix.database.entity.TaskSubmission" />
-		<mapping class="de.phoenix.database.entity.TaskSubmissionDates" />
-		<mapping class="de.phoenix.database.entity.TaskTest" />
-		<mapping class="de.phoenix.database.entity.Text" />
+        <property name="hbm2ddl.auto">validate</property>
 
-	</session-factory>
+        <mapping class="de.phoenix.database.entity.Attachment" />
+        <mapping class="de.phoenix.database.entity.Details" />
+        <mapping class="de.phoenix.database.entity.Lecture" />
+        <mapping class="de.phoenix.database.entity.LectureGroup" />
+        <mapping class="de.phoenix.database.entity.LectureGroupTaskSheet" />
+        <mapping class="de.phoenix.database.entity.Task" />
+        <mapping class="de.phoenix.database.entity.TaskSheet" />
+        <mapping class="de.phoenix.database.entity.TaskSubmission" />
+        <mapping class="de.phoenix.database.entity.TaskSubmissionDates" />
+        <mapping class="de.phoenix.database.entity.TaskTest" />
+        <mapping class="de.phoenix.database.entity.Text" />
+
+    </session-factory>
 </hibernate-configuration>

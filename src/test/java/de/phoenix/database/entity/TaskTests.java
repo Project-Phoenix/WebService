@@ -19,15 +19,15 @@
 package de.phoenix.database.entity;
 
 import static de.phoenix.database.EntityTest.BASE_URL;
+import static de.phoenix.database.EntityTest.CLIENT;
+import static de.phoenix.database.EntityTest.READER;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,6 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
@@ -45,7 +44,6 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
-import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixSubmission;
@@ -69,309 +67,231 @@ public class TaskTests {
 
     @Test
     @Order(1)
-    public void createTask() {
+    public void createTask() throws IOException {
 
-        if (!TEST_BINARY_FILE.exists()) {
-            fail("Binary file does not exists!");
-        }
-
-        if (!TEST_PATTERN_FILE.exists()) {
-            fail("Text file does not exists!");
-        }
-
-        if (!TEST_DESCRIPTION_FILE.exists()) {
-            fail("Task Description File does not exists!");
-        }
-
-        // Create client
-        Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
-        try {
+        WebResource wr = PhoenixTask.createResource(CLIENT, BASE_URL);
 
-            List<PhoenixText> texts = new ArrayList<PhoenixText>();
-            PhoenixText textFile = new PhoenixText(TEST_PATTERN_FILE, TEST_PATTERN_FILE.getName());
-            texts.add(textFile);
+        List<PhoenixText> texts = new ArrayList<PhoenixText>();
+        PhoenixText textFile = new PhoenixText(TEST_PATTERN_FILE, TEST_PATTERN_FILE.getName());
+        texts.add(textFile);
 
-            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
-            PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
-            attachments.add(binaryFile);
+        List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+        PhoenixAttachment binaryFile = new PhoenixAttachment(TEST_BINARY_FILE, TEST_BINARY_FILE.getName());
+        attachments.add(binaryFile);
 
-            String description = getText(TEST_DESCRIPTION_FILE);
-
-            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
-            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
-            assertTrue(post.toString(), post.getStatus() == 200);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-
-    }
-
-    private String getText(File file) {
-        StringBuilder sBuilder = new StringBuilder((int) file.length());
-        try {
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-            byte[] buffer = new byte[2048];
-            int read = 0;
-            while ((read = bis.read(buffer)) != -1) {
-                sBuilder.append(new String(buffer, 0, read));
-            }
-
-            bis.close();
-            return sBuilder.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        String description = READER.read(TEST_DESCRIPTION_FILE);
+        PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+        assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
     @Test
     @Order(2)
-    public void getAllTasks() {
-        Client c = PhoenixClient.create();
-        WebResource wr = c.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
-        ClientResponse resp = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+    public void getAllTasks() throws FileNotFoundException, CharacterCodingException {
+        WebResource wr = CLIENT.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GET);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
-        List<PhoenixTask> tasks = EntityUtil.extractEntityList(resp);
+        List<PhoenixTask> tasks = EntityUtil.extractEntityList(response);
+        assertEquals(1, tasks.size());
 
-        assertFalse("TaskList is empty!", tasks.isEmpty());
-        for (PhoenixTask phoenixTask : tasks) {
-            assertTrue(phoenixTask.getTitle(), phoenixTask.getTitle().equals(TEST_TITLE));
-            assertFalse(phoenixTask.getDescription(), phoenixTask.getDescription().isEmpty());
-            List<PhoenixText> pattern = phoenixTask.getPattern();
-            assertFalse("PatternList is empty!", pattern.isEmpty());
-            for (PhoenixText pat : pattern) {
-                assertFalse("Patterntext is empty!", pat.getText().isEmpty());
-            }
-        }
+        PhoenixTask task = tasks.get(0);
+        assertEquals(TEST_TITLE, task.getTitle());
+        assertEquals(READER.read(TEST_DESCRIPTION_FILE), task.getDescription());
+
+        List<PhoenixText> texts = task.getPattern();
+        assertEquals(1, texts.size());
+
+        PhoenixText text = texts.get(0);
+        assertEquals(READER.read(TEST_PATTERN_FILE), text.getText());
     }
 
     @Test
     @Order(3)
     public void getTaskByTitle() {
-
-        Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+        WebResource wr = PhoenixTask.getResource(CLIENT, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertTrue(post.toString(), post.getStatus() == 200);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        assertFalse("List is empty!", list.isEmpty());
-        assertTrue("List contains not only one task!", list.size() == 1);
+        List<PhoenixTask> list = EntityUtil.extractEntityList(response);
+        assertEquals(1, list.size());
 
         PhoenixTask task = list.get(0);
-        assertFalse("No task found!", task == null);
-        assertTrue("Task title wrong!", task.getTitle().equals(TEST_TITLE));
+        assertNotNull(task);
+        assertEquals(TEST_TITLE, task.getTitle());
     }
 
     private final static File TEST_SUBMISSION_FILE = new File("src/test/resources/task/specialNumbers/SpecialNumbers.java");
 
     @Test
     @Order(4)
-    public void submitSolutionForManuelTask() {
-
-        if (!TEST_SUBMISSION_FILE.exists()) {
-            fail("Submission File does not exists!");
-        }
-
-        Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+    public void submitSolutionForManuelTask() throws IOException {
+        WebResource wr = PhoenixTask.getResource(CLIENT, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", TEST_TITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertTrue(post.toString(), post.getStatus() == 200);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
-        PhoenixTask task = EntityUtil.extractEntity(post);
+        PhoenixTask task = EntityUtil.extractEntity(response);
 
-        try {
-            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
-            wr = PhoenixTask.submitResource(c, BASE_URL);
-            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
+        wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
 
-            assertTrue(post.toString(), post.getStatus() == 200);
-            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
-            assertTrue(res.getStatus().equals(SubmissionStatus.SUBMITTED));
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-        }
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        assertEquals(Status.OK, response.getClientResponseStatus());
+
+        PhoenixSubmissionResult result = response.getEntity(PhoenixSubmissionResult.class);
+        assertEquals(SubmissionStatus.SUBMITTED, result.getStatus());
     }
 
     @Test
     @Order(5)
     public void getSubmissionForTask() throws IOException {
 
-        Client c = PhoenixClient.create();
-
         SelectEntity<PhoenixTask> taskSelector = new SelectEntity<PhoenixTask>();
         taskSelector.addKey("title", TEST_TITLE);
 
-        WebResource wrGetSubmissions = PhoenixSubmission.getResource(c, BASE_URL);
+        WebResource wrGetSubmissions = PhoenixSubmission.getResource(CLIENT, BASE_URL);
 
         SelectEntity<PhoenixSubmission> submissionSelector = new SelectEntity<PhoenixSubmission>();
         submissionSelector.addKey("task", taskSelector);
 
-        ClientResponse post = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, submissionSelector);
-        assertTrue(post.toString(), post.getStatus() == 200);
+        ClientResponse response = wrGetSubmissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, submissionSelector);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
-        List<PhoenixSubmission> submissions = EntityUtil.extractEntityList(post);
-        assertFalse("Result is empty!", submissions.isEmpty());
-        for (PhoenixSubmission phoenixSubmission : submissions) {
-            assertTrue(phoenixSubmission.getAttachments().size() + "", phoenixSubmission.getAttachments().size() == 0);
-            assertTrue(phoenixSubmission.getTexts().size() + "", phoenixSubmission.getTexts().size() == 1);
-            PhoenixText t = phoenixSubmission.getTexts().get(0);
-            assertTrue((t.getName() + "." + t.getType()) + " not equals" + TEST_SUBMISSION_FILE.getName(), (t.getName() + "." + t.getType()).equals(TEST_SUBMISSION_FILE.getName()));
+        List<PhoenixSubmission> submissions = EntityUtil.extractEntityList(response);
+        assertEquals(1, submissions.size());
 
-        }
-
+        PhoenixSubmission phoenixSubmission = submissions.get(0);
+        assertEquals(0, phoenixSubmission.getAttachments().size());
+        assertEquals(1, phoenixSubmission.getTexts().size());
+        assertEquals(TEST_SUBMISSION_FILE.getName(), phoenixSubmission.getTexts().get(0).getFullname());
     }
 
     @Test
     @Order(6)
     public void getAllTitles() {
-        Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getAllTitlesResource(c, BASE_URL);
+        WebResource wr = PhoenixTask.getAllTitlesResource(CLIENT, BASE_URL);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        assertTrue(post.toString(), post.getStatus() == 200);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
-        List<String> titles = EntityUtil.extractEntityList(post);
+        List<String> titles = EntityUtil.extractEntityList(response);
 
-        assertFalse("Title list is empty!", titles.isEmpty());
-        assertTrue("Title list contain more than 0 elements , " + titles.size(), titles.size() == 1);
-        assertTrue(titles.get(0) + " is not " + TEST_TITLE, titles.get(0).equals(TEST_TITLE));
-
+        assertEquals(1, titles.size());
+        assertEquals(TEST_TITLE, titles.get(0));
     }
 
     @Test
     @Order(7)
     public void createDuplicateTask() {
-        // Create client
-        Client c = PhoenixClient.create();
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
-        try {
+        WebResource wr = PhoenixTask.createResource(CLIENT, BASE_URL);
 
-            // Empty lists - we have not interest in lists for this test
-            List<PhoenixText> texts = new ArrayList<PhoenixText>();
-            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+        // Empty lists - we have not interest in lists for this test
+        List<PhoenixText> texts = new ArrayList<PhoenixText>();
+        List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
 
-            // No interest in description
-            String description = "";
+        // No interest in description
+        String description = "";
 
-            PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
-            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+        PhoenixTask task = new PhoenixTask(attachments, texts, description, TEST_TITLE);
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
 
-            // Because we want to create a title with same title, the system
-            // throws an exception
-            assertTrue(post.toString(), post.getStatus() == 400 && post.getEntity(String.class).equals("Duplicate task title!"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+        // Because we want to create a title with same title, the system
+        // throws an exception
+        assertEquals(Status.BAD_REQUEST, response.getClientResponseStatus());
+        assertEquals("Duplicate task title!", response.getEntity(String.class));
     }
 
     private final static String AUTOMATIC_TEST_TITLE = "TernarySearch";
 
     @Test
     @Order(8)
-    public void createAutomaticTask() {
-        // Create client
-        Client c = PhoenixClient.create();
+    public void createAutomaticTask() throws IOException {
         // Get webresource
-        WebResource wr = PhoenixTask.createResource(c, BASE_URL);
-        try {
+        WebResource wr = PhoenixTask.createResource(CLIENT, BASE_URL);
 
-            // The pattern for the submission
-            List<PhoenixText> pattern = new ArrayList<PhoenixText>();
-            pattern.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearch.java"), "TernarySearch.java"));
+        // The pattern for the submission
+        List<PhoenixText> pattern = new ArrayList<PhoenixText>();
+        pattern.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearch.java"), "TernarySearch.java"));
 
-            // No attachments
-            List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
+        // No attachments
+        List<PhoenixAttachment> attachments = new ArrayList<PhoenixAttachment>();
 
-            // No interest in description
-            String description = "";
+        // No interest in description
+        String description = "";
 
-            PhoenixTaskTest pTest = new PhoenixTaskTest(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
+        // Create test information
+        PhoenixTaskTest pTest = new PhoenixTaskTest(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
+        pTest.setTimeout(10);
 
-            PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", Arrays.asList(pTest));
-            DisallowedContent disallowedContent = new DisallowedContent().disallow("java.io").disallow("java.nio");
-            task.setDisallowedContent(disallowedContent);
-            ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+        // Create automatic test
+        PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", Arrays.asList(pTest));
 
-            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+        // Disallow IO packages
+        DisallowedContent disallowedContent = new DisallowedContent().disallow("java.io").disallow("java.nio");
+        task.setDisallowedContent(disallowedContent);
+
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
+
     }
 
     @Test
     @Order(9)
-    public void submitSolutionForAutoTask() {
+    public void submitSolutionForAutoTask() throws IOException {
 
-        Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+        WebResource wr = PhoenixTask.getResource(CLIENT, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", AUTOMATIC_TEST_TITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
-        PhoenixTask task = EntityUtil.extractEntity(post);
+        PhoenixTask task = EntityUtil.extractEntity(response);
 
-        try {
-            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyTernarySearch.java")));
-            wr = PhoenixTask.submitResource(c, BASE_URL);
-            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyTernarySearch.java")));
+        wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
-            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
-            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
+        PhoenixSubmissionResult res = response.getEntity(PhoenixSubmissionResult.class);
 
-            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
-            assertEquals(SubmissionStatus.OK, res.getStatus());
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-        }
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
+        assertEquals(SubmissionStatus.OK, res.getStatus());
+
     }
 
     @Test
     @Order(10)
-    public void submitSolutionWithInvalidContent() {
-        Client c = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(c, BASE_URL);
+    public void submitSolutionWithInvalidContent() throws IOException {
+        WebResource wr = PhoenixTask.getResource(CLIENT, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", AUTOMATIC_TEST_TITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
+        ClientResponse response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
-        PhoenixTask task = EntityUtil.extractEntity(post);
+        PhoenixTask task = EntityUtil.extractEntity(response);
 
-        try {
-            PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyMaliciousTernarySearch.java")));
-            wr = PhoenixTask.submitResource(c, BASE_URL);
-            post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyMaliciousTernarySearch.java")));
+        wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
 
-            assertEquals(ClientResponse.Status.OK, post.getClientResponseStatus());
-            PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
-            assertEquals(SubmissionStatus.ERROR, res.getStatus());
-            assertEquals("Code can not use java.io", res.getStatusText());
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-        }
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
+
+        PhoenixSubmissionResult res = response.getEntity(PhoenixSubmissionResult.class);
+        assertEquals(SubmissionStatus.ERROR, res.getStatus());
+        assertEquals("Code can not use java.io", res.getStatusText());
+
     }
 
     @Test
     @Order(11)
     public void searchNonExistingTask() {
-        Client c = PhoenixClient.create();
-        WebResource getAllTasksResource = PhoenixTask.getResource(c, BASE_URL);
+        WebResource getAllTasksResource = PhoenixTask.getResource(CLIENT, BASE_URL);
         ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTask>().addKey("title", "troll"));
         assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
     }

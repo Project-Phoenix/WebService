@@ -19,10 +19,10 @@
 package de.phoenix.database.entity;
 
 import static de.phoenix.database.EntityTest.BASE_URL;
+import static de.phoenix.database.EntityTest.CLIENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -38,7 +38,6 @@ import org.joda.time.Period;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
@@ -46,7 +45,6 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
-import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
@@ -63,8 +61,7 @@ public class LectureTests {
     @Test
     @Order(1)
     public void createLecture() throws ParseException {
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLecture.createResource(c, BASE_URL);
+        WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
 
         LocalTime startTime = new LocalTime(11, 15);
         LocalTime endTime = new LocalTime(12, 45);
@@ -75,23 +72,22 @@ public class LectureTests {
         PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Arrays.asList(detail));
 
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
-
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
     @Test
     @Order(2)
     public void getLectures() {
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLecture.getResource(c, BASE_URL);
+        WebResource ws = PhoenixLecture.getResource(CLIENT, BASE_URL);
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixLecture>());
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
         List<PhoenixLecture> lectures = EntityUtil.extractEntityList(response);
         assertFalse("Lecture list is empty!", lectures.isEmpty());
+
         PhoenixLecture lec = lectures.get(0);
-        assertTrue("LectureName was " + lec.getTitle() + ", but should be" + TEST_LECTURE_TITLE, lec.getTitle().equals(TEST_LECTURE_TITLE));
-        assertTrue("Intervall is not 1 weeks, but " + lec.getLectureDetails().get(0).getInverval(), lec.getLectureDetails().get(0).getInverval().getWeeks() == 1);
+        assertEquals(TEST_LECTURE_TITLE, lec.getTitle());
+        assertEquals(lec.getLectureDetails().get(0).getInverval(), lec.getLectureDetails().get(0).getInverval());
 
     }
 
@@ -101,18 +97,17 @@ public class LectureTests {
     @Test
     @Order(3)
     public void addGroup() {
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLecture.getResource(c, BASE_URL);
+        WebResource ws = PhoenixLecture.getResource(CLIENT, BASE_URL);
 
         // Get single lecture
         SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
         PhoenixLecture lec = EntityUtil.extractEntity(response);
 
         // Add group to lecture
-        WebResource ws2 = PhoenixLecture.addGroupResource(c, BASE_URL);
+        WebResource ws2 = PhoenixLecture.addGroupResource(CLIENT, BASE_URL);
 
         // Create information for the group information
         LocalTime startTime = new LocalTime(15, 00);
@@ -132,27 +127,24 @@ public class LectureTests {
         PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
-
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Create second group
         group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
-
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
     @Test
     @Order(4)
     public void addDetail() {
-        Client c = PhoenixClient.create();
-        WebResource getLectureResource = PhoenixLecture.getResource(c, BASE_URL);
+        WebResource getLectureResource = PhoenixLecture.getResource(CLIENT, BASE_URL);
 
         // Get single lecture
         SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
         ClientResponse response = getLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
         PhoenixLecture lec = EntityUtil.extractEntity(response);
 
@@ -164,15 +156,14 @@ public class LectureTests {
 
         PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
-        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URL);
+        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
         response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
     @Test
     @Order(5)
     public void addDetailToNotExistingLecture() {
-        Client c = PhoenixClient.create();
 
         // Create information for the group information
         LocalTime startTime = new LocalTime(2, 30);
@@ -185,7 +176,7 @@ public class LectureTests {
         // Add something to a non existing lecture
         AddToEntity<PhoenixLecture, PhoenixDetails> addDetailToLecture = new AddToEntity<PhoenixLecture, PhoenixDetails>(detail).addKey("title", "troll");
 
-        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(c, BASE_URL);
+        WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
         ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
         assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
     }
@@ -194,8 +185,7 @@ public class LectureTests {
     @Order(6)
     public void getGroupsForALecture() throws IllegalArgumentException, IOException {
 
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLectureGroup.getResource(c, BASE_URL);
+        WebResource ws = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
 
         SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
         SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
@@ -203,7 +193,7 @@ public class LectureTests {
         groupSelector.addKey("lecture", lectureSelector);
 
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
-        assertTrue(response.toString(), response.getStatus() == 200);
+        assertEquals(Status.OK, response.getClientResponseStatus());
 
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
         assertFalse("Lecture list is empty!", groups.isEmpty());
@@ -213,8 +203,7 @@ public class LectureTests {
     @Order(7)
     public void getNoGroupsForNotALecture() throws IllegalArgumentException, IOException {
 
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLectureGroup.getResource(c, BASE_URL);
+        WebResource ws = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
 
         SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
         // Not existing lecture
@@ -232,8 +221,7 @@ public class LectureTests {
     @Test
     @Order(8)
     public void deleteLectureGroup() {
-        Client c = PhoenixClient.create();
-        WebResource ws = PhoenixLectureGroup.deleteResource(c, BASE_URL);
+        WebResource ws = PhoenixLectureGroup.deleteResource(CLIENT, BASE_URL);
 
         // Create Lecture Group Selector
         SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>();
