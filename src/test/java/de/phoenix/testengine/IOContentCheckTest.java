@@ -21,8 +21,8 @@ public class IOContentCheckTest {
     @BeforeClass
     public static void beforeClass() {
         TextFileLoader loader = new TextFileLoader();
-        maliciousSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/DeleteFile.java"));
-        valideSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/MyBuilder.java"));
+        maliciousSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/testClasses/DeleteFile.java"));
+        valideSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/testClasses/MyBuilder.java"));
         validator = new CharSequenceValidator("java.io", "java.nio");
     }
 

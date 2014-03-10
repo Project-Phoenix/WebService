@@ -66,7 +66,7 @@ public class DatabaseTestData {
                 System.out.println("Start executing dump");
                 ScriptRunner r = new ScriptRunner(connection);
                 try {
-                    r.runScript(new InputStreamReader(new FileInputStream(new File("src/test/resources/testdata.sql")), Charset.forName("UTF-8")));
+                    r.runScript(new InputStreamReader(new FileInputStream(new File("src/test/resources/database/testdata.sql")), Charset.forName("UTF-8")));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

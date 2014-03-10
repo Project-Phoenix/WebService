@@ -26,9 +26,9 @@ public class TestingTests {
     @Test
     public void runStaticTest() throws ClassCastException, CharSequenceCompilerException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
-        Class<Object> builderClass = compileJavaFile(com, "MyBuilder", getClass().getResourceAsStream("/MyBuilder.java"));
+        Class<Object> builderClass = compileJavaFile(com, "MyBuilder", getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         assertNotNull(builderClass);
-        Class<Object> testClass = compileJavaFile(com, "TestMyBuilder", getClass().getResourceAsStream("/TestMyBuilder.java"));
+        Class<Object> testClass = compileJavaFile(com, "TestMyBuilder", getClass().getResourceAsStream("/testClasses/TestMyBuilder.java"));
         assertNotNull(testClass);
 
         assertEquals(0, JUnitCore.runClasses(testClass).getFailureCount());
@@ -37,12 +37,12 @@ public class TestingTests {
     @Test
     public void runCorrectDynamicTest() throws ClassCastException, CharSequenceCompilerException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
-        Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/MyCounter.java"));
+        Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         assertNotNull(counterClass);
 
         TextFileLoader loader = new TextFileLoader();
         assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
+        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         JUnitTest unitTest = JUnitTest.create("TestCounter", content).setClassTag("MyCounter").build();
@@ -56,12 +56,12 @@ public class TestingTests {
     @Test(expected = CharSequenceCompilerException.class)
     public void runWrongDynamicTest() throws ClassCastException, CharSequenceCompilerException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
-        Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/MyCounter.java"));
+        Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         assertNotNull(counterClass);
 
         TextFileLoader loader = new TextFileLoader();
         assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
+        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         // Create test suite with unit class name
@@ -73,12 +73,12 @@ public class TestingTests {
     @Test(timeout = 2000)
     public void runEndlessLoop() throws ClassCastException, CharSequenceCompilerException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
-        Class<Object> counterClass = compileJavaFile(com, "EndlessMyCounter", getClass().getResourceAsStream("/EndlessMyCounter.java"));
+        Class<Object> counterClass = compileJavaFile(com, "EndlessMyCounter", getClass().getResourceAsStream("/testClasses/EndlessMyCounter.java"));
         assertNotNull(counterClass);
 
         TextFileLoader loader = new TextFileLoader();
         assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
+        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         int timeout = 500;
@@ -95,8 +95,8 @@ public class TestingTests {
     public void sameClassnamesDifferentImplementation() throws ClassCastException, CharSequenceCompilerException {
 
         TextFileLoader loader = new TextFileLoader();
-        String unitTestSource = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
-        String correctSource = loader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
+        String unitTestSource = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
+        String correctSource = loader.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         JUnitTest unitTest = JUnitTest.create("TestCounter", unitTestSource).setClassTag("MyCounter").build();
 
         // Correct class compiling and testing

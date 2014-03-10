@@ -21,8 +21,8 @@ public class NetworkingContentCheckTest {
     @BeforeClass
     public static void beforeClass() {
         TextFileLoader loader = new TextFileLoader();
-        maliciousSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/NetworkingClass.java"));
-        valideSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/MyBuilder.java"));
+        maliciousSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/NetworkingClass.java"));
+        valideSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/MyBuilder.java"));
         validator = new CharSequenceValidator("java.net", "javax.net");
     }
 

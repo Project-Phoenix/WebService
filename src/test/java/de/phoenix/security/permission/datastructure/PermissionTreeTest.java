@@ -46,7 +46,7 @@ public class PermissionTreeTest {
     @Test
     public void createBigTree() {
         try {
-            File f = new File("src/test/resources/permissions.txt");
+            File f = new File("src/test/resources/security/permissions.txt");
             List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {
@@ -66,7 +66,7 @@ public class PermissionTreeTest {
     @Test
     public void cloneTest() {
         try {
-            File f = new File("src/test/resources/permissions.txt");
+            File f = new File("src/test/resources/security/permissions.txt");
             List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {
@@ -128,7 +128,7 @@ public class PermissionTreeTest {
     @Test
     public void toListTest() {
         try {
-            File f = new File("src/test/resources/permissions.txt");
+            File f = new File("src/test/resources/security/permissions.txt");
             List<String> lines = readAllLines(f);
             PermissionTree tree = new PermissionTree();
             for (String line : lines) {

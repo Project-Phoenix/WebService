@@ -14,7 +14,7 @@ public class ClassFileReaderTest {
         TextFileLoader cReader = new TextFileLoader();
         assertNotNull(cReader);
 
-        String s = cReader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
+        String s = cReader.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         assertNotNull(s);
         assertFalse(s.isEmpty());
         assertTrue(s.contains("public class MyCounter"));

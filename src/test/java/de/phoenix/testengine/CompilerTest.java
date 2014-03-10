@@ -23,7 +23,7 @@ public class CompilerTest {
         CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
         assertNotNull(t);
         TextFileLoader c = new TextFileLoader();
-        String javaSource = c.readFile(getClass().getResourceAsStream("/MyCounter.java"));
+        String javaSource = c.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         Class<?> clazz = t.compile("MyCounter", javaSource);
         assertNotNull(clazz);
         assertEquals("MyCounter", clazz.getName());
@@ -49,7 +49,7 @@ public class CompilerTest {
         assertNotNull(t);
 
         TextFileLoader c = new TextFileLoader();
-        String javaSource = c.readFile(getClass().getResourceAsStream("/MyBuilder.java"));
+        String javaSource = c.readFile(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         Class<?> clazz = t.compile("MyBuilder", javaSource);
 
         assertNotNull(clazz);
@@ -110,9 +110,9 @@ public class CompilerTest {
         TextFileLoader loader = new TextFileLoader();
         Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>();
 
-        String utilSource = loader.readFile(getClass().getResourceAsStream("/util/Util.java"));
+        String utilSource = loader.readFile(getClass().getResourceAsStream("/testClasses/util/Util.java"));
 
-        String helloSource = loader.readFile(getClass().getResourceAsStream("/HelloWorld.java"));
+        String helloSource = loader.readFile(getClass().getResourceAsStream("/testClasses/HelloWorld.java"));
         // Use not qualified class names
         classesToCompile.put("Util", utilSource);
         classesToCompile.put("HelloWorld", helloSource);

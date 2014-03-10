@@ -44,24 +44,24 @@ public class ValidatorEngineTest {
         String sourceCode = null;
         ContentValidatorResult result = null;
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/DeleteFile.java"));
+        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/DeleteFile.java"));
         result = validatorEngine.validate(sourceCode);
         assertFalse(result.isValid());
         assertEquals("Code can not use java.io", result.getReason());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/EndlessMyCounter.java"));
+        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/EndlessMyCounter.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/MyBuilder.java"));
+        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
+        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/NetworkingClass.java"));
+        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/NetworkingClass.java"));
         result = validatorEngine.validate(sourceCode);
         assertFalse(result.isValid());
         assertEquals("Code can not use java.net", result.getReason());

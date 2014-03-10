@@ -51,7 +51,7 @@ public class BasicRoleTest {
     @Test
     public void createBigRole() {
         try {
-            File f = new File("src/test/resources/permissions.txt");
+            File f = new File("src/test/resources/security/permissions.txt");
             List<String> lines = readAllLines(f);
 
             Role adminRole = new Role("Admin");
