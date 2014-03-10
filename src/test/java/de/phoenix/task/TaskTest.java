@@ -52,6 +52,7 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskTest;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
@@ -295,11 +296,10 @@ public class TaskTest {
 
             // No interest in description
             String description = "";
-            
-            List<PhoenixText> tests = new ArrayList<PhoenixText>();
-            tests.add(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
 
-            PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", tests);
+            PhoenixTaskTest pTest = new PhoenixTaskTest(new PhoenixText(new File("src/test/resources/task/ternarySearch/TernarySearchTest.java"), "TernarySearchTest.java"));
+
+            PhoenixTask task = new PhoenixAutomaticTask(attachments, pattern, description, AUTOMATIC_TEST_TITLE, "java", Arrays.asList(pTest));
             DisallowedContent disallowedContent = new DisallowedContent().disallow("java.io").disallow("java.nio");
             task.setDisallowedContent(disallowedContent);
             ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, task);
@@ -339,7 +339,7 @@ public class TaskTest {
             fail();
         }
     }
-    
+
     @Test
     @Order(10)
     public void submitSolutionWithInvalidContent() {

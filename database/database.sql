@@ -291,28 +291,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `phoenix`.`taskTests`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `phoenix`.`taskTests` (
-  `task_id` INT NOT NULL,
-  `text_id` INT NOT NULL,
-  PRIMARY KEY (`task_id`, `text_id`),
-  INDEX `fk_task_has_text_text1_idx` (`text_id` ASC),
-  INDEX `fk_task_has_text_task1_idx` (`task_id` ASC),
-  CONSTRAINT `fk_task_has_text_task1`
-    FOREIGN KEY (`task_id`)
-    REFERENCES `phoenix`.`task` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_task_has_text_text1`
-    FOREIGN KEY (`text_id`)
-    REFERENCES `phoenix`.`text` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `phoenix`.`lectureGroupTaskSheet`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `phoenix`.`lectureGroupTaskSheet` (
@@ -360,6 +338,30 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskSubmissionDates` (
     REFERENCES `phoenix`.`task` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `phoenix`.`taskTest`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `phoenix`.`taskTest` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `timeout` INT NULL,
+  `task` INT NOT NULL,
+  `text` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_test_task1_idx` (`task` ASC),
+  INDEX `fk_test_text1_idx` (`text` ASC),
+  CONSTRAINT `fk_test_task1`
+    FOREIGN KEY (`task`)
+    REFERENCES `phoenix`.`task` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_test_text1`
+    FOREIGN KEY (`text`)
+    REFERENCES `phoenix`.`text` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 

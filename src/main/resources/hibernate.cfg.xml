@@ -31,6 +31,7 @@
 		<mapping class="de.phoenix.database.entity.TaskSheet" />
 		<mapping class="de.phoenix.database.entity.TaskSubmission" />
 		<mapping class="de.phoenix.database.entity.TaskSubmissionDates" />
+		<mapping class="de.phoenix.database.entity.TaskTest" />
 		<mapping class="de.phoenix.database.entity.Text" />
 
 	</session-factory>

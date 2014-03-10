@@ -244,7 +244,8 @@ public class LectureTest {
         SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>();
         // Add Lecture Key - the title
         lectureSelector.addKey("title", TEST_LECTURE_TITLE);
-        // Add lecture selector to group selector (only groups from this lecture are selected)
+        // Add lecture selector to group selector (only groups from this lecture
+        // are selected)
         groupSelector.addKey("lecture", lectureSelector);
 
         // Send delete response

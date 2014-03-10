@@ -31,6 +31,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -86,9 +87,8 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     @ManyToMany(mappedBy = "textList")
     private List<Task> taskList;
 
-    // The possible test files for a task
-    @ManyToMany(mappedBy = "testList")
-    private List<Task> taskList1;
+    @OneToMany(mappedBy = "text")
+    private List<TaskTest> taskTestList;
 
     public Text() {
     }
@@ -184,12 +184,12 @@ public class Text implements Serializable, Convertable<PhoenixText> {
     }
 
     @XmlTransient
-    public List<Task> getTaskTests() {
-        return taskList1;
+    public List<TaskTest> getTaskTestList() {
+        return taskTestList;
     }
 
-    public void setTaskTests(List<Task> taskTests) {
-        this.taskList1 = taskTests;
+    public void setTaskTestList(List<TaskTest> taskTestList) {
+        this.taskTestList = taskTestList;
     }
 
     @Override

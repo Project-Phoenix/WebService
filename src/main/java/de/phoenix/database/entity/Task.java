@@ -51,6 +51,7 @@ import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskTest;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.DisallowedContent;
 
@@ -108,20 +109,14 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     @Cascade(CascadeType.SAVE_UPDATE)
     private List<Text> textList;
 
-    //@formatter:off
-    @JoinTable(name = "taskTests", joinColumns = {
-            @JoinColumn(name = "task_id", referencedColumnName = "id")}, inverseJoinColumns = {
-            @JoinColumn(name = "text_id", referencedColumnName = "id")})
-    //@formatter:on
-    @ManyToMany
-    @Cascade(CascadeType.SAVE_UPDATE)
-    private List<Text> testList;
-
     @OneToMany(mappedBy = "task")
     private List<TaskSubmission> taskSubmissionList;
 
     @OneToMany(mappedBy = "task")
     private List<TaskSubmissionDates> taskSubmissionDatesList;
+
+    @OneToMany(mappedBy = "task")
+    private List<TaskTest> taskTestList;
 
     @Lob
     @Column(name = "disallowedContent")
@@ -160,10 +155,10 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
             this.backend = autoTask.getBackend();
             this.isAutomaticTest = true;
 
-            List<PhoenixText> tests = autoTask.getTests();
-            this.testList = new ArrayList<Text>(tests.size());
-            for (PhoenixText test : autoTask.getTests()) {
-                this.testList.add(new Text(test));
+            List<PhoenixTaskTest> tests = autoTask.getTests();
+            this.taskTestList = new ArrayList<TaskTest>(tests.size());
+            for (PhoenixTaskTest test : autoTask.getTests()) {
+                this.taskTestList.add(new TaskTest(test));
             }
         }
     }
@@ -236,21 +231,21 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     }
 
     @XmlTransient
+    public List<TaskTest> getTaskTests() {
+        return taskTestList;
+    }
+
+    public void setTaskTests(List<TaskTest> taskTests) {
+        this.taskTestList = taskTests;
+    }
+
+    @XmlTransient
     public List<TaskSubmission> getTaskSubmissions() {
         return taskSubmissionList;
     }
 
     public void setTaskSubmissions(List<TaskSubmission> taskSubmissions) {
         this.taskSubmissionList = taskSubmissions;
-    }
-
-    @XmlTransient
-    public List<Text> getTests() {
-        return testList;
-    }
-
-    public void setTests(List<Text> tests) {
-        this.testList = tests;
     }
 
     @XmlTransient

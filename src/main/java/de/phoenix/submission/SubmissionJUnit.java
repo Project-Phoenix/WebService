@@ -28,6 +28,7 @@ import org.junit.runner.Result;
 
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
+import de.phoenix.database.entity.TaskTest;
 import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.submission.compiler.CharSequenceCompiler;
@@ -48,7 +49,7 @@ public class SubmissionJUnit implements SubmissionHandler {
 
         Task task = submission.getTask();
 
-        List<Text> tests = task.getTests();
+        List<TaskTest> tests = task.getTaskTests();
         if (tests.isEmpty()) {
             return new SubmissionResult(SubmissionStatus.OK, "No tests - everything ok");
         }
@@ -59,9 +60,10 @@ public class SubmissionJUnit implements SubmissionHandler {
             throw new SubmissionException("Currently only one submitted class is supported!");
         }
 
-        Text test = tests.get(0);
+        TaskTest test = tests.get(0);
         try {
-            JUnitTest unitTest = prepareJunit(test, submission.getTexts().get(0), DEFAULT_TIMEOUT);
+            int timeout = test.getTimeout() == 0 ? DEFAULT_TIMEOUT : test.getTimeout();
+            JUnitTest unitTest = prepareJunit(test.getText(), submission.getTexts().get(0), timeout);
 
             Class<Object> testClass = unitTest.compile(compiler);
             Result testResult = JUnitCore.runClasses(testClass);
