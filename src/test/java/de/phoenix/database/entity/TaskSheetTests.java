@@ -16,7 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix.tasksheet;
+package de.phoenix.database.entity;
 
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +51,7 @@ import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
 @RunWith(OrderedRunner.class)
-public class TaskSheetTest {
+public class TaskSheetTests {
 
     private static final String TASK_SHEET_TITLE = "Testblatt";
 

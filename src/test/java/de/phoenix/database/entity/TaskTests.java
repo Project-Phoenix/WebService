@@ -16,7 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix.task;
+package de.phoenix.database.entity;
 
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static org.junit.Assert.assertEquals;
@@ -60,7 +60,7 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.submission.DisallowedContent;
 
 @RunWith(OrderedRunner.class)
-public class TaskTest {
+public class TaskTests {
 
     private final static String TEST_TITLE = "Befreundete Zahlen";
     private final static File TEST_DESCRIPTION_FILE = new File("src/test/resources/task/specialNumbers/TaskDescription.html");

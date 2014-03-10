@@ -29,12 +29,12 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
-import de.phoenix.lecture.LectureTest;
-import de.phoenix.task.TaskTest;
-import de.phoenix.tasksheet.TaskSheetTest;
+import de.phoenix.database.entity.LectureTests;
+import de.phoenix.database.entity.TaskSheetTests;
+import de.phoenix.database.entity.TaskTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({LectureTest.class, TaskTest.class, TaskSheetTest.class})
+@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class})
 public class EntityTest {
 
     public final static String BASE_URL = "http://localhost:7766/rest";

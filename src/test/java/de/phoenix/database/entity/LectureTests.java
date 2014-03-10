@@ -16,7 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix.lecture;
+package de.phoenix.database.entity;
 
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static org.junit.Assert.assertEquals;
@@ -56,7 +56,7 @@ import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
 @RunWith(OrderedRunner.class)
-public class LectureTest {
+public class LectureTests {
 
     private final String TEST_LECTURE_TITLE = "Einführung in die Informatik";
 
