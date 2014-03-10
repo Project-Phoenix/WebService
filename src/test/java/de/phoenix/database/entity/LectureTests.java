@@ -87,7 +87,7 @@ public class LectureTests {
 
         PhoenixLecture lec = lectures.get(0);
         assertEquals(TEST_LECTURE_TITLE, lec.getTitle());
-        assertEquals(lec.getLectureDetails().get(0).getInverval(), lec.getLectureDetails().get(0).getInverval());
+        assertEquals(lec.getLectureDetails().get(0).getInterval(), lec.getLectureDetails().get(0).getInterval());
 
     }
 

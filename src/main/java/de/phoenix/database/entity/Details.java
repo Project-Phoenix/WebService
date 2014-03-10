@@ -110,8 +110,8 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     public Details(PhoenixDetails details) {
         this.room = details.getRoom();
-        this.setInterval(details.getInverval());
-        this.weekday = details.getWeekDay();
+        this.setInterval(details.getInterval());
+        this.weekday = details.getWeekday();
 
         this.startTime = details.getStartTime();
         this.endTime = details.getEndTime();
@@ -236,11 +236,11 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
     @Override
     public void copyValues(PhoenixDetails phoenixEntity) {
         this.setRoom(phoenixEntity.getRoom());
-        this.setWeekday(phoenixEntity.getWeekDay());
+        this.setWeekday(phoenixEntity.getWeekday());
         this.setStartTime(phoenixEntity.getStartTime());
         this.setEndTime(phoenixEntity.getEndTime());
-        this.setInterval(phoenixEntity.getInverval());
+        this.setInterval(phoenixEntity.getInterval());
         this.setStartDate(phoenixEntity.getStartDate());
-        this.setEndDate(phoenixEntity.getStartDate());
+        this.setEndDate(phoenixEntity.getEndDate());
     }
 }
