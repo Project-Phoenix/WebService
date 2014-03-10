@@ -4,27 +4,36 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.nio.charset.CharacterCodingException;
 import java.util.regex.Pattern;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
-import de.phoenix.TextFileLoader;
 import de.phoenix.submission.compiler.CharSequenceCompiler;
 import de.phoenix.submission.compiler.CharSequenceCompilerException;
 import de.phoenix.submission.test.JUnitTest;
+import de.phoenix.util.TextFileReader;
 
 public class TestingTests {
 
-    private Class<Object> compileJavaFile(CharSequenceCompiler<Object> compiler, String className, InputStream resource) throws ClassCastException, CharSequenceCompilerException {
-        TextFileLoader loader = new TextFileLoader();
-        String source = loader.readFile(resource);
+    private static TextFileReader reader;
+
+    @BeforeClass
+    public static void beforeClass() {
+        reader = new TextFileReader();
+    }
+
+    private Class<Object> compileJavaFile(CharSequenceCompiler<Object> compiler, String className, InputStream resource) throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
+
+        String source = reader.read(resource);
         return compiler.compile(className, source);
     }
 
     @Test
-    public void runStaticTest() throws ClassCastException, CharSequenceCompilerException {
+    public void runStaticTest() throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
         Class<Object> builderClass = compileJavaFile(com, "MyBuilder", getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         assertNotNull(builderClass);
@@ -35,14 +44,12 @@ public class TestingTests {
     }
 
     @Test
-    public void runCorrectDynamicTest() throws ClassCastException, CharSequenceCompilerException {
+    public void runCorrectDynamicTest() throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
         Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         assertNotNull(counterClass);
 
-        TextFileLoader loader = new TextFileLoader();
-        assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
+        String content = reader.read(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         JUnitTest unitTest = JUnitTest.create("TestCounter", content).setClassTag("MyCounter").build();
@@ -54,14 +61,12 @@ public class TestingTests {
     }
 
     @Test(expected = CharSequenceCompilerException.class)
-    public void runWrongDynamicTest() throws ClassCastException, CharSequenceCompilerException {
+    public void runWrongDynamicTest() throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
         Class<Object> counterClass = compileJavaFile(com, "MyCounter", getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         assertNotNull(counterClass);
 
-        TextFileLoader loader = new TextFileLoader();
-        assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
+        String content = reader.read(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         // Create test suite with unit class name
@@ -71,14 +76,12 @@ public class TestingTests {
     }
 
     @Test(timeout = 2000)
-    public void runEndlessLoop() throws ClassCastException, CharSequenceCompilerException {
+    public void runEndlessLoop() throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
         Class<Object> counterClass = compileJavaFile(com, "EndlessMyCounter", getClass().getResourceAsStream("/testClasses/EndlessMyCounter.java"));
         assertNotNull(counterClass);
 
-        TextFileLoader loader = new TextFileLoader();
-        assertNotNull(loader);
-        String content = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
+        String content = reader.read(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
         assertNotNull(content);
 
         int timeout = 500;
@@ -92,11 +95,10 @@ public class TestingTests {
     }
 
     @Test
-    public void sameClassnamesDifferentImplementation() throws ClassCastException, CharSequenceCompilerException {
+    public void sameClassnamesDifferentImplementation() throws ClassCastException, CharSequenceCompilerException, CharacterCodingException {
 
-        TextFileLoader loader = new TextFileLoader();
-        String unitTestSource = loader.readFile(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
-        String correctSource = loader.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
+        String unitTestSource = reader.read(getClass().getResourceAsStream("/testClasses/TestCounterPattern.java"));
+        String correctSource = reader.read(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         JUnitTest unitTest = JUnitTest.create("TestCounter", unitTestSource).setClassTag("MyCounter").build();
 
         // Correct class compiling and testing

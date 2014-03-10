@@ -4,13 +4,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.charset.CharacterCodingException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.phoenix.TextFileLoader;
 import de.phoenix.submission.validate.CharSequenceValidator;
 import de.phoenix.submission.validate.ContentValidator;
 import de.phoenix.submission.validate.ContentValidator.ContentValidatorResult;
+import de.phoenix.util.TextFileReader;
 
 public class NetworkingContentCheckTest {
 
@@ -19,10 +21,10 @@ public class NetworkingContentCheckTest {
     private static ContentValidator validator;
 
     @BeforeClass
-    public static void beforeClass() {
-        TextFileLoader loader = new TextFileLoader();
-        maliciousSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/NetworkingClass.java"));
-        valideSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/MyBuilder.java"));
+    public static void beforeClass() throws CharacterCodingException {
+        TextFileReader reader = new TextFileReader();
+        maliciousSourceCode = reader.read(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/NetworkingClass.java"));
+        valideSourceCode = reader.read(NetworkingContentCheckTest.class.getResourceAsStream("/testClasses/MyBuilder.java"));
         validator = new CharSequenceValidator("java.net", "javax.net");
     }
 

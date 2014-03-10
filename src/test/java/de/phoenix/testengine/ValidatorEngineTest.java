@@ -4,20 +4,25 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.charset.CharacterCodingException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.phoenix.TextFileLoader;
 import de.phoenix.submission.validate.CharSequenceValidator;
 import de.phoenix.submission.validate.ContentValidateEngine;
 import de.phoenix.submission.validate.ContentValidator.ContentValidatorResult;
+import de.phoenix.util.TextFileReader;
 
 public class ValidatorEngineTest {
 
     private static ContentValidateEngine validatorEngine;
-
+    private static TextFileReader reader;
+    
     @BeforeClass
     public static void beforeClass() {
+        reader = new TextFileReader();
+        
         validatorEngine = new ContentValidateEngine();
         validatorEngine.registerContentChecker(new CharSequenceValidator("java.io", "java.nio"));
         validatorEngine.registerContentChecker(new CharSequenceValidator("java.net", "javax.net"));
@@ -39,29 +44,28 @@ public class ValidatorEngineTest {
     }
 
     @Test
-    public void validateSourceCode() {
-        TextFileLoader tLoader = new TextFileLoader();
+    public void validateSourceCode() throws CharacterCodingException {
         String sourceCode = null;
         ContentValidatorResult result = null;
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/DeleteFile.java"));
+        sourceCode = reader.read(getClass().getResourceAsStream("/testClasses/DeleteFile.java"));
         result = validatorEngine.validate(sourceCode);
         assertFalse(result.isValid());
         assertEquals("Code can not use java.io", result.getReason());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/EndlessMyCounter.java"));
+        sourceCode = reader.read(getClass().getResourceAsStream("/testClasses/EndlessMyCounter.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
+        sourceCode = reader.read(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
+        sourceCode = reader.read(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         result = validatorEngine.validate(sourceCode);
         assertTrue(result.isValid());
 
-        sourceCode = tLoader.readFile(getClass().getResourceAsStream("/testClasses/NetworkingClass.java"));
+        sourceCode = reader.read(getClass().getResourceAsStream("/testClasses/NetworkingClass.java"));
         result = validatorEngine.validate(sourceCode);
         assertFalse(result.isValid());
         assertEquals("Code can not use java.net", result.getReason());

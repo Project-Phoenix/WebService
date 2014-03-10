@@ -7,23 +7,31 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.CharacterCodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.phoenix.TextFileLoader;
 import de.phoenix.submission.compiler.CharSequenceCompiler;
 import de.phoenix.submission.compiler.CharSequenceCompilerException;
+import de.phoenix.util.TextFileReader;
 
 public class CompilerTest {
+    
+    private static TextFileReader reader;
+    
+    @BeforeClass
+    public static void beforeClass() {
+        reader = new TextFileReader();
+    }
 
     @Test
-    public void counterClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void counterClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, CharacterCodingException {
         CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
         assertNotNull(t);
-        TextFileLoader c = new TextFileLoader();
-        String javaSource = c.readFile(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
+        String javaSource = reader.read(getClass().getResourceAsStream("/testClasses/MyCounter.java"));
         Class<?> clazz = t.compile("MyCounter", javaSource);
         assertNotNull(clazz);
         assertEquals("MyCounter", clazz.getName());
@@ -43,13 +51,12 @@ public class CompilerTest {
     }
 
     @Test
-    public void builderClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void builderClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, CharacterCodingException {
 
         CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
         assertNotNull(t);
 
-        TextFileLoader c = new TextFileLoader();
-        String javaSource = c.readFile(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
+        String javaSource = reader.read(getClass().getResourceAsStream("/testClasses/MyBuilder.java"));
         Class<?> clazz = t.compile("MyBuilder", javaSource);
 
         assertNotNull(clazz);
@@ -105,14 +112,14 @@ public class CompilerTest {
     }
 
     @Test
-    public void packageCompilingTest() throws CharSequenceCompilerException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+    public void packageCompilingTest() throws CharSequenceCompilerException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException, CharacterCodingException {
         CharSequenceCompiler<Object> compiler = new CharSequenceCompiler<Object>();
-        TextFileLoader loader = new TextFileLoader();
+
         Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>();
 
-        String utilSource = loader.readFile(getClass().getResourceAsStream("/testClasses/util/Util.java"));
+        String utilSource = reader.read(getClass().getResourceAsStream("/testClasses/util/Util.java"));
 
-        String helloSource = loader.readFile(getClass().getResourceAsStream("/testClasses/HelloWorld.java"));
+        String helloSource = reader.read(getClass().getResourceAsStream("/testClasses/HelloWorld.java"));
         // Use not qualified class names
         classesToCompile.put("Util", utilSource);
         classesToCompile.put("HelloWorld", helloSource);
