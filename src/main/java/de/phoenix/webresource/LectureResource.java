@@ -86,7 +86,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
 
             List<PhoenixLecture> result = ConverterUtil.convert(lectures);
 
-            return Response.ok(PhoenixLecture.toSendableList(result)).build();
+            return Response.ok(result).build();
 
         } finally {
             if (session != null)

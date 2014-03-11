@@ -75,8 +75,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
             List<PhoenixTask> result = ConverterUtil.convert(tasks);
 
-            // Encapsulate the list to transform it via JXR-RS
-            return Response.ok(PhoenixTask.toSendableList(result)).build();
+            return Response.ok(result).build();
 
         } finally {
             if (session != null)
