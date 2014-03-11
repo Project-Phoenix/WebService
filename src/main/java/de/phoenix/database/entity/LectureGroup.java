@@ -46,6 +46,7 @@ import org.joda.time.LocalTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.date.Weekday;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 
@@ -112,7 +113,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
         this.maxMember = phoenixLectureGroup.getMaxMember();
         this.name = phoenixLectureGroup.getName();
         this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime();
-        this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday();
+        this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday().getDateTimeConstant();
         this.lecture = lecture;
 
         this.detailsList = new ArrayList<Details>();
@@ -216,7 +217,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     @Override
     public PhoenixLectureGroup convert() {
-        return new PhoenixLectureGroup(getName(), getMaxMember(), getSubmissionDeadlineWeekday(), new LocalTime(getSubmissionDeadlineTime()), ConverterUtil.convert(getDetails()), getLecture().convert());
+        return new PhoenixLectureGroup(getName(), getMaxMember(), Weekday.forID(getSubmissionDeadlineWeekday()), new LocalTime(getSubmissionDeadlineTime()), ConverterUtil.convert(getDetails()), getLecture().convert());
     }
 
     @Override

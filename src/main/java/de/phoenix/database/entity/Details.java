@@ -40,6 +40,7 @@ import org.joda.time.LocalTime;
 import org.joda.time.Period;
 
 import de.phoenix.database.entity.util.Convertable;
+import de.phoenix.date.Weekday;
 import de.phoenix.rs.entity.PhoenixDetails;
 
 @Entity
@@ -111,7 +112,7 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
     public Details(PhoenixDetails details) {
         this.room = details.getRoom();
         this.setInterval(details.getInterval());
-        this.weekday = details.getWeekday();
+        this.weekday = details.getWeekday().getDateTimeConstant();
 
         this.startTime = details.getStartTime();
         this.endTime = details.getEndTime();
@@ -230,13 +231,13 @@ public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     @Override
     public PhoenixDetails convert() {
-        return new PhoenixDetails(getRoom(), getWeekday(), new LocalTime(getStartTime()), new LocalTime(getEndTime()), getInterval(), new LocalDate(getStartDate()), new LocalDate(getEndDate()));
+        return new PhoenixDetails(getRoom(), Weekday.forID(getWeekday()), new LocalTime(getStartTime()), new LocalTime(getEndTime()), getInterval(), new LocalDate(getStartDate()), new LocalDate(getEndDate()));
     }
 
     @Override
     public void copyValues(PhoenixDetails phoenixEntity) {
         this.setRoom(phoenixEntity.getRoom());
-        this.setWeekday(phoenixEntity.getWeekday());
+        this.setWeekday(phoenixEntity.getWeekday().getDateTimeConstant());
         this.setStartTime(phoenixEntity.getStartTime());
         this.setEndTime(phoenixEntity.getEndTime());
         this.setInterval(phoenixEntity.getInterval());

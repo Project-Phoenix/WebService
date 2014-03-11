@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
+import de.phoenix.date.Weekday;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
@@ -58,7 +59,7 @@ public class DetailTests {
         nowDate = new LocalDate(1992, 3, 24);
 
         // Create sample detail
-        PhoenixDetails pDetail1 = new PhoenixDetails("room1", 1, nowTime, nowTime.plusHours(1), Period.days(1), nowDate, nowDate.plusDays(1));
+        PhoenixDetails pDetail1 = new PhoenixDetails("room1", Weekday.MONDAY, nowTime, nowTime.plusHours(1), Period.days(1), nowDate, nowDate.plusDays(1));
 
         // Create a lecture
         String title = "TestLecture";
@@ -75,7 +76,7 @@ public class DetailTests {
     @Test
     public void updateDetail() {
         // The lecture is now 2 hours long
-        PhoenixDetails updatedDetail = new PhoenixDetails("room1", 1, nowTime, nowTime.plusHours(2), Period.days(1), nowDate, nowDate.plusWeeks(2));
+        PhoenixDetails updatedDetail = new PhoenixDetails("room1", Weekday.MONDAY, nowTime, nowTime.plusHours(2), Period.days(1), nowDate, nowDate.plusWeeks(2));
         PhoenixDetails oldDetail = pLecture.getLectureDetails().get(0);
 
         // Update the detail

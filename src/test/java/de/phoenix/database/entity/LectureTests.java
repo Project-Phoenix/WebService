@@ -31,7 +31,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
@@ -42,6 +41,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 
+import de.phoenix.date.Weekday;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
@@ -67,7 +67,7 @@ public class LectureTests {
         LocalTime endTime = new LocalTime(12, 45);
         LocalDate startDate = new LocalDate(2013, 10, 01);
         LocalDate endDate = new LocalDate(2014, 03, 31);
-        PhoenixDetails detail = new PhoenixDetails("G29-336", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-336", Weekday.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
 
         PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Arrays.asList(detail));
 
@@ -115,7 +115,7 @@ public class LectureTests {
         LocalDate startDate = new LocalDate(2013, 10, 21);
         LocalDate endDate = new LocalDate(2014, 01, 27);
 
-        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", Weekday.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
 
         // Create a test group with
         // name = Gruppe 2
@@ -124,13 +124,13 @@ public class LectureTests {
         // default submission time on Monday is 10 o'clock
         // In the room G29-k058 and other details described above
         // and the assigned lecture
-        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Create second group
-        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, DateTimeConstants.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
         assertEquals(Status.OK, response.getClientResponseStatus());
@@ -154,7 +154,7 @@ public class LectureTests {
         LocalDate startDate = new LocalDate(2013, 10, 21);
         LocalDate endDate = new LocalDate(2014, 01, 27);
 
-        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", Weekday.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
         response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
@@ -171,7 +171,7 @@ public class LectureTests {
         LocalDate startDate = new LocalDate(2013, 10, 21);
         LocalDate endDate = new LocalDate(2014, 01, 27);
 
-        PhoenixDetails detail = new PhoenixDetails("G29-K058", DateTimeConstants.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
+        PhoenixDetails detail = new PhoenixDetails("G29-K058", Weekday.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
         // Add something to a non existing lecture
         AddToEntity<PhoenixLecture, PhoenixDetails> addDetailToLecture = new AddToEntity<PhoenixLecture, PhoenixDetails>(detail).addKey("title", "troll");
