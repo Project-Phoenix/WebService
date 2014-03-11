@@ -209,8 +209,8 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
             SubmissionResult result = new SubmissionResult(SubmissionStatus.SUBMITTED, "");
             if (task.isAutomaticTest()) {
                 result = CONTROLLER.controllSolution(taskSubmission);
-                taskSubmission.setSubmissionResult(result);
             }
+            taskSubmission.setSubmissionResult(result);
 
             session.save(taskSubmission);
 

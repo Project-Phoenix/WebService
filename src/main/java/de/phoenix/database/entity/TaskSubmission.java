@@ -49,6 +49,7 @@ import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.SubmissionResult;
@@ -242,13 +243,14 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
 
     @Override
     public PhoenixSubmission convert() {
-        return new PhoenixSubmission(getDate(), getTask().convert(), getStatus(), getStatusText(), ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()));
+        PhoenixSubmissionResult res = new PhoenixSubmissionResult(SubmissionStatus.values()[getStatus()], statusText);
+        return new PhoenixSubmission(getDate(), getTask().convert(), res, ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()));
     }
 
     @Override
     public void copyValues(PhoenixSubmission phoenixEntity) {
-        this.setStatus(phoenixEntity.getStatus());
-        this.setStatusText(phoenixEntity.getStatusText());
+        this.setStatus(phoenixEntity.getResult().getStatus().ordinal());
+        this.setStatusText(phoenixEntity.getResult().getStatusText());
     }
 
 }
