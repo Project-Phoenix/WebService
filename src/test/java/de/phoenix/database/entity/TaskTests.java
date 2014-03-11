@@ -140,7 +140,7 @@ public class TaskTests {
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(TEST_SUBMISSION_FILE));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
 
-        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, Arrays.asList(sub)));
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         PhoenixSubmissionResult result = response.getEntity(PhoenixSubmissionResult.class);
@@ -255,7 +255,7 @@ public class TaskTests {
 
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyTernarySearch.java")));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
-        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, Arrays.asList(sub)));
         assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
         PhoenixSubmissionResult res = response.getEntity(PhoenixSubmissionResult.class);
@@ -279,7 +279,7 @@ public class TaskTests {
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyMaliciousTernarySearch.java")));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
 
-        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, sub));
+        response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, Arrays.asList(sub)));
         assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
         PhoenixSubmissionResult res = response.getEntity(PhoenixSubmissionResult.class);

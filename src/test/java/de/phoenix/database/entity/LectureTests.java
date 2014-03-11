@@ -126,16 +126,15 @@ public class LectureTests {
         // and the assigned lecture
         PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
-        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Create second group
         group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
 
-        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, group));
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
-
     @Test
     @Order(4)
     public void addDetail() {
@@ -157,7 +156,7 @@ public class LectureTests {
         PhoenixDetails detail = new PhoenixDetails("G29-K058", Weekday.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
-        response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, detail));
+        response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(detail)));
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
 
@@ -174,7 +173,7 @@ public class LectureTests {
         PhoenixDetails detail = new PhoenixDetails("G29-K058", Weekday.WEDNESDAY, startTime, endTime, Period.weeks(2), startDate, endDate);
 
         // Add something to a non existing lecture
-        AddToEntity<PhoenixLecture, PhoenixDetails> addDetailToLecture = new AddToEntity<PhoenixLecture, PhoenixDetails>(detail).addKey("title", "troll");
+        AddToEntity<PhoenixLecture, PhoenixDetails> addDetailToLecture = new AddToEntity<PhoenixLecture, PhoenixDetails>(Arrays.asList(detail)).addKey("title", "troll");
 
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
         ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
