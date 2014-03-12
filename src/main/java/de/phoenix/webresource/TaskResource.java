@@ -18,7 +18,6 @@
 
 package de.phoenix.webresource;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -39,7 +38,6 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
-import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
@@ -59,52 +57,6 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
     public TaskResource() {
         super(TaskCriteriaFactory.getInstance());
-    }
-
-    // TOOO: Remove it , because the Select and Update mechanism is better
-    @SuppressWarnings("unchecked")
-    @Path(PhoenixTask.WEB_RESOURCE_GETALL)
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Deprecated
-    public Response getAll() throws SQLException {
-
-        Session session = DatabaseManager.getSession();
-        try {
-            List<Task> tasks = session.getNamedQuery("Task.findAll").list();
-
-            List<PhoenixTask> result = ConverterUtil.convert(tasks);
-
-            return Response.ok(result).build();
-
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
-
-    @Path(PhoenixTask.WEB_RESOURCE_GETBYTITLE)
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Deprecated
-    public Response getByTitle(String title) {
-
-        Session session = DatabaseManager.getSession();
-
-        try {
-            Task task = (Task) session.getNamedQuery("Task.findByTitle").setString("title", title).uniqueResult();
-            if (task == null)
-                return Response.status(Status.NO_CONTENT).build();
-            // Always convert before closing the session
-            PhoenixTask result = task.convert();
-
-            return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
-
-        } finally {
-            if (session != null)
-                session.close();
-        }
     }
 
     @Path(PhoenixTask.WEB_RESOURCE_CREATE)

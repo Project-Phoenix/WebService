@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -41,7 +40,6 @@ import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
-import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.ConnectionEntity;
@@ -53,45 +51,6 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
 
     public TaskSheetResource() {
         super(TaskSheetCriteriaFactory.getInstance());
-    }
-
-    @Path(PhoenixTaskSheet.WEB_RESOURCE_CREATE)
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createTaskSheet(PhoenixTaskSheet phoenixSheet) {
-
-        return onCreate(phoenixSheet, TaskSheetCreator.INSTANCE);
-    }
-
-    private static class TaskSheetCreator implements EntityCreator<TaskSheet, PhoenixTaskSheet> {
-
-        private final static TaskSheetCreator INSTANCE = new TaskSheetCreator();
-
-        @Override
-        public TaskSheet create(PhoenixTaskSheet phoenixEntity, Session session) {
-            return new TaskSheet(phoenixEntity);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Path(PhoenixTaskSheet.WEB_RESOURCE_GETALL)
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllSheets() {
-        Session session = DatabaseManager.getSession();
-
-        try {
-            List<TaskSheet> sheets = session.getNamedQuery("TaskSheet.findAll").list();
-
-            List<PhoenixTaskSheet> result = ConverterUtil.convert(sheets);
-            session.close();
-
-            return Response.ok(result).build();
-
-        } finally {
-            if (session != null)
-                session.close();
-        }
     }
 
     @Path(PhoenixTaskSheet.WEB_RESOURCE_GET)

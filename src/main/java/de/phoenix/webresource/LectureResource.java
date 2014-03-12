@@ -21,7 +21,6 @@ package de.phoenix.webresource;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -36,7 +35,6 @@ import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.criteria.LectureCriteriaFactory;
-import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
@@ -67,30 +65,6 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
         @Override
         public Lecture create(PhoenixLecture phoenixEntity, Session session) {
             return new Lecture(phoenixEntity);
-        }
-    }
-
-    // TODO: Remove next version
-    @SuppressWarnings("unchecked")
-    @Path(PhoenixLecture.WEB_RESOURCE_GETALL)
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Deprecated
-    public Response getAllLectures() {
-
-        Session session = DatabaseManager.getSession();
-
-        try {
-
-            List<Lecture> lectures = session.getNamedQuery("Lecture.findAll").list();
-
-            List<PhoenixLecture> result = ConverterUtil.convert(lectures);
-
-            return Response.ok(result).build();
-
-        } finally {
-            if (session != null)
-                session.close();
         }
     }
 

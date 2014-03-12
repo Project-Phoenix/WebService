@@ -25,9 +25,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Session;
-
-import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
@@ -39,31 +36,6 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
 
     public LectureGroupResource() {
         super(LectureGroupCriteriaFactory.getInstance());
-    }
-
-    @Path(PhoenixLectureGroup.WEB_RESOURCE_CREATE)
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createGroup(PhoenixLectureGroup phoenixLectureGroup) {
-
-        return onCreate(phoenixLectureGroup, LectureGroupCreator.INSTANCE);
-    }
-
-    private static class LectureGroupCreator implements EntityCreator<LectureGroup, PhoenixLectureGroup> {
-
-        private final static LectureGroupCreator INSTANCE = new LectureGroupCreator();
-
-        @Override
-        public LectureGroup create(PhoenixLectureGroup phoenixLectureGroup, Session session) {
-            // Search for lecture
-            Lecture lecture = (Lecture) session.getNamedQuery("Lecture.findByName").setParameter("name", phoenixLectureGroup.getLecture().getTitle()).uniqueResult();
-
-            if (lecture == null) {
-                return null;
-            }
-
-            return new LectureGroup(phoenixLectureGroup, lecture);
-        }
     }
 
     @Path(PhoenixLectureGroup.WEB_RESOURCE_GET)
