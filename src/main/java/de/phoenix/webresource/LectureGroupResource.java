@@ -29,6 +29,7 @@ import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path(PhoenixLectureGroup.WEB_RESOURCE_ROOT)
@@ -44,6 +45,14 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLectureGroup(SelectEntity<PhoenixLectureGroup> selectEntity) {
         return onGet(selectEntity);
+    }
+    
+    @Path(PhoenixLectureGroup.WEB_RESOURCE_UPDATE)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateLectureGroup(UpdateEntity<PhoenixLectureGroup> updatedEntity) {
+        return onUpdate(updatedEntity);
     }
 
     @Path(PhoenixLectureGroup.WEB_RESOURCE_DELETE)

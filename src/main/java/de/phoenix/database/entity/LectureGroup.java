@@ -223,5 +223,8 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     @Override
     public void copyValues(PhoenixLectureGroup phoenixEntity) {
         this.setName(phoenixEntity.getName());
+        this.setMaxMember(phoenixEntity.getMaxMember());
+        this.setSubmissionDeadlineTime(phoenixEntity.getSubmissionDeadlineTime());
+        this.setSubmissionDeadlineWeekday(phoenixEntity.getSubmissionDeadlineWeekday().getDateTimeConstant());
     }
 }

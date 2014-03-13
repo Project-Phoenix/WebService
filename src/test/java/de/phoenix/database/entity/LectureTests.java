@@ -124,13 +124,13 @@ public class LectureTests {
         // default submission time on Monday is 10 o'clock
         // In the room G29-k058 and other details described above
         // and the assigned lecture
-        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail));
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Create second group
-        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail), lec);
+        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail));
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());

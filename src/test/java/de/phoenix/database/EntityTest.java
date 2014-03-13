@@ -32,6 +32,7 @@ import de.phoenix.DatabaseCleaner;
 import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
 import de.phoenix.database.entity.DetailTests;
+import de.phoenix.database.entity.LectureGroupTests;
 import de.phoenix.database.entity.LectureTests;
 import de.phoenix.database.entity.TaskSheetTests;
 import de.phoenix.database.entity.TaskTests;
@@ -39,7 +40,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.util.TextFileReader;
 
 @RunWith(Suite.class)
-@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class})
+@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
 public class EntityTest {
 
     public final static String BASE_URL = "http://localhost:7766/rest";
