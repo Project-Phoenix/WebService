@@ -29,6 +29,9 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link TaskSubmission}
+ */
 public class TaskSubmissionCriteriaFactory extends CriteriaFactory<TaskSubmission, PhoenixSubmission> {
 
     private final static TaskSubmissionCriteriaFactory instance = new TaskSubmissionCriteriaFactory();

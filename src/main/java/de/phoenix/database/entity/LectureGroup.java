@@ -47,6 +47,10 @@ import de.phoenix.date.Weekday;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 
+/**
+ * Class defining database strucut for single groups assigned to a lecture.
+ * PhoenixEntity is {@link PhoenixLectureGroup}
+ */
 @Entity
 @Table(name = "lectureGroup")
 public class LectureGroup implements Serializable, Convertable<PhoenixLectureGroup> {

@@ -39,6 +39,11 @@ import org.joda.time.DateTime;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 
+/**
+ * Class defining a task sheet assigned to a group. All changes in this class
+ * does not change the original task sheet. The PhoenixEntity is
+ * {@link PhoenixLectureGroupTaskSheet}
+ */
 @Entity
 @Table(name = "lectureGroupTaskSheet")
 public class LectureGroupTaskSheet implements Serializable, Convertable<PhoenixLectureGroupTaskSheet> {

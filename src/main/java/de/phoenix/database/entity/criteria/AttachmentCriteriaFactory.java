@@ -27,6 +27,9 @@ import de.phoenix.database.entity.Attachment;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link Attachment}
+ */
 public class AttachmentCriteriaFactory extends CriteriaFactory<Attachment, PhoenixAttachment> {
 
     private final static AttachmentCriteriaFactory instance = new AttachmentCriteriaFactory();

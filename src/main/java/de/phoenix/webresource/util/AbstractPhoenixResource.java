@@ -35,14 +35,42 @@ import de.phoenix.rs.key.PhoenixEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 
+/**
+ * Abstract class to generalize the get and delete process of entities via
+ * {@link SelectEntity} and the update process with {@link UpdateEntity}
+ * 
+ * @param <T>
+ *            The database side of the entity
+ * @param <E>
+ *            The API implementation of the entity
+ */
 public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extends PhoenixEntity> {
 
     private CriteriaFactory<T, E> criteriaFactory;
 
+    /**
+     * Add a criteria factory for generalizing the get, update and delete
+     * operations
+     * 
+     * @param criteriaFactory
+     *            The factory creating criterias for the entity the resource
+     *            manages.
+     */
     public AbstractPhoenixResource(CriteriaFactory<T, E> criteriaFactory) {
         this.criteriaFactory = criteriaFactory;
     }
 
+    // TODO: Check if there are duplicate entry errors
+    /**
+     * Invoke the method, when a single entity has to be simply created
+     * 
+     * @param phoenixEntity
+     *            The API implementation of the entity
+     * @param creator
+     *            The creator, which transfers the phoenixEntity to a
+     *            persistable entity
+     * @return 200, when everything was ok
+     */
     protected Response onCreate(E phoenixEntity, EntityCreator<T, E> creator) {
         Session session = DatabaseManager.getSession();
         try {
@@ -60,12 +88,26 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     }
 
     /**
-     * Command pattern
+     * Simple interface to encapsulate the constructor
+     * 
+     * @param <T>
+     * @param <E>
      */
     protected interface EntityCreator<T extends Convertable<E>, E> {
         public T create(E phoenixEntity, Session session);
     }
 
+    /**
+     * Invoke the method, when a entity has to be updated
+     * 
+     * @param updatedEntity
+     *            The update entity containing old entity (to find, what to
+     *            update) and the new one to assign the values
+     * @return 304, when the update entity matches more than one entity to
+     *         update <br>
+     *         404, when the update entity does not match any entity to update <br>
+     *         Otherwise 200
+     */
     protected Response onUpdate(UpdateEntity<E> updatedEntity) {
         Session session = DatabaseManager.getSession();
         try {
@@ -91,6 +133,16 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
+    /**
+     * Invoke the method, when a entity has to be deleted
+     * 
+     * @param selectEntity
+     *            Describes, what entity will be deleted
+     * @return 304, when the select entity matches more than one entity to
+     *         update <br>
+     *         404, when the update entity does not match any entity to update <br>
+     *         Otherwise 200
+     */
     protected Response onDelete(SelectEntity<E> selectEntity) {
         Session session = DatabaseManager.getSession();
         try {
@@ -111,6 +163,15 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
     }
 
+    /**
+     * Searches for a certain entity in the database and retrieve a list
+     * containing all entities matches by the SelectEntity
+     * 
+     * @param selectEntity
+     *            Describe what entities to match
+     * @return 404, when no entity was found <br>
+     *         Otherwise a list containg all entities and status code 200
+     */
     protected Response onGet(SelectEntity<E> selectEntity) {
         Session session = DatabaseManager.getSession();
         try {

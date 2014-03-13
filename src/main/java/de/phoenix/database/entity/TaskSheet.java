@@ -43,6 +43,10 @@ import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 
+/**
+ * Class defining database structure for a collection of tasks. PhoenixEntity is
+ * {@link PhoenixTaskSheet}
+ */
 @Entity
 @Table(name = "taskSheet")
 public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {

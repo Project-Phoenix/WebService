@@ -25,6 +25,9 @@ import de.phoenix.database.entity.Lecture;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link Lecture}
+ */
 public class LectureCriteriaFactory extends CriteriaFactory<Lecture, PhoenixLecture> {
 
     private final static LectureCriteriaFactory instance = new LectureCriteriaFactory();

@@ -52,6 +52,10 @@ import de.phoenix.rs.entity.PhoenixTaskTest;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.DisallowedContent;
 
+/**
+ * Class defining database structure for a task to solve. PhoenixEntity is
+ * {@link PhoenixTask} and its inheritated class {@link PhoenixAutomaticTask}
+ */
 @Entity
 @Table(name = "task")
 public class Task implements Serializable, Convertable<PhoenixTask> {

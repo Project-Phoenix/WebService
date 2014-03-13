@@ -27,6 +27,12 @@ import de.phoenix.submission.validate.CharSequenceValidator;
 import de.phoenix.submission.validate.ContentValidateEngine;
 import de.phoenix.submission.validate.ContentValidator.ContentValidatorResult;
 
+/**
+ * Submission controlling module to check, if the source code contaings
+ * malicious or forbidden code fragements. <br>
+ * This shall prevent code, that want to destroy something (delete files) or
+ * open connections or something else, which can disturb the process
+ */
 public class SubmissionSourceValidator implements SubmissionHandler {
 
     @Override

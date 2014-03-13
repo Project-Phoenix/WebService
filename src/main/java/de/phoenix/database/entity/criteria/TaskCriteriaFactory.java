@@ -26,6 +26,9 @@ import de.phoenix.database.entity.Task;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link Task}
+ */
 public class TaskCriteriaFactory extends CriteriaFactory<Task, PhoenixTask> {
 
     private final static TaskCriteriaFactory instance = new TaskCriteriaFactory();

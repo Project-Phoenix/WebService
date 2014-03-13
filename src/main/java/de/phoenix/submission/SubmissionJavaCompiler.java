@@ -32,6 +32,10 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.submission.compiler.CharSequenceCompiler;
 import de.phoenix.submission.compiler.CharSequenceCompilerException;
 
+/**
+ * Submission controlling module to compile java source files. <br>
+ * This class uses a in memory compiler, the {@link CharSequenceCompiler}
+ */
 public class SubmissionJavaCompiler implements SubmissionHandler {
 
     public SubmissionJavaCompiler() {

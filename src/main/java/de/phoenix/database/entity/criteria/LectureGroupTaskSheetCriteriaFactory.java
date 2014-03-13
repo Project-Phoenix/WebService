@@ -31,6 +31,9 @@ import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct Criterias for {@link LectureGroupTaskSheetCriteriaFactory}
+ */
 public class LectureGroupTaskSheetCriteriaFactory extends CriteriaFactory<LectureGroupTaskSheet, PhoenixLectureGroupTaskSheet> {
 
     private final static LectureGroupTaskSheetCriteriaFactory instance = new LectureGroupTaskSheetCriteriaFactory();

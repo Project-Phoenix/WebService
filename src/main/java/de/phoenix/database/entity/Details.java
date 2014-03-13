@@ -40,6 +40,10 @@ import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.date.Weekday;
 import de.phoenix.rs.entity.PhoenixDetails;
 
+/**
+ * Class defining database structure for additional information about events.
+ * PhoenixEntity is {@link PhoenixDetails}
+ */
 @Entity
 @Table(name = "details")
 public class Details implements Serializable, Convertable<PhoenixDetails> {

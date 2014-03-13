@@ -9,20 +9,39 @@ import org.junit.runner.Result;
 import de.phoenix.submission.compiler.CharSequenceCompiler;
 import de.phoenix.submission.compiler.CharSequenceCompilerException;
 
+/**
+ * Class to encapsulate a JUnit test with a certain timeout and placeholder to
+ * replace at runtime
+ */
 public class JUnitTest {
 
     private String content;
     private final String className;
 
+    /**
+     * Construct the junit test with the classname of the junit test and the
+     * content
+     * 
+     * @param className
+     *            The name of the JUnit class
+     * @param content
+     *            The content of the JUnit class
+     */
     private JUnitTest(String className, String content) {
         this.content = content;
         this.className = className;
     }
 
+    /**
+     * @return The name of the JUnit class
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * @return The content of the Junit class
+     */
     public String getContent() {
         return content;
     }
@@ -32,19 +51,52 @@ public class JUnitTest {
         return content.toString();
     }
 
+    /**
+     * Wrapper function to compile the junit class
+     * 
+     * @param compiler
+     *            The compiler to use.
+     * @return A compiled class of this junit class, which is stored in memory,
+     *         but not loaded
+     * @throws ClassCastException
+     * @throws CharSequenceCompilerException
+     */
     public <T> Class<T> compile(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
         return compiler.compile(className, content);
     }
 
+    /**
+     * Wrapper function to compile and run the junit class. It invokes the
+     * {@link #compile(CharSequenceCompiler)} and run the
+     * {@link JUnitCore#runClasses(Class...)} methods
+     * 
+     * @param compiler
+     *            The compiler to use
+     * @return The result of the junit tests
+     * @throws ClassCastException
+     * @throws CharSequenceCompilerException
+     */
     public <T> Result runTest(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
         Class<T> compiledClass = compile(compiler);
         return JUnitCore.runClasses(compiledClass);
     }
 
+    /**
+     * Start the building process of a JUnit test
+     * 
+     * @param className
+     *            The classname of the junit test
+     * @param content
+     *            The content of the junit test
+     * @return A builder
+     */
     public static JUnitTestBuilder create(String className, String content) {
         return new JUnitTestBuilder(className, content);
     }
 
+    /**
+     * Nested class for builder pattern
+     */
     public static class JUnitTestBuilder {
 
         private JUnitTest product;
@@ -55,13 +107,28 @@ public class JUnitTest {
             this.product = new JUnitTest(className, content);
         }
 
+        /**
+         * Replace all ${CLASS} with the to test class name
+         * 
+         * @param className
+         *            The submitted class name
+         * @return This builder
+         */
         public JUnitTestBuilder setClassTag(String className) {
             this.product.content = CLASS_TAG_PATTERN.matcher(this.product.getContent()).replaceAll(className);
             return this;
         }
 
+        /**
+         * Set the time out for a test for all methods not further described by
+         * a @Test(timeout) Annotation
+         * 
+         * @param timeout
+         *            The timeout for the task in milliseconds
+         * @return This builder
+         */
         public JUnitTestBuilder setTimeOut(int timeout) {
-            organizeImports("org.junit.Rule", "org.junit.rules.Timeout");
+            addImport("org.junit.Rule", "org.junit.rules.Timeout");
 
             int index = this.product.content.indexOf('{') + 1;
             StringBuilder sBuilder = new StringBuilder(this.product.content);
@@ -69,11 +136,12 @@ public class JUnitTest {
             this.product.content = sBuilder.toString();
             return this;
         }
+
         public JUnitTest build() {
             return this.product;
         }
 
-        private void organizeImports(String... imports) {
+        private void addImport(String... imports) {
             for (int i = 0; i < imports.length; ++i) {
                 String string = imports[i];
 

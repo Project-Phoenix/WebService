@@ -18,6 +18,10 @@
 
 package de.phoenix.submission;
 
+/**
+ * Subclass of {@link SubmissionException} to indicate errors, which are made by
+ * the user (not reaching the test results or invalid java code)
+ */
 public class UserSubmissionException extends SubmissionException {
 
     private static final long serialVersionUID = -5030354193549941037L;

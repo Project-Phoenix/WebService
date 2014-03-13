@@ -40,6 +40,10 @@ import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.util.hash.SHA1Hasher;
 
+/**
+ * Class defining database structure for text encoded files. PhoenixEntity is
+ * {@link PhoenixText}
+ */
 @Entity
 @Table(name = "text")
 public class Text implements Serializable, Convertable<PhoenixText> {

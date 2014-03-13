@@ -21,6 +21,10 @@ package de.phoenix.database;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+
+/**
+ * Wrapper class to the database access via Hibernate
+ */
 public class DatabaseManager {
 
     /* Singletone Start */
@@ -51,10 +55,18 @@ public class DatabaseManager {
 
     private final SessionFactory sessionFactory;
 
+    /**
+     * Close the database manager closing all sessions form the session factory
+     */
     public void close() {
         this.sessionFactory.close();
     }
 
+    /**
+     * Open a new session
+     * 
+     * @return New session
+     */
     public Session openSession() {
         return sessionFactory.openSession();
     }

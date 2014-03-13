@@ -35,6 +35,9 @@ import de.phoenix.submission.compiler.CharSequenceCompiler;
 import de.phoenix.submission.compiler.CharSequenceCompilerException;
 import de.phoenix.submission.test.JUnitTest;
 
+/**
+ * Submission controlling module to run junit test cases
+ */
 public class SubmissionJUnit implements SubmissionHandler {
 
     private static final int DEFAULT_TIMEOUT = 10000;

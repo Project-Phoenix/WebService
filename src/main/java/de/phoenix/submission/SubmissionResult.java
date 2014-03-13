@@ -25,19 +25,38 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 
+/**
+ * The result of a submission controlling process
+ */
 public class SubmissionResult extends PhoenixSubmissionResult {
 
     @JsonIgnore
     private Map<String, Object> temponaryResult = new HashMap<String, Object>();
 
-    public SubmissionResult() {
-        super();
-    }
-
+    /**
+     * Construct a submission result with a certain status and some detailled
+     * information as text
+     * 
+     * @param status
+     *            The status of the submission
+     * @param statusText
+     *            The detailled status text
+     */
     public SubmissionResult(SubmissionStatus status, String statusText) {
         super(status, statusText);
     }
 
+    /**
+     * Construct a new submission result using the old submission result to copy
+     * the temponary objects
+     * 
+     * @param newStatus
+     *            The new status overriding the old one
+     * @param newStatusText
+     *            The new status text overriding the old one
+     * @param oldResult
+     *            The previous result
+     */
     public SubmissionResult(SubmissionStatus newStatus, String newStatusText, SubmissionResult oldResult) {
         this(newStatus, newStatusText);
         this.temponaryResult.putAll(oldResult.temponaryResult);

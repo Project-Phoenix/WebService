@@ -20,6 +20,9 @@ package de.phoenix.submission;
 
 import de.phoenix.database.entity.TaskSubmission;
 
+/**
+ * Single module of the submission controlling process.
+ */
 public interface SubmissionHandler {
 
     /**

@@ -39,6 +39,10 @@ import javax.persistence.Table;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixTaskTest;
 
+/**
+ * Class defining database structure for automatic tests runned by tasks.
+ * PhoenixEntity is {@link PhoenixTaskTest}
+ */
 @Entity
 @Table(name = "taskTest")
 public class TaskTest implements Serializable, Convertable<PhoenixTaskTest> {

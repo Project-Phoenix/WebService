@@ -27,6 +27,9 @@ import de.phoenix.database.entity.Text;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link Text}
+ */
 public class TextCriteriaFactory extends CriteriaFactory<Text, PhoenixText> {
 
     private final static TextCriteriaFactory instance = new TextCriteriaFactory();

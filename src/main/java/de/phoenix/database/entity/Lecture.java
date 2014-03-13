@@ -43,6 +43,10 @@ import de.phoenix.database.entity.util.ConverterUtil;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 
+/**
+ * Class defining database structure for single lecture events. PhoenixEntity is
+ * {@link PhoenixLecture}
+ */
 @Entity
 @Table(name = "lecture")
 public class Lecture implements Serializable, Convertable<PhoenixLecture> {

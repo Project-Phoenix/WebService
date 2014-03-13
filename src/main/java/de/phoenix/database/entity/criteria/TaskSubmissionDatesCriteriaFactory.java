@@ -31,6 +31,9 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link TaskSubmissionDates}
+ */
 public class TaskSubmissionDatesCriteriaFactory extends CriteriaFactory<TaskSubmissionDates, PhoenixTaskSubmissionDates> {
 
     private final static TaskSubmissionDatesCriteriaFactory instance = new TaskSubmissionDatesCriteriaFactory();

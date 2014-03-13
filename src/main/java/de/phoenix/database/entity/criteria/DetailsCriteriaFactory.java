@@ -28,6 +28,9 @@ import de.phoenix.database.entity.Details;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link Details}
+ */
 public class DetailsCriteriaFactory extends CriteriaFactory<Details, PhoenixDetails> {
 
     private final static DetailsCriteriaFactory instance = new DetailsCriteriaFactory();

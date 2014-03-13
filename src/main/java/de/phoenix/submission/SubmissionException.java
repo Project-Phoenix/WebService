@@ -18,6 +18,9 @@
 
 package de.phoenix.submission;
 
+/**
+ * Helper exception to indicate what is wrong while checking a submission
+ */
 public class SubmissionException extends RuntimeException {
 
     private static final long serialVersionUID = 6615991443656374550L;

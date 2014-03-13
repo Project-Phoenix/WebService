@@ -26,14 +26,36 @@ import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.key.PhoenixEntity;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Abstract factory to create criterias for a certain entity. The criterias are
+ * used to search for an instance of the entity type
+ * 
+ * @param <T>
+ * @param <E>
+ */
 public abstract class CriteriaFactory<T extends Convertable<E>, E extends PhoenixEntity> {
 
     private final Class<T> clazz;
 
+    /**
+     * Used to identify at runtime the class of the type
+     * 
+     * @param clazz
+     *            The class of the entity type
+     */
     protected CriteriaFactory(Class<T> clazz) {
         this.clazz = clazz;
     }
 
+    /**
+     * Create a criteria from a select entity using its set keys
+     * 
+     * @param selectEntity
+     *            SelectEntity containg the keys for the search
+     * @param session
+     *            The current session
+     * @return A created criteria matching the select entity
+     */
     public Criteria extractCriteria(SelectEntity<E> selectEntity, Session session) {
         Criteria criteria = session.createCriteria(clazz);
 
@@ -41,21 +63,70 @@ public abstract class CriteriaFactory<T extends Convertable<E>, E extends Phoeni
         return criteria;
     }
 
+    /**
+     * Set the different attributes of criteria for this entity type.
+     * 
+     * @param selectEntity
+     *            The select entity containg keys
+     * @param criteria
+     *            The criteria to fill
+     * @param session
+     *            The current session
+     */
     public abstract void setAttributes(SelectEntity<E> selectEntity, Criteria criteria, Session session);
 
+    /**
+     * Helper method to set a criteria attribute
+     * 
+     * @param entity
+     *            The select entity
+     * @param entityAttributeName
+     *            The name of the attribute in the select entity
+     * @param clazz
+     *            The class of the attribute
+     * @param criteriaAttributeName
+     *            The name of the attribute in the criteria
+     * @param criteria
+     *            The criteria
+     */
     protected void addParameter(SelectEntity<E> entity, String entityAttributeName, Class<?> clazz, String criteriaAttributeName, Criteria criteria) {
         Object o = entity.get(entityAttributeName);
         if (o != null)
             criteria.add(Restrictions.eq(criteriaAttributeName, o));
     }
 
+    /**
+     * Same as
+     * {@link #addParameter(SelectEntity, String, Class, String, Criteria)} ,
+     * where attributename == criteriaAttributeName
+     * 
+     * @param entity
+     *            The select entity
+     * @param attributeName
+     *            The name of the attribute in the select entity
+     * @param clazz
+     *            The class of the attribute
+     * @param criteria
+     *            The criteria
+     */
     protected void addParameter(SelectEntity<E> entity, String attributeName, Class<?> clazz, Criteria criteria) {
         this.addParameter(entity, attributeName, clazz, attributeName, criteria);
     }
 
+    /**
+     * Searches for another PhoenixEntity for the criteria
+     * 
+     * @param selectEntity
+     *            The selectEntity
+     * @param session
+     *            The current session
+     * @param factory
+     *            The factory for the other PhoenixEntity
+     * @return The result of the search
+     */
     @SuppressWarnings("unchecked")
-    protected <M extends Convertable<N>, N extends PhoenixEntity> M search(SelectEntity<N> bla, Session session, CriteriaFactory<M, N> factory) {
-        Criteria criteria = factory.extractCriteria(bla, session);
+    protected <M extends Convertable<N>, N extends PhoenixEntity> M search(SelectEntity<N> selectEntity, Session session, CriteriaFactory<M, N> factory) {
+        Criteria criteria = factory.extractCriteria(selectEntity, session);
         return (M) criteria.uniqueResult();
     }
 }

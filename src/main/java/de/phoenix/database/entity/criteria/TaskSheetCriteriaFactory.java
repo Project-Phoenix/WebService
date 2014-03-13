@@ -25,6 +25,9 @@ import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.SelectEntity;
 
+/**
+ * Construct criterias for {@link TaskSheet}
+ */
 public class TaskSheetCriteriaFactory extends CriteriaFactory<TaskSheet, PhoenixTaskSheet> {
 
     private final static TaskSheetCriteriaFactory instance = new TaskSheetCriteriaFactory();

@@ -51,6 +51,10 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.SubmissionResult;
 
+/**
+ * Class defining database structure for a solution for a task. PhoenixEntity is
+ * {@link PhoenixSubmission}
+ */
 @Entity
 @Table(name = "taskSubmission")
 public class TaskSubmission implements Serializable, Convertable<PhoenixSubmission> {

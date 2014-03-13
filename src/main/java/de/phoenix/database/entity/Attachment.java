@@ -44,6 +44,10 @@ import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.util.hash.Hasher;
 import de.phoenix.util.hash.SHA1Hasher;
 
+/**
+ * Class defining database structure for binary attachments. PhoenixEntity is
+ * {@link PhoenixAttachment}
+ */
 @Entity
 @Table(name = "attachment")
 public class Attachment implements Serializable, Convertable<PhoenixAttachment> {

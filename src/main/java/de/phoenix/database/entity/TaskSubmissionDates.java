@@ -36,6 +36,10 @@ import org.joda.time.DateTime;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
 
+/**
+ * Class defining database structure for invidual dates for tasks of a task
+ * sheet. PhoenixEntity is {@link PhoenixTaskSubmissionDates}
+ */
 @Entity
 @Table(name = "taskSubmissionDates")
 public class TaskSubmissionDates implements Serializable, Convertable<PhoenixTaskSubmissionDates> {

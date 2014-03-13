@@ -21,12 +21,22 @@ package de.phoenix.database.entity.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Util class to convert Entities to PhoenixEntities
+ */
 public class ConverterUtil {
 
     private ConverterUtil() {
 
     }
 
+    /**
+     * Converts a list of entities to a list of phoenix entites.
+     * 
+     * @param list
+     *            The list of entities
+     * @return A list of phoenix entities
+     */
     public static <T extends Convertable<E>, E> List<E> convert(List<T> list) {
         List<E> result = new ArrayList<E>();
         for (T tmp : list) {

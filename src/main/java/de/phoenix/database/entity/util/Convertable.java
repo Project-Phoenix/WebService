@@ -33,5 +33,12 @@ public interface Convertable<T> {
      */
     public T convert();
 
+    /**
+     * Copy values from the phoenixEntity to this entity. Used for updates
+     * functions
+     * 
+     * @param phoenixEntity
+     *            The phoenixentity containing the new attributes
+     */
     public void copyValues(T phoenixEntity);
 }
