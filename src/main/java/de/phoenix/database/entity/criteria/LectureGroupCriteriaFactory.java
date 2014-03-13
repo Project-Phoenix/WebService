@@ -45,11 +45,11 @@ public class LectureGroupCriteriaFactory extends CriteriaFactory<LectureGroup, P
 
     @Override
     public void setAttributes(SelectEntity<PhoenixLectureGroup> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "name", String.class, criteria);
-        addParameter(selectEntity, "maxMember", int.class, criteria);
-        addParameter(selectEntity, "submissionDeadLineTime", String.class, criteria);
-        addParameter(selectEntity, "submissionDeadlineWeekyday", String.class, criteria);
-        addParameter(selectEntity, "name", String.class, criteria);
+        addParameter(selectEntity, "name", criteria);
+        addParameter(selectEntity, "maxMember", criteria);
+        addParameter(selectEntity, "submissionDeadLineTime", criteria);
+        addParameter(selectEntity, "submissionDeadlineWeekyday", criteria);
+        addParameter(selectEntity, "name", criteria);
 
         SelectEntity<PhoenixLecture> lectureKey = selectEntity.get("lecture");
         if (lectureKey != null) {

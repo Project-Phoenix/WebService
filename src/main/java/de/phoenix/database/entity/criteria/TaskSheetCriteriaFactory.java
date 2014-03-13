@@ -42,7 +42,7 @@ public class TaskSheetCriteriaFactory extends CriteriaFactory<TaskSheet, Phoenix
 
     @Override
     public void setAttributes(SelectEntity<PhoenixTaskSheet> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "title", String.class, criteria);
+        addParameter(selectEntity, "title", criteria);
     }
 
 }

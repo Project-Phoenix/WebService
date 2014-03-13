@@ -82,35 +82,30 @@ public abstract class CriteriaFactory<T extends Convertable<E>, E extends Phoeni
      *            The select entity
      * @param entityAttributeName
      *            The name of the attribute in the select entity
-     * @param clazz
-     *            The class of the attribute
      * @param criteriaAttributeName
      *            The name of the attribute in the criteria
      * @param criteria
      *            The criteria
      */
-    protected void addParameter(SelectEntity<E> entity, String entityAttributeName, Class<?> clazz, String criteriaAttributeName, Criteria criteria) {
+    protected void addParameter(SelectEntity<E> entity, String entityAttributeName, String criteriaAttributeName, Criteria criteria) {
         Object o = entity.get(entityAttributeName);
         if (o != null)
             criteria.add(Restrictions.eq(criteriaAttributeName, o));
     }
 
     /**
-     * Same as
-     * {@link #addParameter(SelectEntity, String, Class, String, Criteria)} ,
+     * Same as {@link #addParameter(SelectEntity, String, String, Criteria)} ,
      * where attributename == criteriaAttributeName
      * 
      * @param entity
      *            The select entity
      * @param attributeName
      *            The name of the attribute in the select entity
-     * @param clazz
-     *            The class of the attribute
      * @param criteria
      *            The criteria
      */
-    protected void addParameter(SelectEntity<E> entity, String attributeName, Class<?> clazz, Criteria criteria) {
-        this.addParameter(entity, attributeName, clazz, attributeName, criteria);
+    protected void addParameter(SelectEntity<E> entity, String attributeName, Criteria criteria) {
+        this.addParameter(entity, attributeName, attributeName, criteria);
     }
 
     /**

@@ -43,12 +43,12 @@ public class TaskCriteriaFactory extends CriteriaFactory<Task, PhoenixTask> {
 
     @Override
     public void setAttributes(SelectEntity<PhoenixTask> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "title", String.class, criteria);
-        addParameter(selectEntity, "description", String.class, criteria);
+        addParameter(selectEntity, "title", criteria);
+        addParameter(selectEntity, "description", criteria);
 
         // Is instance of automatic task
         if (selectEntity.get("backend") != null) {
-            addParameter(selectEntity, "backend", String.class, criteria);
+            addParameter(selectEntity, "backend", criteria);
             criteria.add(Restrictions.eq("backend", true));
         }
     }

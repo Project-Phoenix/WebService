@@ -20,9 +20,6 @@ package de.phoenix.database.entity.criteria;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 
 import de.phoenix.database.entity.Details;
 import de.phoenix.rs.entity.PhoenixDetails;
@@ -45,13 +42,13 @@ public class DetailsCriteriaFactory extends CriteriaFactory<Details, PhoenixDeta
 
     @Override
     public void setAttributes(SelectEntity<PhoenixDetails> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "room", String.class, criteria);
-        addParameter(selectEntity, "weekDay", int.class, criteria);
-        addParameter(selectEntity, "startTime", LocalTime.class, criteria);
-        addParameter(selectEntity, "endTime", LocalTime.class, criteria);
-        addParameter(selectEntity, "interval", Period.class, criteria);
-        addParameter(selectEntity, "startDate", LocalDate.class, criteria);
-        addParameter(selectEntity, "endDate", LocalDate.class, criteria);
+        addParameter(selectEntity, "room", criteria);
+        addParameter(selectEntity, "weekDay", criteria);
+        addParameter(selectEntity, "startTime", criteria);
+        addParameter(selectEntity, "endTime", criteria);
+        addParameter(selectEntity, "interval", criteria);
+        addParameter(selectEntity, "startDate", criteria);
+        addParameter(selectEntity, "endDate", criteria);
     }
 
 }

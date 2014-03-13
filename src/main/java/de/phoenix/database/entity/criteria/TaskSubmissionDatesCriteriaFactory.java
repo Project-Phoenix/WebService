@@ -21,7 +21,6 @@ package de.phoenix.database.entity.criteria;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.LectureGroupTaskSheet;
 import de.phoenix.database.entity.Task;
@@ -48,8 +47,8 @@ public class TaskSubmissionDatesCriteriaFactory extends CriteriaFactory<TaskSubm
 
     @Override
     public void setAttributes(SelectEntity<PhoenixTaskSubmissionDates> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "deadline", DateTime.class, criteria);
-        addParameter(selectEntity, "releaseDate", DateTime.class, criteria);
+        addParameter(selectEntity, "deadline", criteria);
+        addParameter(selectEntity, "releaseDate", criteria);
 
         SelectEntity<PhoenixLectureGroupTaskSheet> taskSheetKey = selectEntity.get("lectureGroupTaskSheet");
         if (taskSheetKey != null) {

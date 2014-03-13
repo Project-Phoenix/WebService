@@ -18,8 +18,6 @@
 
 package de.phoenix.database.entity.criteria;
 
-import java.util.Date;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
@@ -44,9 +42,9 @@ public class AttachmentCriteriaFactory extends CriteriaFactory<Attachment, Phoen
 
     @Override
     public void setAttributes(SelectEntity<PhoenixAttachment> selectEntity, Criteria criteria, Session session) {
-        addParameter(selectEntity, "creationDate", Date.class, criteria);
-        addParameter(selectEntity, "name", String.class, criteria);
-        addParameter(selectEntity, "type", String.class, criteria);
+        addParameter(selectEntity, "creationDate", criteria);
+        addParameter(selectEntity, "name", criteria);
+        addParameter(selectEntity, "type", criteria);
     }
 
 }
