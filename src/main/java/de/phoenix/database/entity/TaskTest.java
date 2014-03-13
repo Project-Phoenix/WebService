@@ -34,23 +34,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixTaskTest;
 
 @Entity
 @Table(name = "taskTest")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "TaskTest.findAll", query = "SELECT t FROM TaskTest t"),
-    @NamedQuery(name = "TaskTest.findById", query = "SELECT t FROM TaskTest t WHERE t.id = :id"),
-    @NamedQuery(name = "TaskTest.findByTimeout", query = "SELECT t FROM TaskTest t WHERE t.timeout = :timeout")})
-//@formatter:on
 public class TaskTest implements Serializable, Convertable<PhoenixTaskTest> {
 
     private static final long serialVersionUID = 1L;

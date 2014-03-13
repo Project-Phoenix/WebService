@@ -33,12 +33,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.ws.rs.DefaultValue;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
@@ -57,13 +54,6 @@ import de.phoenix.submission.DisallowedContent;
 
 @Entity
 @Table(name = "task")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t"),
-    @NamedQuery(name = "Task.findById", query = "SELECT t FROM Task t WHERE t.id = :id"),
-    @NamedQuery(name = "Task.findByTitle", query = "SELECT t FROM Task t WHERE t.title = :title")})
-//@formatter:on
 public class Task implements Serializable, Convertable<PhoenixTask> {
 
     private static final long serialVersionUID = 1L;

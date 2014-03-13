@@ -31,11 +31,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
@@ -48,13 +45,6 @@ import de.phoenix.rs.entity.PhoenixLecture;
 
 @Entity
 @Table(name = "lecture")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "Lecture.findAll", query = "SELECT l FROM Lecture l"),
-    @NamedQuery(name = "Lecture.findById", query = "SELECT l FROM Lecture l WHERE l.id = :id"),
-    @NamedQuery(name = "Lecture.findByTitle", query = "SELECT l FROM Lecture l WHERE l.title = :title")})
-//@formatter:on
 public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     private static final long serialVersionUID = 1L;

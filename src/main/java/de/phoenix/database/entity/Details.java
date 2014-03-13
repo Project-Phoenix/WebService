@@ -28,10 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Type;
@@ -45,20 +42,6 @@ import de.phoenix.rs.entity.PhoenixDetails;
 
 @Entity
 @Table(name = "details")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "Details.findAll", query = "SELECT d FROM Details d"),
-    @NamedQuery(name = "Details.findById", query = "SELECT d FROM Details d WHERE d.id = :id"),
-    @NamedQuery(name = "Details.findByRoom", query = "SELECT d FROM Details d WHERE d.room = :room"),
-    @NamedQuery(name = "Details.findByWeekday", query = "SELECT d FROM Details d WHERE d.weekday = :weekday"),
-    @NamedQuery(name = "Details.findByStartTime", query = "SELECT d FROM Details d WHERE d.startTime = :startTime"),
-    @NamedQuery(name = "Details.findByEndTime", query = "SELECT d FROM Details d WHERE d.endTime = :endTime"),
-    @NamedQuery(name = "Details.findByInterval", query = "SELECT d FROM Details d WHERE d.interval = :interval"),
-    @NamedQuery(name = "Details.findByStartDate", query = "SELECT d FROM Details d WHERE d.startDate = :startDate"),
-    @NamedQuery(name = "Details.findByEndDate", query = "SELECT d FROM Details d WHERE d.endDate = :endDate"),
-    @NamedQuery(name = "Details.findByPhoenixDetails", query = "SELECT d FROM Details d WHERE d.room = :room AND d.weekday = :weekday AND d.startTime = :startTime AND d.endTime = :endTime AND d.interval = :interval AND d.startDate = :startDate AND d.endDate = :endDate")})
-//@formatter:on
 public class Details implements Serializable, Convertable<PhoenixDetails> {
 
     private static final long serialVersionUID = 1L;

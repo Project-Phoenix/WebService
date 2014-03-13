@@ -34,10 +34,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
@@ -56,13 +53,6 @@ import de.phoenix.submission.SubmissionResult;
 
 @Entity
 @Table(name = "taskSubmission")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "TaskSubmission.findAll", query = "SELECT t FROM TaskSubmission t"),
-    @NamedQuery(name = "TaskSubmission.findById", query = "SELECT t FROM TaskSubmission t WHERE t.id = :id"),
-    @NamedQuery(name = "TaskSubmission.findByDate", query = "SELECT t FROM TaskSubmission t WHERE t.date = :date")})
-//@formatter:on
 public class TaskSubmission implements Serializable, Convertable<PhoenixSubmission> {
 
     private static final long serialVersionUID = 1L;

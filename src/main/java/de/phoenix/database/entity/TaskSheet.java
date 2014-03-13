@@ -30,11 +30,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
@@ -48,16 +45,10 @@ import de.phoenix.rs.entity.PhoenixTaskSheet;
 
 @Entity
 @Table(name = "taskSheet")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "TaskSheet.findAll", query = "SELECT t FROM TaskSheet t"),
-    @NamedQuery(name = "TaskSheet.findById", query = "SELECT t FROM TaskSheet t WHERE t.id = :id"),
-    @NamedQuery(name = "TaskSheet.findByCreationDate", query = "SELECT t FROM TaskSheet t WHERE t.creationDate = :creationDate")})
-//@formatter:on
 public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)

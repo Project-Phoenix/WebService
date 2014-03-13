@@ -28,10 +28,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
@@ -41,14 +38,6 @@ import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
 
 @Entity
 @Table(name = "taskSubmissionDates")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "TaskSubmissionDates.findAll", query = "SELECT t FROM TaskSubmissionDates t"),
-    @NamedQuery(name = "TaskSubmissionDates.findById", query = "SELECT t FROM TaskSubmissionDates t WHERE t.id = :id"),
-    @NamedQuery(name = "TaskSubmissionDates.findByDeadline", query = "SELECT t FROM TaskSubmissionDates t WHERE t.deadline = :deadline"),
-    @NamedQuery(name = "TaskSubmissionDates.findByReleasedate", query = "SELECT t FROM TaskSubmissionDates t WHERE t.releasedate = :releasedate")})
-//@formatter:on
 public class TaskSubmissionDates implements Serializable, Convertable<PhoenixTaskSubmissionDates> {
 
     private static final long serialVersionUID = 1L;

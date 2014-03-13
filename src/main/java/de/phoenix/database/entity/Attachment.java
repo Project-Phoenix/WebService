@@ -32,10 +32,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.Hibernate;
@@ -49,15 +46,6 @@ import de.phoenix.util.hash.SHA1Hasher;
 
 @Entity
 @Table(name = "attachment")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "Attachment.findAll", query = "SELECT a FROM Attachment a"),
-    @NamedQuery(name = "Attachment.findById", query = "SELECT a FROM Attachment a WHERE a.id = :id"),
-    @NamedQuery(name = "Attachment.findByCreationDate", query = "SELECT a FROM Attachment a WHERE a.creationDate = :creationDate"),
-    @NamedQuery(name = "Attachment.findByName", query = "SELECT a FROM Attachment a WHERE a.name = :name"),
-    @NamedQuery(name = "Attachment.findByType", query = "SELECT a FROM Attachment a WHERE a.type = :type")})
-//@formatter:on
 public class Attachment implements Serializable, Convertable<PhoenixAttachment> {
 
     private static final long serialVersionUID = 1L;

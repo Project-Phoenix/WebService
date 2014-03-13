@@ -29,11 +29,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Type;
@@ -45,16 +42,8 @@ import de.phoenix.util.hash.SHA1Hasher;
 
 @Entity
 @Table(name = "text")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "Text.findAll", query = "SELECT t FROM Text t"),
-    @NamedQuery(name = "Text.findById", query = "SELECT t FROM Text t WHERE t.id = :id"),
-    @NamedQuery(name = "Text.findByCreationDate", query = "SELECT t FROM Text t WHERE t.creationDate = :creationDate"),
-    @NamedQuery(name = "Text.findByTitle", query = "SELECT t FROM Text t WHERE t.title = :title"),
-    @NamedQuery(name = "Text.findByType", query = "SELECT t FROM Text t WHERE t.type = :type")})
-//@formatter:on
 public class Text implements Serializable, Convertable<PhoenixText> {
+
     private static final long serialVersionUID = 1L;
 
     @Id

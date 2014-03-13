@@ -32,11 +32,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.Cascade;
@@ -52,16 +49,6 @@ import de.phoenix.rs.entity.PhoenixLectureGroup;
 
 @Entity
 @Table(name = "lectureGroup")
-@XmlRootElement
-//@formatter:off
-@NamedQueries({
-    @NamedQuery(name = "LectureGroup.findAll", query = "SELECT l FROM LectureGroup l"),
-    @NamedQuery(name = "LectureGroup.findById", query = "SELECT l FROM LectureGroup l WHERE l.id = :id"),
-    @NamedQuery(name = "LectureGroup.findByName", query = "SELECT l FROM LectureGroup l WHERE l.name = :name"),
-    @NamedQuery(name = "LectureGroup.findByMaxMember", query = "SELECT l FROM LectureGroup l WHERE l.maxMember = :maxMember"),
-    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineTime", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineTime = :submissionDeadlineTime"),
-    @NamedQuery(name = "LectureGroup.findBySubmissionDeadlineWeekday", query = "SELECT l FROM LectureGroup l WHERE l.submissionDeadlineWeekday = :submissionDeadlineWeekday")})
-//@formatter:on
 public class LectureGroup implements Serializable, Convertable<PhoenixLectureGroup> {
 
     private static final long serialVersionUID = 1L;
