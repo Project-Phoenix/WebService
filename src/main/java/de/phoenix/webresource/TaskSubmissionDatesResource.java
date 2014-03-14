@@ -29,6 +29,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import de.phoenix.database.DatabaseManager;
@@ -87,13 +88,27 @@ public class TaskSubmissionDatesResource extends AbstractPhoenixResource<TaskSub
                 return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
             }
 
-            TaskSubmissionDates dates = new TaskSubmissionDates();
-            dates.setLectureGroupTaskSheet(taskSheet);
-            dates.setTask(task);
-            dates.setDeadline((DateTime) connectionEntity.getAttribute("deadline"));
-            dates.setReleasedate((DateTime) connectionEntity.getAttribute("releaseDate"));
+            DateTime deadLine = connectionEntity.getAttribute("deadline");
+            DateTime releaseDate = connectionEntity.getAttribute("releaseDate");
 
-            session.save(dates);
+            // Check if there is already a submission date for this
+            TaskSubmissionDates dates = get(session, taskSheet, task);
+            // There is NO date for this task
+            if (dates == null) {
+                dates = new TaskSubmissionDates();
+                dates.setTask(task);
+                dates.setLectureGroupTaskSheet(taskSheet);
+                dates.setDeadline(deadLine);
+                dates.setReleasedate(releaseDate);
+                session.save(dates);
+            }
+            // There IS a data for this task
+            else {
+                dates.setDeadline(deadLine);
+                dates.setReleasedate(releaseDate);
+                session.update(dates);
+            }
+
             trans.commit();
 
         } finally {
@@ -103,5 +118,10 @@ public class TaskSubmissionDatesResource extends AbstractPhoenixResource<TaskSub
         }
 
         return Response.ok().build();
+    }
+    private TaskSubmissionDates get(Session session, LectureGroupTaskSheet taskSheet, Task task) {
+        Criteria criteria = session.createCriteria(TaskSubmissionDates.class);
+        criteria = criteria.add(Restrictions.eq("task", task)).add(Restrictions.eq("lectureGroupTaskSheet", taskSheet));
+        return (TaskSubmissionDates) criteria.uniqueResult();
     }
 }
