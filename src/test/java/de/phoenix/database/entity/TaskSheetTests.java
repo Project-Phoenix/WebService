@@ -114,7 +114,7 @@ public class TaskSheetTests {
 
         PhoenixLectureGroupTaskSheet groupTaskSheet = EntityUtil.extractEntity(response);
 
-        PhoenixTask task = groupTaskSheet.getTaskSheet().getTasks().get(0);
+        PhoenixTask task = groupTaskSheet.getTasks().get(0).getTask();
         ConnectionEntity connectionEntity = new TaskSubmissionDatesConnection(DateTime.now().plusDays(3), DateTime.now(), groupTaskSheet, task);
 
         WebResource createTaskSubmissionDateResource = PhoenixTaskSubmissionDates.createResource(CLIENT, BASE_URL);

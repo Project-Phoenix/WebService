@@ -19,7 +19,10 @@
 package de.phoenix.database.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -38,6 +41,7 @@ import org.joda.time.DateTime;
 
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
+import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet.PhoenixDatedTask;
 
 /**
  * Class defining a task sheet assigned to a group. All changes in this class
@@ -164,13 +168,32 @@ public class LectureGroupTaskSheet implements Serializable, Convertable<PhoenixL
 
     @Override
     public PhoenixLectureGroupTaskSheet convert() {
-        return new PhoenixLectureGroupTaskSheet(defaultDeadline, defaultReleaseDate, this.taskSheet.convert(), this.lectureGroup.convert());
+
+        Set<Task> set = new HashSet<Task>();
+        for (Task task : getTaskSheet().getTasks())
+            set.add(task);
+
+        List<TaskSubmissionDates> submissionDates = getTaskSubmissionDates();
+        List<PhoenixDatedTask> tasks = new ArrayList<PhoenixDatedTask>(submissionDates.size());
+
+        for (TaskSubmissionDates dates : submissionDates) {
+            Task task = dates.getTask();
+            set.remove(dates.getTask());
+            tasks.add(new PhoenixDatedTask(dates.getReleasedate(), dates.getDeadline(), task.convert()));
+        }
+
+        for (Task task : set) {
+            tasks.add(new PhoenixDatedTask(defaultReleaseDate, defaultDeadline, task.convert()));
+        }
+
+        return new PhoenixLectureGroupTaskSheet(this.lectureGroup.convert(), tasks);
     }
 
     @Override
     public void copyValues(PhoenixLectureGroupTaskSheet phoenixEntity) {
-        this.defaultDeadline = phoenixEntity.getDefaultDeadline();
-        this.defaultReleaseDate = phoenixEntity.getDefaultReleaseDate();
+        // TODO: Think about the concept
+//        this.defaultDeadline = phoenixEntity.getDefaultDeadline();
+//        this.defaultReleaseDate = phoenixEntity.getDefaultReleaseDate();
 
     }
 
