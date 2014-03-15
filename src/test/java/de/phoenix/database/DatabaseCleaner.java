@@ -16,7 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix;
+package de.phoenix.database;
 
 import java.util.List;
 
@@ -58,6 +58,7 @@ public class DatabaseCleaner {
                     continue;
                 }
                 session.createSQLQuery("DELETE FROM " + table + ";").executeUpdate();
+                session.createSQLQuery("ALTER TABLE " + table + " AUTO_INCREMENT=1;").executeUpdate();
             }
             transaction.commit();
             session.createSQLQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();

@@ -18,8 +18,6 @@
 
 package de.phoenix.database;
 
-import java.io.File;
-
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.RunWith;
@@ -28,8 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.sun.jersey.api.client.Client;
 
-import de.phoenix.DatabaseCleaner;
-import de.phoenix.DatabaseTestData;
 import de.phoenix.TestHttpServer;
 import de.phoenix.database.entity.DetailTests;
 import de.phoenix.database.entity.LectureGroupTests;
@@ -40,7 +36,8 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.util.TextFileReader;
 
 @RunWith(Suite.class)
-@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
+//@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
+@SuiteClasses({ConnectionTests.class, LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
 public class EntityTest {
 
     public final static String BASE_URL = "http://localhost:7766/rest";
@@ -69,22 +66,8 @@ public class EntityTest {
             DatabaseCleaner.getInstance().run();
             System.out.println("Create test data");
             DatabaseTestData.getInstance().createTestData();
-            System.out.println("Delete all generated class files");
-            deleteAllClassFiles();
             System.out.println("Stop HTTP Server");
             httpServer.stop();
         };
-
-        private void deleteAllClassFiles() {
-            File dir = new File(".");
-            File[] files = dir.listFiles();
-            if (files == null)
-                return;
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                if (file.getName().endsWith(".class"))
-                    file.delete();
-            }
-        }
     };
 }

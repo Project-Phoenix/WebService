@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 import org.hibernate.Session;
 import org.junit.Test;
 
-public class ConnectionTest {
+public class ConnectionTests {
 
     @Test
     public void test() {

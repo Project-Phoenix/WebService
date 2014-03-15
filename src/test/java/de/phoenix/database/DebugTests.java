@@ -16,9 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix.webresource;
-
-import static org.junit.Assert.assertFalse;
+package de.phoenix.database;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +30,7 @@ import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 
 @RunWith(OrderedRunner.class)
-public class DebugTest extends JerseyTest {
+public class DebugTests extends JerseyTest {
 
     @Override
     protected AppDescriptor configure() {
@@ -43,7 +41,7 @@ public class DebugTest extends JerseyTest {
     @Order(1)
     public void testDebug() {
         WebResource web = resource().path("debug");
-        String res = web.get(String.class);
-        assertFalse(res.isEmpty());
+        web.get(String.class);
+
     }
 }

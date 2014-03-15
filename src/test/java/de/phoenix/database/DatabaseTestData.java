@@ -16,7 +16,7 @@
  * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.phoenix;
+package de.phoenix.database;
 
 import java.io.File;
 import java.io.FileInputStream;
