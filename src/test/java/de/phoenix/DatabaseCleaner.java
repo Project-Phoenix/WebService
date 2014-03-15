@@ -53,6 +53,10 @@ public class DatabaseCleaner {
             List<String> tableNames = query.list();
             Transaction transaction = session.beginTransaction();
             for (String table : tableNames) {
+                // Ignore the debug table
+                if (table.equalsIgnoreCase("debugLog")) {
+                    continue;
+                }
                 session.createSQLQuery("DELETE FROM " + table + ";").executeUpdate();
             }
             transaction.commit();

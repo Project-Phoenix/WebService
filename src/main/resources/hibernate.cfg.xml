@@ -26,6 +26,7 @@
         <property name="hbm2ddl.auto">validate</property>
 
         <mapping class="de.phoenix.database.entity.Attachment" />
+        <mapping class="de.phoenix.database.entity.DebugLog" />
         <mapping class="de.phoenix.database.entity.Details" />
         <mapping class="de.phoenix.database.entity.Lecture" />
         <mapping class="de.phoenix.database.entity.LectureGroup" />

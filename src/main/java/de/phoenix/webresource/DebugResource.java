@@ -18,11 +18,19 @@
 
 package de.phoenix.webresource;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+
+import de.phoenix.database.DatabaseManager;
+import de.phoenix.database.entity.DebugLog;
 
 @Path("debug")
 public class DebugResource {
@@ -30,7 +38,17 @@ public class DebugResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLog() {
+        
+        Session session =  DatabaseManager.getSession();
+        @SuppressWarnings("unchecked")
+        List<Object> list = session.createCriteria(DebugLog.class).addOrder(Order.desc("date")).list();
+        
+        StringBuilder sBuilder = new StringBuilder();
+        for (Object object : list) {
+            sBuilder.append(object.toString());
+            sBuilder.append('\n');
+        }
 
-        return Response.ok("Debug information\nOneLine\nSecondLine").build();
+        return Response.ok(sBuilder.toString()).build();
     }
 }
