@@ -27,6 +27,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,6 +38,7 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTask;
@@ -72,9 +74,27 @@ public class TaskSheetTests {
         response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, bundleTasksToTaskSheet);
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
-
+    
     @Test
     @Order(2)
+    public void createDuplicateTaskSheet() {
+        // Do the same as createTaskSheet
+        
+        WebResource getAllTasksResource = PhoenixTask.getResource(CLIENT, BASE_URL);
+        ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        List<PhoenixTask> tasks = EntityUtil.extractEntityList(response);
+
+        WebResource connectTasksheetWithTasksResource = PhoenixTaskSheet.connectTaskSheetWithTaskResource(CLIENT, BASE_URL);
+
+        ConnectionEntity bundleTasksToTaskSheet = new TaskSheetConnection(TASK_SHEET_TITLE, tasks);
+
+        response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, bundleTasksToTaskSheet);
+        // Check if duplicate was detected
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @Order(3)
     public void createLectureGroupTaskSheets() {
 
         WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
@@ -93,7 +113,29 @@ public class TaskSheetTests {
     }
 
     @Test
+    @Ignore("Must implement this!")
     @Order(3)
+    public void createDuplicateLectureGroupTaskSheets() {
+
+        // Do the same as createLectureGroupTaskSheets
+        WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
+        ClientResponse response = getAllGroupsResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixLectureGroup>());
+        List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
+
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(CLIENT, BASE_URL);
+        response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTaskSheet>().addKey("title", TASK_SHEET_TITLE));
+        PhoenixTaskSheet taskSheet = EntityUtil.extractEntity(response);
+
+        ConnectionEntity connectionEntity = new LectureGroupTaskSheetConnection(DateTime.now(), DateTime.now().plusWeeks(1), taskSheet, groups);
+
+        WebResource createLectureGroupTaskSheet = PhoenixLectureGroupTaskSheet.createResource(CLIENT, BASE_URL);
+        response = createLectureGroupTaskSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, connectionEntity);
+        // Check if duplicate was detected
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    @Order(4)
     public void setSubmissionDateForTask() {
 
         WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);

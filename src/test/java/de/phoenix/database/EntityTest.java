@@ -36,7 +36,6 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.util.TextFileReader;
 
 @RunWith(Suite.class)
-//@SuiteClasses({LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
 @SuiteClasses({ConnectionTests.class, LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class})
 public class EntityTest {
 

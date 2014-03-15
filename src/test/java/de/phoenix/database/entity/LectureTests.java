@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,6 +45,7 @@ import de.phoenix.date.Weekday;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
@@ -60,7 +61,7 @@ public class LectureTests {
 
     @Test
     @Order(1)
-    public void createLecture() throws ParseException {
+    public void createLecture() {
         WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
 
         LocalTime startTime = new LocalTime(11, 15);
@@ -91,11 +92,20 @@ public class LectureTests {
 
     }
 
+    @Test
+    @Order(3)
+    public void createDuplicateLecture() {
+        WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
+        PhoenixLecture duplicateLecture = new PhoenixLecture(TEST_LECTURE_TITLE, new ArrayList<PhoenixDetails>());
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, duplicateLecture);
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+    }
+
     private static final String TEST_GROUP_NAME = "Gruppe 2";
     private static final int TEST_GROUP_MAX_SIZE = 22;
 
     @Test
-    @Order(3)
+    @Order(4)
     public void addGroup() {
         WebResource ws = PhoenixLecture.getResource(CLIENT, BASE_URL);
 
@@ -135,8 +145,47 @@ public class LectureTests {
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
+
     @Test
-    @Order(4)
+    @Order(5)
+    public void addDuplicateGroupSameLecture() {
+        WebResource ws = PhoenixLecture.getResource(CLIENT, BASE_URL);
+
+        // Get single lecture
+        SelectEntity<PhoenixLecture> selectLecture = new SelectEntity<PhoenixLecture>().addKey("title", TEST_LECTURE_TITLE);
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectLecture);
+        assertEquals(Status.OK, response.getClientResponseStatus());
+
+        PhoenixLecture lec = EntityUtil.extractEntity(response);
+
+        // Add group to lecture
+        WebResource ws2 = PhoenixLecture.addGroupResource(CLIENT, BASE_URL);
+
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @Order(6)
+    public void addDuplicateGroupDifferentLecture() {
+        WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
+
+        // Create a new temporary lecture
+        PhoenixLecture newLecture = new PhoenixLecture(TEST_LECTURE_TITLE+"2", new ArrayList<PhoenixDetails>());
+        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, newLecture);
+        assertEquals(Status.OK, response.getClientResponseStatus());
+
+        // Add group to lecture
+        WebResource ws2 = PhoenixLecture.addGroupResource(CLIENT, BASE_URL);
+
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
+        response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(newLecture, Arrays.asList(group)));
+        assertEquals(Status.OK, response.getClientResponseStatus());
+    }
+    
+    @Test
+    @Order(7)
     public void addDetail() {
         WebResource getLectureResource = PhoenixLecture.getResource(CLIENT, BASE_URL);
 
@@ -161,7 +210,7 @@ public class LectureTests {
     }
 
     @Test
-    @Order(5)
+    @Order(8)
     public void addDetailToNotExistingLecture() {
 
         // Create information for the group information
@@ -177,11 +226,11 @@ public class LectureTests {
 
         WebResource addDetailToLectureResource = PhoenixLecture.addDetailResource(CLIENT, BASE_URL);
         ClientResponse response = addDetailToLectureResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addDetailToLecture);
-        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
+        assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
     }
 
     @Test
-    @Order(6)
+    @Order(9)
     public void getGroupsForALecture() throws IllegalArgumentException, IOException {
 
         WebResource ws = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
@@ -199,7 +248,7 @@ public class LectureTests {
     }
 
     @Test
-    @Order(7)
+    @Order(10)
     public void getNoGroupsForNotALecture() throws IllegalArgumentException, IOException {
 
         WebResource ws = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
@@ -218,7 +267,7 @@ public class LectureTests {
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     public void deleteLectureGroup() {
         WebResource ws = PhoenixLectureGroup.deleteResource(CLIENT, BASE_URL);
 

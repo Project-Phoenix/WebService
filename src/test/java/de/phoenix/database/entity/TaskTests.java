@@ -44,6 +44,7 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixAttachment;
 import de.phoenix.rs.entity.PhoenixAutomaticTask;
 import de.phoenix.rs.entity.PhoenixSubmission;
@@ -203,8 +204,7 @@ public class TaskTests {
 
         // Because we want to create a title with same title, the system
         // throws an exception
-        assertEquals(Status.BAD_REQUEST, response.getClientResponseStatus());
-        assertEquals("Duplicate task title!", response.getEntity(String.class));
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
     }
 
     private final static String AUTOMATIC_TEST_TITLE = "TernarySearch";

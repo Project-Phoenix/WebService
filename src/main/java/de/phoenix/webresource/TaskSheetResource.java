@@ -27,7 +27,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -40,6 +39,7 @@ import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.ConnectionEntity;
@@ -86,25 +86,21 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
                 try {
                     Task task = (Task) criteria.uniqueResult();
                     if (task == null) {
-                        return Response.status(Status.NOT_FOUND).entity("No entity").build();
+                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
                     }
                     tasks.add(task);
                 } catch (HibernateException e) {
-                    return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
+                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
                 }
             }
 
             taskSheet.setTasks(tasks);
 
-            session.save(taskSheet);
-            trans.commit();
-
+            return handlePossibleDuplicateInsert(session, trans, taskSheet);
         } finally {
             if (session != null) {
                 session.close();
             }
         }
-
-        return Response.ok().build();
     }
 }

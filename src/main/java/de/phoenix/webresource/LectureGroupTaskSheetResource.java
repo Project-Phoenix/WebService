@@ -26,7 +26,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -41,6 +40,7 @@ import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.database.entity.criteria.LectureGroupTaskSheetCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
@@ -71,10 +71,10 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
             try {
                 taskSheet = (TaskSheet) taskSheetCriteria.uniqueResult();
                 if (taskSheet == null) {
-                    return Response.status(Status.NOT_FOUND).entity("No entity").build();
+                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
                 }
             } catch (HibernateException e) {
-                return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
+                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
             }
 
             // Search for groups
@@ -86,7 +86,7 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
                 try {
                     LectureGroup group = (LectureGroup) criteria.uniqueResult();
                     if (group == null) {
-                        return Response.status(Status.NOT_FOUND).entity("No entity").build();
+                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
                     }
 
                     // Persist lecture group task sheet
@@ -97,7 +97,7 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
                     groupTaskSheet.setLectureGroup(group);
                     session.save(groupTaskSheet);
                 } catch (HibernateException e) {
-                    return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
+                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
                 }
             }
 

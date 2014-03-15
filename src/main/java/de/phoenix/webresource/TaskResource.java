@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response.Status;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.exception.ConstraintViolationException;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
@@ -63,22 +62,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTask(PhoenixTask phoenixTask) {
-        try {
-            return onCreate(phoenixTask, TaskCreator.INSTANCE);
-        } catch (ConstraintViolationException e) {
-            if (isDuplicateEntryError(e)) {
-                return Response.status(Status.BAD_REQUEST).entity("Duplicate task title!").build();
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    private static final String DUPLICATE_SQL_STATE = "23000";
-    private static final int DUPLICATE_SQL_ERROR = 1062;
-
-    private boolean isDuplicateEntryError(ConstraintViolationException e) {
-        return e.getErrorCode() == DUPLICATE_SQL_ERROR && e.getSQLState().equals(DUPLICATE_SQL_STATE);
+        return onCreate(phoenixTask, TaskCreator.INSTANCE);
     }
 
     private static class TaskCreator implements EntityCreator<Task, PhoenixTask> {

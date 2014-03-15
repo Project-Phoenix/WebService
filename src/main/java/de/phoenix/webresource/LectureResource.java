@@ -54,7 +54,6 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLecture(PhoenixLecture phoenixLecture) {
-
         return onCreate(phoenixLecture, LectureCreator.INSTANCE);
     }
 
@@ -111,15 +110,13 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
                 lecture.addLectureGroup(new LectureGroup(phoenixLectureGroup, lecture));
             }
 
-            session.update(lecture);
-            trans.commit();
-
-            return Response.ok().build();
+            return handlePossibleDuplicateUpdate(session, trans, lecture);
         } finally {
             if (session != null)
                 session.close();
         }
     }
+
     @Path(PhoenixLecture.WEB_RESOURCE_ADD_DETAIL)
     @POST
     @Produces(MediaType.APPLICATION_JSON)

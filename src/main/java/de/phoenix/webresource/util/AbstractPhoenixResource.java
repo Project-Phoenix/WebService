@@ -26,11 +26,13 @@ import javax.ws.rs.core.Response.Status;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.criteria.CriteriaFactory;
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.database.entity.util.ConverterUtil;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.key.PhoenixEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
@@ -60,7 +62,6 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         this.criteriaFactory = criteriaFactory;
     }
 
-    // TODO: Check if there are duplicate entry errors
     /**
      * Invoke the method, when a single entity has to be simply created
      * 
@@ -77,14 +78,47 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
             Transaction trans = session.beginTransaction();
 
             T entity = creator.create(phoenixEntity, session);
-            session.save(entity);
-
-            trans.commit();
-            return Response.ok().build();
+            
+            return handlePossibleDuplicateInsert(session, trans, entity);
         } finally {
             if (session != null)
                 session.close();
         }
+    }
+    
+    protected Response handlePossibleDuplicateInsert(Session session, Transaction trans, Object entity) {
+        try {
+            session.save(entity);
+            trans.commit();
+        } catch (ConstraintViolationException e) {
+            if (isDuplicateEntryError(e)) {
+                return Response.status(PhoenixStatusType.DUPLIATE_ENTITY).build();
+            } else {
+                throw e;
+            }
+        }
+        return Response.ok().build();
+    }
+    
+    protected Response handlePossibleDuplicateUpdate(Session session, Transaction trans, Object entity) {
+        try {
+            session.update(entity);
+            trans.commit();
+        } catch (ConstraintViolationException e) {
+            if (isDuplicateEntryError(e)) {
+                return Response.status(PhoenixStatusType.DUPLIATE_ENTITY).build();
+            } else {
+                throw e;
+            }
+        }
+        return Response.ok().build();
+    }
+
+    private static final String DUPLICATE_SQL_STATE = "23000";
+    private static final int DUPLICATE_SQL_ERROR = 1062;
+
+    private boolean isDuplicateEntryError(ConstraintViolationException e) {
+        return e.getErrorCode() == DUPLICATE_SQL_ERROR && e.getSQLState().equals(DUPLICATE_SQL_STATE);
     }
 
     /**
@@ -103,9 +137,10 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
      * @param updatedEntity
      *            The update entity containing old entity (to find, what to
      *            update) and the new one to assign the values
-     * @return 304, when the update entity matches more than one entity to
-     *         update <br>
-     *         404, when the update entity does not match any entity to update <br>
+     * @return {@link PhoenixStatusType#MULTIPLE_ENTITIES}, when the update
+     *         entity matches more than one entity to update <br>
+     *         {@link PhoenixStatusType#NO_ENTITIES}, when the update entity
+     *         does not match any entity to update <br>
      *         Otherwise 200
      */
     protected Response onUpdate(UpdateEntity<E> updatedEntity) {
@@ -138,9 +173,10 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
      * 
      * @param selectEntity
      *            Describes, what entity will be deleted
-     * @return 304, when the select entity matches more than one entity to
-     *         update <br>
-     *         404, when the update entity does not match any entity to update <br>
+     * @return {@link PhoenixStatusType#MULTIPLE_ENTITIES}, when the select
+     *         entity matches more than one entity to delete <br>
+     *         {@link PhoenixStatusType#NO_ENTITIES}, when the select entity
+     *         does not match any entity to delete <br>
      *         Otherwise 200
      */
     protected Response onDelete(SelectEntity<E> selectEntity) {
@@ -169,7 +205,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
      * 
      * @param selectEntity
      *            Describe what entities to match
-     * @return 404, when no entity was found <br>
+     * @return {@link PhoenixStatusType#NO_ENTITIES}, when no entity was found <br>
      *         Otherwise a list containg all entities and status code 200
      */
     protected Response onGet(SelectEntity<E> selectEntity) {
@@ -200,9 +236,9 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     protected Response checkOnlyOne(List<T> entities) {
 
         if (entities.isEmpty()) {
-            return Response.status(Status.NOT_FOUND).entity("No entity").build();
+            return Response.status(PhoenixStatusType.NO_ENTITIES).build();
         } else if (entities.size() > 1) {
-            return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
+            return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
         } else {
             return Response.ok().build();
         }
