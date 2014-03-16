@@ -36,6 +36,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import de.phoenix.database.entity.util.Convertable;
 import de.phoenix.rs.entity.PhoenixTaskTest;
 
@@ -60,6 +63,7 @@ public class TaskTest implements Serializable, Convertable<PhoenixTaskTest> {
 
     @JoinColumn(name = "text", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @Cascade(CascadeType.SAVE_UPDATE)
     private Text text;
 
     @JoinColumn(name = "task", referencedColumnName = "id")
@@ -73,9 +77,10 @@ public class TaskTest implements Serializable, Convertable<PhoenixTaskTest> {
         this.id = id;
     }
 
-    public TaskTest(PhoenixTaskTest test) {
+    public TaskTest(Task task, PhoenixTaskTest test) {
         this.text = new Text(test.getContent());
         this.timeout = (int) test.getTimeout();
+        this.task = task;
     }
 
     public Integer getId() {

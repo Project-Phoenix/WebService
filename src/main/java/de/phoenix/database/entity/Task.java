@@ -110,6 +110,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     private List<TaskSubmissionDates> taskSubmissionDatesList;
 
     @OneToMany(mappedBy = "task")
+    @Cascade(CascadeType.SAVE_UPDATE)
     private List<TaskTest> taskTestList;
 
     @Lob
@@ -152,7 +153,7 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
             List<PhoenixTaskTest> tests = autoTask.getTests();
             this.taskTestList = new ArrayList<TaskTest>(tests.size());
             for (PhoenixTaskTest test : autoTask.getTests()) {
-                this.taskTestList.add(new TaskTest(test));
+                this.taskTestList.add(new TaskTest(this, test));
             }
         }
     }
