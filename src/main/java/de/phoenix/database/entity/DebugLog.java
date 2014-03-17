@@ -18,7 +18,9 @@
 
 package de.phoenix.database.entity;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Locale;
 
 import javax.persistence.Basic;
@@ -30,10 +32,14 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import de.phoenix.database.DatabaseManager;
 
 @Entity
 @Table(name = "debugLog")
@@ -89,9 +95,7 @@ public class DebugLog implements Serializable {
 
     @Override
     public String toString() {
-//        retur
         return "[" + date.toString(format) + "]: " + log;
-//        return "de.phoenix.database.entity.DebugLog[ id=" + id + " ]";
     }
 
     public String getLog() {
@@ -108,5 +112,38 @@ public class DebugLog implements Serializable {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public static void log(String message) {
+        try {
+            Session session = DatabaseManager.getSession();
+            DebugLog log = new DebugLog(message, DateTime.now());
+            Transaction trans = session.beginTransaction();
+            session.save(log);
+            trans.commit();
+            session.close();
+        } catch (Exception e) {
+        }
+    }
+    
+    public static String log(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter ps = new PrintWriter(sw);
+        throwable.printStackTrace(ps);
+        String message = sw.toString();
+        ps.close();
+
+        Session session = DatabaseManager.getSession();
+        try {
+            DebugLog log = new DebugLog(message, DateTime.now());
+            Transaction trans = session.beginTransaction();
+            session.save(log);
+            trans.commit();
+        } catch (Exception e) {
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return message;
     }
 }
