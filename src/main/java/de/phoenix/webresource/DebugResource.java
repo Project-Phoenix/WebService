@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 
 import de.phoenix.database.DatabaseManager;
@@ -48,7 +49,21 @@ public class DebugResource {
             sBuilder.append(object.toString());
             sBuilder.append('\n');
         }
+        
+        session.close();
 
         return Response.ok(sBuilder.toString()).build();
+    }
+    
+    @Path("delete")
+    @GET
+    public Response delete() {
+        
+        Session session = DatabaseManager.getSession();
+        Transaction trans = session.beginTransaction();
+        session.createSQLQuery("DELETE FROM debugLog").executeUpdate();
+        trans.commit();
+        session.close();
+        return Response.ok().build();
     }
 }

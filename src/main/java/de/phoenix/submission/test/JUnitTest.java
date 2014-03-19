@@ -3,12 +3,6 @@ package de.phoenix.submission.test;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-
-import de.phoenix.submission.compiler.CharSequenceCompiler;
-import de.phoenix.submission.compiler.CharSequenceCompilerException;
-
 /**
  * Class to encapsulate a JUnit test with a certain timeout and placeholder to
  * replace at runtime
@@ -49,36 +43,6 @@ public class JUnitTest {
     @Override
     public String toString() {
         return content.toString();
-    }
-
-    /**
-     * Wrapper function to compile the junit class
-     * 
-     * @param compiler
-     *            The compiler to use.
-     * @return A compiled class of this junit class, which is stored in memory,
-     *         but not loaded
-     * @throws ClassCastException
-     * @throws CharSequenceCompilerException
-     */
-    public <T> Class<T> compile(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
-        return compiler.compile(className, content);
-    }
-
-    /**
-     * Wrapper function to compile and run the junit class. It invokes the
-     * {@link #compile(CharSequenceCompiler)} and run the
-     * {@link JUnitCore#runClasses(Class...)} methods
-     * 
-     * @param compiler
-     *            The compiler to use
-     * @return The result of the junit tests
-     * @throws ClassCastException
-     * @throws CharSequenceCompilerException
-     */
-    public <T> Result runTest(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
-        Class<T> compiledClass = compile(compiler);
-        return JUnitCore.runClasses(compiledClass);
     }
 
     /**

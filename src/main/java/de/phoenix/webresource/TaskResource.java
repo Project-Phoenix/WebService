@@ -46,7 +46,6 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.submission.DefaultSubmissionController;
 import de.phoenix.submission.SubmissionController;
-import de.phoenix.submission.SubmissionResult;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path(PhoenixTask.WEB_RESOURCE_ROOT)
@@ -142,7 +141,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
             PhoenixSubmission phoenixSubmission = phoenixSubmissions.get(0);
             TaskSubmission taskSubmission = new TaskSubmission(task, phoenixSubmission);
 
-            SubmissionResult result = new SubmissionResult(SubmissionStatus.SUBMITTED, "");
+            PhoenixSubmissionResult result = new PhoenixSubmissionResult(SubmissionStatus.SUBMITTED, "");
             if (task.isAutomaticTest()) {
                 result = CONTROLLER.controllSolution(taskSubmission);
             }
@@ -152,7 +151,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
 
             trans.commit();
 
-            return Response.ok(new PhoenixSubmissionResult(result.getStatus(), result.getStatusText()), MediaType.APPLICATION_JSON).build();
+            return Response.ok(result, MediaType.APPLICATION_JSON).build();
         } finally {
             if (session != null)
                 session.close();

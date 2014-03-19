@@ -22,10 +22,12 @@ import java.util.List;
 
 import de.phoenix.database.entity.TaskSubmission;
 import de.phoenix.database.entity.Text;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.submission.validate.CharSequenceValidator;
 import de.phoenix.submission.validate.ContentValidateEngine;
 import de.phoenix.submission.validate.ContentValidator.ContentValidatorResult;
+import de.phoenix.submissionpipeline.UserSubmissionException;
 
 /**
  * Submission controlling module to check, if the source code contaings
@@ -36,10 +38,10 @@ import de.phoenix.submission.validate.ContentValidator.ContentValidatorResult;
 public class SubmissionSourceValidator implements SubmissionHandler {
 
     @Override
-    public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorResult) {
+    public PhoenixSubmissionResult controlSubmission(TaskSubmission submission) {
         DisallowedContent disallowedContent = submission.getTask().getDisallowedContent();
         if (disallowedContent == null) {
-            return new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted", predecessorResult);
+            return new PhoenixSubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
         }
 
         ContentValidateEngine engine = new ContentValidateEngine();
@@ -56,6 +58,6 @@ public class SubmissionSourceValidator implements SubmissionHandler {
             }
         }
 
-        return new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted", predecessorResult);
+        return new PhoenixSubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
     }
 }

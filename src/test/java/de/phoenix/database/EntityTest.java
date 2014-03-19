@@ -18,6 +18,12 @@
 
 package de.phoenix.database;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.RunWith;
@@ -26,6 +32,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.sun.jersey.api.client.Client;
 
+import de.phoenix.PhoenixApplication;
 import de.phoenix.TestHttpServer;
 import de.phoenix.database.entity.DetailTests;
 import de.phoenix.database.entity.LectureGroupTests;
@@ -50,6 +57,8 @@ public class EntityTest {
 
         @Override
         protected void before() throws Throwable {
+            copyHelper();
+
             System.out.println("Start HTTP Server");
             httpServer = new TestHttpServer(BASE_URL);
             System.out.println("Whipe database");
@@ -59,6 +68,30 @@ public class EntityTest {
             READER = new TextFileReader();
         };
 
+        private void copyHelper() throws IOException {
+            InputStream in = getClass().getResourceAsStream("/SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+            if (in == null) {
+                System.err.println("Can't find the helper programm");
+                System.exit(1);
+                return;
+            }
+
+            PhoenixApplication.submissionPipelineDir = new File(System.getProperty("java.io.tmpdir"), "phoenixhelper");
+            PhoenixApplication.submissionPipelineDir.mkdir();
+
+            PhoenixApplication.submissionPipelineFile = new File(PhoenixApplication.submissionPipelineDir, "SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+
+            OutputStream out = new FileOutputStream(PhoenixApplication.submissionPipelineFile);
+            byte[] buffer = new byte[2048];
+            int read = 0;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.close();
+            in.close();
+
+        }
+
         @Override
         protected void after() {
             System.out.println("Whipe database");
@@ -67,6 +100,27 @@ public class EntityTest {
             DatabaseTestData.getInstance().createTestData();
             System.out.println("Stop HTTP Server");
             httpServer.stop();
+
+            deleteHelper();
+        }
+
+        private void deleteHelper() {
+            deleteDir(PhoenixApplication.submissionPipelineDir);
+
+        }
+
+        private void deleteDir(File file) {
+            File[] files = file.listFiles();
+
+            for (int i = 0; i < files.length; i++) {
+                File subfile = files[i];
+                if (subfile.isDirectory())
+                    deleteDir(subfile);
+                else
+                    subfile.delete();
+            }
+            file.delete();
         };
+
     };
 }

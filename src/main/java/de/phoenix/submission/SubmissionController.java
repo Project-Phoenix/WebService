@@ -22,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.phoenix.database.entity.TaskSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
+import de.phoenix.submissionpipeline.SubmissionException;
+import de.phoenix.submissionpipeline.UserSubmissionException;
 
 public class SubmissionController {
 
@@ -57,15 +60,16 @@ public class SubmissionController {
      *            The submission to becontrolled
      * @return SubmissionResult containg neccessary information
      */
-    public SubmissionResult controllSolution(TaskSubmission submission) {
-        SubmissionResult status = new SubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
+    public PhoenixSubmissionResult controllSolution(TaskSubmission submission) {
+        PhoenixSubmissionResult status = new PhoenixSubmissionResult(SubmissionStatus.SUBMITTED, "Submitted");
+
         for (SubmissionHandler handler : submissionHandler) {
             try {
-                status = handler.controlSubmission(submission, status);
+                status = handler.controlSubmission(submission);
             } catch (UserSubmissionException e) {
-                return new SubmissionResult(SubmissionStatus.ERROR, e.getMessage());
+                return new PhoenixSubmissionResult(SubmissionStatus.ERROR, e.getMessage());
             } catch (SubmissionException e) {
-                return new SubmissionResult(SubmissionStatus.ERROR, "Inform your admin - something went wrong you cannot fix yourself! Sry");
+                return new PhoenixSubmissionResult(SubmissionStatus.ERROR, "Inform your admin - something went wrong you cannot fix yourself! Sry");
             }
         }
         return status;

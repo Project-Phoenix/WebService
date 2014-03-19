@@ -49,7 +49,6 @@ import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixText;
-import de.phoenix.submission.SubmissionResult;
 
 /**
  * Class defining database structure for a solution for a task. PhoenixEntity is
@@ -204,7 +203,7 @@ public class TaskSubmission implements Serializable, Convertable<PhoenixSubmissi
         this.task = task;
     }
 
-    public void setSubmissionResult(SubmissionResult result) {
+    public void setSubmissionResult(PhoenixSubmissionResult result) {
         this.status = result.getStatus().ordinal();
         this.statusText = result.getStatusText();
     }

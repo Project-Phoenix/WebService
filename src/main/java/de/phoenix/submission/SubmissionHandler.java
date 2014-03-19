@@ -19,6 +19,7 @@
 package de.phoenix.submission;
 
 import de.phoenix.database.entity.TaskSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 
 /**
  * Single module of the submission controlling process.
@@ -32,6 +33,6 @@ public interface SubmissionHandler {
      *            The submission to handle
      * @return The result of this handle
      */
-    public SubmissionResult controlSubmission(TaskSubmission submission, SubmissionResult predecessorResult);
+    public PhoenixSubmissionResult controlSubmission(TaskSubmission submission);
 
 }
