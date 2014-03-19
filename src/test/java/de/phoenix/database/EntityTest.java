@@ -76,7 +76,7 @@ public class EntityTest {
                 return;
             }
 
-            PhoenixApplication.submissionPipelineDir = new File(System.getProperty("java.io.tmpdir"), "phoenixhelper");
+            PhoenixApplication.submissionPipelineDir = new File("tmp");
             PhoenixApplication.submissionPipelineDir.mkdir();
 
             PhoenixApplication.submissionPipelineFile = new File(PhoenixApplication.submissionPipelineDir, "SubmissionPipeline-0.0.1-SNAPSHOT.jar");
