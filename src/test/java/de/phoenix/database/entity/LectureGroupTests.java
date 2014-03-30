@@ -69,7 +69,7 @@ public class LectureGroupTests {
         // simple lecture
         PhoenixLecture pLecture = new PhoenixLecture("TestTitle", new ArrayList<PhoenixDetails>());
         WebResource res = PhoenixLecture.createResource(CLIENT, BASE_URL);
-        ClientResponse response  = res.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, pLecture);
+        ClientResponse response = res.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, pLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Sample Detail

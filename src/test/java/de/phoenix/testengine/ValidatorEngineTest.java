@@ -18,11 +18,11 @@ public class ValidatorEngineTest {
 
     private static ContentValidateEngine validatorEngine;
     private static TextFileReader reader;
-    
+
     @BeforeClass
     public static void beforeClass() {
         reader = new TextFileReader();
-        
+
         validatorEngine = new ContentValidateEngine();
         validatorEngine.registerContentChecker(new CharSequenceValidator("java.io", "java.nio"));
         validatorEngine.registerContentChecker(new CharSequenceValidator("java.net", "javax.net"));

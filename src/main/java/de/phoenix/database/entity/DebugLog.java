@@ -125,7 +125,7 @@ public class DebugLog implements Serializable {
         } catch (Exception e) {
         }
     }
-    
+
     public static String log(Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter ps = new PrintWriter(sw);

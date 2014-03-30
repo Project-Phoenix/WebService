@@ -46,7 +46,7 @@ public class LectureGroupResource extends AbstractPhoenixResource<LectureGroup, 
     public Response getLectureGroup(SelectEntity<PhoenixLectureGroup> selectEntity) {
         return onGet(selectEntity);
     }
-    
+
     @Path(PhoenixLectureGroup.WEB_RESOURCE_UPDATE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

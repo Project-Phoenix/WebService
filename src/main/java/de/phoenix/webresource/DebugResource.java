@@ -39,26 +39,26 @@ public class DebugResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLog() {
-        
-        Session session =  DatabaseManager.getSession();
+
+        Session session = DatabaseManager.getSession();
         @SuppressWarnings("unchecked")
         List<Object> list = session.createCriteria(DebugLog.class).addOrder(Order.desc("date")).list();
-        
+
         StringBuilder sBuilder = new StringBuilder();
         for (Object object : list) {
             sBuilder.append(object.toString());
             sBuilder.append('\n');
         }
-        
+
         session.close();
 
         return Response.ok(sBuilder.toString()).build();
     }
-    
+
     @Path("delete")
     @GET
     public Response delete() {
-        
+
         Session session = DatabaseManager.getSession();
         Transaction trans = session.beginTransaction();
         session.createSQLQuery("DELETE FROM debugLog").executeUpdate();

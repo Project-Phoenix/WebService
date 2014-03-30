@@ -62,14 +62,11 @@ public class SubmissionCompilerAndTest implements SubmissionHandler {
             addClass(task, clazz);
         }
 
-        DebugLog.log(submission.getTask().isAutomaticTest()+"");
         if (submission.getTask().isAutomaticTest()) {
             for (TaskTest test : submission.getTask().getTaskTests()) {
                 addTest(task, test, className);
             }
         }
-        
-        DebugLog.log(task.getTests().toString());
 
         // TODO: Add libraries
 
@@ -82,15 +79,10 @@ public class SubmissionCompilerAndTest implements SubmissionHandler {
 
         try {
             Process process = builder.start();
-            DebugLog.log("Started process");
             JSON_MAPPER.writeValue(process.getOutputStream(), task);
-            DebugLog.log("Wrote task to process");
             process.getOutputStream().close();
-            DebugLog.log("Closed output stream");
 
-            DebugLog.log("Waiting for result");
             PhoenixSubmissionResult result = JSON_MAPPER.readValue(process.getInputStream(), PhoenixSubmissionResult.class);
-            DebugLog.log("Received result: " + result);
 
             return result;
         } catch (Exception e) {

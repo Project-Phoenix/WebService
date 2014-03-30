@@ -172,7 +172,7 @@ public class LectureTests {
         WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
 
         // Create a new temporary lecture
-        PhoenixLecture newLecture = new PhoenixLecture(TEST_LECTURE_TITLE+"2", new ArrayList<PhoenixDetails>());
+        PhoenixLecture newLecture = new PhoenixLecture(TEST_LECTURE_TITLE + "2", new ArrayList<PhoenixDetails>());
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, newLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
@@ -183,7 +183,7 @@ public class LectureTests {
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(newLecture, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
-    
+
     @Test
     @Order(7)
     public void addDetail() {

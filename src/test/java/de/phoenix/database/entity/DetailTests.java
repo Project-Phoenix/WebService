@@ -83,22 +83,22 @@ public class DetailTests {
         UpdateEntity<PhoenixDetails> updateEntity = KeyReader.createUpdate(oldDetail, updatedDetail);
         ClientResponse response = PhoenixDetails.updateResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, updateEntity);
         assertEquals(Status.OK, response.getClientResponseStatus());
-        
+
         // Get the new lecture
         response = PhoenixLecture.getResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixLecture>().addKey("title", "TestLecture"));
         assertEquals(Status.OK, response.getClientResponseStatus());
         pLecture = EntityUtil.extractEntity(response);
         PhoenixDetails newDetail = pLecture.getLectureDetails().get(0);
-        
+
         // Compare the detail
         assertEquals(updatedDetail.getRoom(), newDetail.getRoom());
         assertEquals(updatedDetail.getWeekday(), newDetail.getWeekday());
-        
+
         assertEquals(updatedDetail.getStartTime(), newDetail.getStartTime());
         assertEquals(updatedDetail.getEndTime(), newDetail.getEndTime());
-        
+
         assertEquals(updatedDetail.getInterval(), newDetail.getInterval());
-        
+
         assertEquals(updatedDetail.getStartDate(), newDetail.getStartDate());
         assertEquals(updatedDetail.getEndDate(), newDetail.getEndDate());
     }

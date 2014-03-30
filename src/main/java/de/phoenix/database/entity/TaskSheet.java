@@ -81,7 +81,7 @@ public class TaskSheet implements Serializable, Convertable<PhoenixTaskSheet> {
     public TaskSheet() {
 
     }
-    
+
     public TaskSheet(String title) {
         this.setTitle(title);
         this.setCreationDate(DateTime.now());

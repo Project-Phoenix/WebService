@@ -41,7 +41,6 @@ public class PhoenixApplication extends PackagesResourceConfig {
 
         try {
             extractSubmissionPipeline();
-            DebugLog.log("Helper programm copied!");
         } catch (IOException e) {
             DebugLog.log(e);
         }
