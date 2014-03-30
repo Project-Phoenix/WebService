@@ -32,7 +32,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.joda.time.DateTime;
+import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
@@ -71,10 +71,8 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
         try {
             Transaction trans = session.beginTransaction();
 
-            TaskSheet taskSheet = new TaskSheet();
-
-            taskSheet.setTitle((String) connectionEntity.getAttribute("title"));
-            taskSheet.setCreationDate(DateTime.now());
+            String title = connectionEntity.getAttribute("title");
+            TaskSheet taskSheet = new TaskSheet(title);
 
             // Search Tasks
             List<SelectEntity<PhoenixTask>> taskSelectors = connectionEntity.getSelectEntities(PhoenixTask.class);
@@ -104,7 +102,61 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
         }
     }
 
-    @Path(PhoenixTaskSheet.WEB_RESOUECE_REMOVE_TASK_FROM_TASKSHEET)
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_ADD_TASK_TO_TASKSHEET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addTaskToTaskSheet(ConnectionEntity connectionEntity) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+
+            // Search for the task sheet
+            String title = connectionEntity.getAttribute("title");
+            Criteria criteria = session.createCriteria(TaskSheet.class).add(Restrictions.eq("title", title));
+            TaskSheet taskSheet;
+            try {
+                taskSheet = (TaskSheet) criteria.uniqueResult();
+                if (taskSheet == null) {
+                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
+                }
+            } catch (HibernateException e) {
+                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
+            }
+
+            // Search Tasks
+            List<SelectEntity<PhoenixTask>> taskSelectors = connectionEntity.getSelectEntities(PhoenixTask.class);
+            TaskCriteriaFactory taskCriteriaFactory = TaskCriteriaFactory.getInstance();
+            List<Task> tasks = new ArrayList<Task>(taskSelectors.size());
+            for (SelectEntity<PhoenixTask> selectEntity : taskSelectors) {
+                criteria = taskCriteriaFactory.extractCriteria(selectEntity, session);
+                try {
+                    Task task = (Task) criteria.uniqueResult();
+                    if (task == null) {
+                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
+                    }
+                    tasks.add(task);
+                } catch (HibernateException e) {
+                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
+                }
+            }
+
+            Transaction trans = session.beginTransaction();
+            List<Task> taskSheetTasks = taskSheet.getTasks();
+            for (Task task : tasks) {
+                if (!taskSheetTasks.contains(task))
+                    taskSheetTasks.add(task);
+            }
+            session.update(taskSheet);
+            trans.commit();
+        } finally {
+            if (session != null)
+                session.close();
+        }
+
+        return Response.ok().build();
+    }
+
+    @Path(PhoenixTaskSheet.WEB_RESOURCE_REMOVE_TASK_FROM_TASKSHEET)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response removeTaskFromTaskSheet(ConnectionEntity connectionEntity) {
