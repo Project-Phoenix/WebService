@@ -28,18 +28,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.TaskCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
-import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.ConnectionEntity;
@@ -61,7 +57,6 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
         return onGet(selectEntity);
     }
 
-    // TODO: Move to other method name?
     @Path(PhoenixTaskSheet.WEB_RESOURCE_CONNECT_TASKSHEET_WITH_TASK)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -80,16 +75,8 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
             List<Task> tasks = new ArrayList<Task>(taskSelectors.size());
 
             for (SelectEntity<PhoenixTask> selectEntity : taskSelectors) {
-                Criteria criteria = taskCriteriaFactory.extractCriteria(selectEntity, session);
-                try {
-                    Task task = (Task) criteria.uniqueResult();
-                    if (task == null) {
-                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                    }
-                    tasks.add(task);
-                } catch (HibernateException e) {
-                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-                }
+                Task task = searchUnique(taskCriteriaFactory, session, selectEntity);
+                tasks.add(task);
             }
 
             taskSheet.setTasks(tasks);
@@ -112,32 +99,16 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
 
             // Search for the task sheet
             String title = connectionEntity.getAttribute("title");
-            Criteria criteria = session.createCriteria(TaskSheet.class).add(Restrictions.eq("title", title));
-            TaskSheet taskSheet;
-            try {
-                taskSheet = (TaskSheet) criteria.uniqueResult();
-                if (taskSheet == null) {
-                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-            }
+            SelectEntity<PhoenixTaskSheet> taskSheetSelector = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
+            TaskSheet taskSheet = searchUnique(TaskSheetCriteriaFactory.getInstance(), session, taskSheetSelector);
 
             // Search Tasks
             List<SelectEntity<PhoenixTask>> taskSelectors = connectionEntity.getSelectEntities(PhoenixTask.class);
             TaskCriteriaFactory taskCriteriaFactory = TaskCriteriaFactory.getInstance();
             List<Task> tasks = new ArrayList<Task>(taskSelectors.size());
             for (SelectEntity<PhoenixTask> selectEntity : taskSelectors) {
-                criteria = taskCriteriaFactory.extractCriteria(selectEntity, session);
-                try {
-                    Task task = (Task) criteria.uniqueResult();
-                    if (task == null) {
-                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                    }
-                    tasks.add(task);
-                } catch (HibernateException e) {
-                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-                }
+                Task task = searchUnique(taskCriteriaFactory, session, selectEntity);
+                tasks.add(task);
             }
 
             Transaction trans = session.beginTransaction();
@@ -168,27 +139,8 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
             SelectEntity<PhoenixTaskSheet> taskSheetSelector = connectionEntity.getFirstSelectEntity(PhoenixTaskSheet.class);
 
             // Search for the task
-            // TODO: Refactor and generalize it to a own method
-            Task task;
-            try {
-                task = (Task) TaskCriteriaFactory.getInstance().extractCriteria(taskSelector, session).uniqueResult();
-                if (task == null) {
-                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-            }
-
-            // Search for the taksheet
-            TaskSheet taskSheet;
-            try {
-                taskSheet = (TaskSheet) TaskSheetCriteriaFactory.getInstance().extractCriteria(taskSheetSelector, session).uniqueResult();
-                if (taskSheet == null) {
-                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-            }
+            Task task = searchUnique(TaskCriteriaFactory.getInstance(), session, taskSelector);
+            TaskSheet taskSheet = searchUnique(TaskSheetCriteriaFactory.getInstance(), session, taskSheetSelector);
 
             // Delete connection
             // Hibernate needs to remove both links

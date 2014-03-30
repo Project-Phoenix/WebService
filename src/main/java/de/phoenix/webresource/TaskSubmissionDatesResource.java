@@ -23,10 +23,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -64,29 +62,11 @@ public class TaskSubmissionDatesResource extends AbstractPhoenixResource<TaskSub
 
             // Search for taskSheet
             SelectEntity<PhoenixLectureGroupTaskSheet> taskSheetSelector = connectionEntity.getFirstSelectEntity(PhoenixLectureGroupTaskSheet.class);
-            Criteria taskSheetCriteria = LectureGroupTaskSheetCriteriaFactory.getInstance().extractCriteria(taskSheetSelector, session);
-            LectureGroupTaskSheet taskSheet;
-            try {
-                taskSheet = (LectureGroupTaskSheet) taskSheetCriteria.uniqueResult();
-                if (taskSheet == null) {
-                    return Response.status(Status.NOT_FOUND).entity("No entity").build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
-            }
+            LectureGroupTaskSheet taskSheet = searchUnique(LectureGroupTaskSheetCriteriaFactory.getInstance(), session, taskSheetSelector);
 
-            // Search for taskSheet
+            // Search for task
             SelectEntity<PhoenixTask> taskSelector = connectionEntity.getFirstSelectEntity(PhoenixTask.class);
-            Criteria taskCriteria = TaskCriteriaFactory.getInstance().extractCriteria(taskSelector, session);
-            Task task;
-            try {
-                task = (Task) taskCriteria.uniqueResult();
-                if (task == null) {
-                    return Response.status(Status.NOT_FOUND).entity("No entity").build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(Status.NOT_MODIFIED).entity("Multiple entities").build();
-            }
+            Task task = searchUnique(TaskCriteriaFactory.getInstance(), session, taskSelector);
 
             DateTime deadLine = connectionEntity.getAttribute("deadline");
             DateTime releaseDate = connectionEntity.getAttribute("releaseDate");

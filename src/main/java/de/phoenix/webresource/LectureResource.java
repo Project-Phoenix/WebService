@@ -98,9 +98,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
         Session session = DatabaseManager.getSession();
         try {
             List<Lecture> lectures = searchEntity(addToEntity, session);
-            Response response = checkOnlyOne(lectures);
-            if (response.getStatus() != 200)
-                return response;
+            checkOnlyOne(lectures);
 
             Lecture lecture = lectures.get(0);
 
@@ -126,9 +124,7 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
         Session session = DatabaseManager.getSession();
         try {
             List<Lecture> lectures = searchEntity(addToEntity, session);
-            Response response = checkOnlyOne(lectures);
-            if (response.getStatus() != 200)
-                return response;
+            checkOnlyOne(lectures);
 
             Lecture lecture = lectures.get(0);
 

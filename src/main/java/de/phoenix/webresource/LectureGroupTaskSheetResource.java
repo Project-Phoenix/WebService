@@ -27,8 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
@@ -40,7 +38,6 @@ import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.database.entity.criteria.LectureGroupTaskSheetCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
-import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
@@ -66,39 +63,21 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
 
             // Search for taskSheet
             SelectEntity<PhoenixTaskSheet> taskSheetSelector = connectionEntity.getFirstSelectEntity(PhoenixTaskSheet.class);
-            Criteria taskSheetCriteria = TaskSheetCriteriaFactory.getInstance().extractCriteria(taskSheetSelector, session);
-            TaskSheet taskSheet;
-            try {
-                taskSheet = (TaskSheet) taskSheetCriteria.uniqueResult();
-                if (taskSheet == null) {
-                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                }
-            } catch (HibernateException e) {
-                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-            }
+            TaskSheet taskSheet = searchUnique(TaskSheetCriteriaFactory.getInstance(), session, taskSheetSelector);
 
             // Search for groups
-            LectureGroupCriteriaFactory groupCriteriaFactory = LectureGroupCriteriaFactory.getInstance();
             List<SelectEntity<PhoenixLectureGroup>> groupSelectors = connectionEntity.getSelectEntities(PhoenixLectureGroup.class);
 
-            for (SelectEntity<PhoenixLectureGroup> selectEntity : groupSelectors) {
-                Criteria criteria = groupCriteriaFactory.extractCriteria(selectEntity, session);
-                try {
-                    LectureGroup group = (LectureGroup) criteria.uniqueResult();
-                    if (group == null) {
-                        return Response.status(PhoenixStatusType.NO_ENTITIES).build();
-                    }
+            for (SelectEntity<PhoenixLectureGroup> groupSelector : groupSelectors) {
+                LectureGroup group = searchUnique(LectureGroupCriteriaFactory.getInstance(), session, groupSelector);
 
-                    // Persist lecture group task sheet
-                    LectureGroupTaskSheet groupTaskSheet = new LectureGroupTaskSheet();
-                    groupTaskSheet.setDefaultDeadline((DateTime) connectionEntity.getAttribute("defaultDeadLine"));
-                    groupTaskSheet.setDefaultReleaseDate((DateTime) connectionEntity.getAttribute("defaultReleaseDate"));
-                    groupTaskSheet.setTaskSheet(taskSheet);
-                    groupTaskSheet.setLectureGroup(group);
-                    session.save(groupTaskSheet);
-                } catch (HibernateException e) {
-                    return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
-                }
+                // Persist lecture group task sheet
+                LectureGroupTaskSheet groupTaskSheet = new LectureGroupTaskSheet();
+                groupTaskSheet.setDefaultDeadline((DateTime) connectionEntity.getAttribute("defaultDeadLine"));
+                groupTaskSheet.setDefaultReleaseDate((DateTime) connectionEntity.getAttribute("defaultReleaseDate"));
+                groupTaskSheet.setTaskSheet(taskSheet);
+                groupTaskSheet.setLectureGroup(group);
+                session.save(groupTaskSheet);
             }
 
             trans.commit();

@@ -131,9 +131,7 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
         Session session = DatabaseManager.getSession();
         try {
             List<Task> tasks = searchEntity(addToEntity, session);
-            Response response = checkOnlyOne(tasks);
-            if (response.getStatus() != 200)
-                return response;
+            checkOnlyOne(tasks);
 
             Task task = tasks.get(0);
 

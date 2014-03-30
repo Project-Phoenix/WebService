@@ -20,10 +20,12 @@ package de.phoenix.webresource.util;
 
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
@@ -78,14 +80,14 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
             Transaction trans = session.beginTransaction();
 
             T entity = creator.create(phoenixEntity, session);
-            
+
             return handlePossibleDuplicateInsert(session, trans, entity);
         } finally {
             if (session != null)
                 session.close();
         }
     }
-    
+
     protected Response handlePossibleDuplicateInsert(Session session, Transaction trans, Object entity) {
         try {
             session.save(entity);
@@ -99,7 +101,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         }
         return Response.ok().build();
     }
-    
+
     protected Response handlePossibleDuplicateUpdate(Session session, Transaction trans, Object entity) {
         try {
             session.update(entity);
@@ -146,22 +148,18 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
     protected Response onUpdate(UpdateEntity<E> updatedEntity) {
         Session session = DatabaseManager.getSession();
         try {
-
             List<T> entities = searchEntity(updatedEntity, session);
-            Response response = checkOnlyOne(entities);
-            if (response.getStatus() == 200) {
-                T entity = entities.get(0);
-                E phoenixEntity = updatedEntity.getNewObject();
+            checkOnlyOne(entities);
+            T entity = entities.get(0);
+            E phoenixEntity = updatedEntity.getNewObject();
 
-                Transaction trans = session.beginTransaction();
-                entity.copyValues(phoenixEntity);
+            Transaction trans = session.beginTransaction();
+            entity.copyValues(phoenixEntity);
 
-                session.update(entity);
-                trans.commit();
-            }
+            session.update(entity);
+            trans.commit();
 
-            return response;
-
+            return Response.ok().build();
         } finally {
             if (session != null)
                 session.close();
@@ -183,16 +181,15 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         Session session = DatabaseManager.getSession();
         try {
             List<T> entities = searchEntity(selectEntity, session);
-            Response response = checkOnlyOne(entities);
-            if (response.getStatus() == 200) {
-                T entity = entities.get(0);
+            checkOnlyOne(entities);
 
-                Transaction trans = session.beginTransaction();
-                session.delete(entity);
-                trans.commit();
-            }
+            T entity = entities.get(0);
 
-            return response;
+            Transaction trans = session.beginTransaction();
+            session.delete(entity);
+            trans.commit();
+
+            return Response.ok().build();
         } finally {
             if (session != null)
                 session.close();
@@ -233,14 +230,28 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         return criteria.list();
     }
 
-    protected Response checkOnlyOne(List<T> entities) {
+    protected void checkOnlyOne(List<T> entities) {
 
         if (entities.isEmpty()) {
-            return Response.status(PhoenixStatusType.NO_ENTITIES).build();
+            throw new WebApplicationException(Response.status(PhoenixStatusType.NO_ENTITIES).build());
         } else if (entities.size() > 1) {
-            return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
+            throw new WebApplicationException(Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build());
         } else {
-            return Response.ok().build();
+            // Do nothing
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <K extends Convertable<V>, V extends PhoenixEntity> K searchUnique(CriteriaFactory<K, V> factory, Session session, SelectEntity<V> selector) {
+        K entity;
+        try {
+            entity = (K) factory.extractCriteria(selector, session).uniqueResult();
+            if (entity == null) {
+                throw new WebApplicationException(Response.status(PhoenixStatusType.NO_ENTITIES).build());
+            }
+            return entity;
+        } catch (HibernateException e) {
+            throw new WebApplicationException(Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build());
         }
     }
 }
