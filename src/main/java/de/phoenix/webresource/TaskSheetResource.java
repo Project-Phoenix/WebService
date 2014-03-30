@@ -103,4 +103,54 @@ public class TaskSheetResource extends AbstractPhoenixResource<TaskSheet, Phoeni
             }
         }
     }
+
+    @Path(PhoenixTaskSheet.WEB_RESOUECE_REMOVE_TASK_FROM_TASKSHEET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response removeTaskFromTaskSheet(ConnectionEntity connectionEntity) {
+        Session session = DatabaseManager.getSession();
+        try {
+            Transaction trans = session.beginTransaction();
+
+            SelectEntity<PhoenixTask> taskSelector = connectionEntity.getFirstSelectEntity(PhoenixTask.class);
+            SelectEntity<PhoenixTaskSheet> taskSheetSelector = connectionEntity.getFirstSelectEntity(PhoenixTaskSheet.class);
+
+            // Search for the task
+            // TODO: Refactor and generalize it to a own method
+            Task task;
+            try {
+                task = (Task) TaskCriteriaFactory.getInstance().extractCriteria(taskSelector, session).uniqueResult();
+                if (task == null) {
+                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
+                }
+            } catch (HibernateException e) {
+                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
+            }
+
+            // Search for the taksheet
+            TaskSheet taskSheet;
+            try {
+                taskSheet = (TaskSheet) TaskSheetCriteriaFactory.getInstance().extractCriteria(taskSheetSelector, session).uniqueResult();
+                if (taskSheet == null) {
+                    return Response.status(PhoenixStatusType.NO_ENTITIES).build();
+                }
+            } catch (HibernateException e) {
+                return Response.status(PhoenixStatusType.MULTIPLE_ENTITIES).build();
+            }
+
+            // Delete connection
+            // Hibernate needs to remove both links
+            task.getTaskSheets().remove(taskSheet);
+            taskSheet.getTasks().remove(task);
+            session.update(task);
+
+            trans.commit();
+
+            return Response.ok().build();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
 }

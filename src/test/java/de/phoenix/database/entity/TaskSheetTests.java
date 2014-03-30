@@ -47,6 +47,7 @@ import de.phoenix.rs.entity.PhoenixTaskSubmissionDates;
 import de.phoenix.rs.entity.connection.LectureGroupTaskSheetConnection;
 import de.phoenix.rs.entity.connection.TaskSheetConnection;
 import de.phoenix.rs.entity.connection.TaskSubmissionDatesConnection;
+import de.phoenix.rs.entity.disconnection.DisconnectTaskTaskSheet;
 import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
@@ -74,12 +75,48 @@ public class TaskSheetTests {
         response = connectTasksheetWithTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, bundleTasksToTaskSheet);
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
-    
+
     @Test
     @Order(2)
+    public void removeOneTask() {
+
+        // Request all task sheet - is only one
+        WebResource getAllTaskSheetsRes = PhoenixTaskSheet.getResource(CLIENT, BASE_URL);
+        ClientResponse response = getAllTaskSheetsRes.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTaskSheet>());
+
+        // Check that the created task sheet has two tasks
+        PhoenixTaskSheet taskSheet = EntityUtil.extractEntity(response);
+        List<PhoenixTask> tasks = taskSheet.getTasks();
+        assertEquals(2, tasks.size());
+
+        // extract one task from the task sheet to remove it and create a task
+        // selector from it
+        SelectEntity<PhoenixTask> taskSelector = new SelectEntity<PhoenixTask>().addKey("title", tasks.get(0).getTitle());
+
+        // Create task sheet selector
+        SelectEntity<PhoenixTaskSheet> taskSheetSelector = new SelectEntity<PhoenixTaskSheet>().addKey("title", taskSheet.getTitle());
+
+        // Remove the task from the task sheet
+        DisconnectTaskTaskSheet deleteEntity = new DisconnectTaskTaskSheet(taskSelector, taskSheetSelector);
+        WebResource removeTaskFromTaskSheetResource = PhoenixTaskSheet.removeTaskFromTaskSheetResource(CLIENT, BASE_URL);
+        response = removeTaskFromTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, deleteEntity);
+
+        assertEquals(200, response.getStatus());
+
+        // Check if the task was removed from tasksheet
+        // Request all task sheet - is only one
+        response = getAllTaskSheetsRes.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTaskSheet>());
+
+        // Check that the created task sheet has two tasks
+        taskSheet = EntityUtil.extractEntity(response);
+        assertEquals(1, taskSheet.getTasks().size());
+    }
+
+    @Test
+    @Order(3)
     public void createDuplicateTaskSheet() {
         // Do the same as createTaskSheet
-        
+
         WebResource getAllTasksResource = PhoenixTask.getResource(CLIENT, BASE_URL);
         ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
         List<PhoenixTask> tasks = EntityUtil.extractEntityList(response);
@@ -94,7 +131,7 @@ public class TaskSheetTests {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void createLectureGroupTaskSheets() {
 
         WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
@@ -114,7 +151,7 @@ public class TaskSheetTests {
 
     @Test
     @Ignore("Must implement this!")
-    @Order(3)
+    @Order(5)
     public void createDuplicateLectureGroupTaskSheets() {
 
         // Do the same as createLectureGroupTaskSheets
@@ -133,9 +170,9 @@ public class TaskSheetTests {
         // Check if duplicate was detected
         assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
-    @Order(4)
+    @Order(6)
     public void setSubmissionDateForTask() {
 
         WebResource getAllGroupsResource = PhoenixLectureGroup.getResource(CLIENT, BASE_URL);
