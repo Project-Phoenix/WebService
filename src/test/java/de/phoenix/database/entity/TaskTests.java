@@ -253,7 +253,7 @@ public class TaskTests {
 
         PhoenixTask task = EntityUtil.extractEntity(response);
 
-        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyTernarySearch.java")));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/goodImpl/TernarySearch.java")));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
         response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, Arrays.asList(sub)));
         assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
@@ -276,7 +276,7 @@ public class TaskTests {
 
         PhoenixTask task = EntityUtil.extractEntity(response);
 
-        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/MyMaliciousTernarySearch.java")));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/badImpl/TernarySearch.java")));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
 
         response = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(task, Arrays.asList(sub)));

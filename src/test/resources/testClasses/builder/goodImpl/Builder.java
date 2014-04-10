@@ -1,12 +1,12 @@
-public class MyBuilder {
+public class Builder {
 
     private String buffer;
 
-    public MyBuilder() {
+    public Builder() {
         this.buffer = "";
     }
 
-    public MyBuilder append(String string) {
+    public Builder append(String string) {
         buffer += string;
         return this;
     }

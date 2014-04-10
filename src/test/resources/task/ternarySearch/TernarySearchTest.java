@@ -24,7 +24,7 @@ public class TernarySearchTest {
     @Test
     public void test() {
         int[] testArray = {1,2,3,4,5,6,7,8,9,10};
-        int pos = ${CLASS}.ternaryRec(testArray, 5);
+        int pos = TernarySearch.ternaryRec(testArray, 5);
         assertEquals(4, pos);
     }
 }

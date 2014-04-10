@@ -1,8 +1,8 @@
-public class EndlessMyCounter {
+public class Counter {
 
     private int counter;
 
-    public EndlessMyCounter() {
+    public Counter() {
 
     }
 

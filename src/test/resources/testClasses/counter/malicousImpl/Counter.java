@@ -1,10 +1,10 @@
 import java.io.File;
 
-public class DeleteFile {
+public class Counter {
 
     private int counter;
 
-    public DeleteFile() {
+    public Counter() {
         File file = new File("deleteme");
         file.delete();
     }

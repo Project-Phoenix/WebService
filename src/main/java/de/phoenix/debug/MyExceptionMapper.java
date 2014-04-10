@@ -40,6 +40,16 @@ public class MyExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable exception) {
 
+        if (exception instanceof WebApplicationException) {
+            Response response = ((WebApplicationException) exception).getResponse();
+            switch (response.getStatus()) {
+                case 460 :
+                case 461 :
+                case 462 :
+                    return response;
+            }
+        }
+
         StringWriter sw = new StringWriter();
         PrintWriter ps = new PrintWriter(sw);
         exception.printStackTrace(ps);

@@ -1,11 +1,11 @@
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-public class TestMyBuilder {
+public class BuilderTest {
 
     @Test
     public void test() {
-        MyBuilder m = new MyBuilder();
+        Builder m = new Builder();
         m.append("Hello World");
         assertEquals("Hello World",m.toString());
     }
