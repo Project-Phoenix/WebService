@@ -65,22 +65,8 @@ public class JUnitTest {
 
         private JUnitTest product;
 
-        private final static Pattern CLASS_TAG_PATTERN = Pattern.compile(Pattern.quote("${CLASS}"));
-
         private JUnitTestBuilder(String className, String content) {
             this.product = new JUnitTest(className, content);
-        }
-
-        /**
-         * Replace all ${CLASS} with the to test class name
-         * 
-         * @param className
-         *            The submitted class name
-         * @return This builder
-         */
-        public JUnitTestBuilder setClassTag(String className) {
-            this.product.content = CLASS_TAG_PATTERN.matcher(this.product.getContent()).replaceAll(className);
-            return this;
         }
 
         /**

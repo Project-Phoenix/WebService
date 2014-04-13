@@ -20,7 +20,9 @@ package de.phoenix.submission;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -36,7 +38,6 @@ import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.submission.test.JUnitTest;
-import de.phoenix.submissionpipeline.UserSubmissionException;
 import de.phoenix.submissionpipeline.api.SubmissionTask;
 
 public class SubmissionCompilerAndTest implements SubmissionHandler {
@@ -51,25 +52,29 @@ public class SubmissionCompilerAndTest implements SubmissionHandler {
         File dir = PhoenixApplication.submissionPipelineDir;
         List<String> commands = getCommands();
 
-        // TODO: Support multiple texts to compile in the future!
-        if (submission.getTexts().size() > 1) {
-            throw new UserSubmissionException("Multiple submission texts are currently not supported!");
+        // Check, if all necessary classes are submitted
+        Set<String> classes = new HashSet<String>();
+        for (Text text : submission.getTask().getTexts()) {
+            classes.add(text.getTitle());
         }
-        // TODO: Assign class name to replace tag!
-        String className = submission.getTexts().get(0).getTitle();
 
         for (Text clazz : submission.getTexts()) {
-            addClass(task, clazz);
+            task.addClass(clazz.convert());
+            classes.remove(clazz.getTitle());
+        }
+
+        // Some to implement classes are missing -> error
+        if (!classes.isEmpty()) {
+            return new PhoenixSubmissionResult(SubmissionStatus.MISSING_FILES, "Missing classes to implement/submit. Maybe you wrote the name of the class wrong? Missing Classes:\r\n" + classes.toString());
         }
 
         if (submission.getTask().isAutomaticTest()) {
             for (TaskTest test : submission.getTask().getTaskTests()) {
-                addTest(task, test, className);
+                addTest(task, test);
             }
         }
 
         // TODO: Add libraries
-
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.directory(dir);
 
@@ -102,13 +107,9 @@ public class SubmissionCompilerAndTest implements SubmissionHandler {
         return commands;
     }
 
-    private void addClass(SubmissionTask task, Text clazz) {
-        task.addClass(clazz.convert());
-    }
-
-    private void addTest(SubmissionTask task, TaskTest test, String className) {
+    private void addTest(SubmissionTask task, TaskTest test) {
         Text text = test.getText();
-        JUnitTest unitTest = JUnitTest.create(text.getTitle(), text.getContent()).setClassTag(className).setTimeOut(test.getTimeout()).build();
+        JUnitTest unitTest = JUnitTest.create(text.getTitle(), text.getContent()).setTimeOut(test.getTimeout()).build();
         task.addTest(new PhoenixText(unitTest.getContent(), DateTime.now(), unitTest.getClassName(), "java"));
     }
 
