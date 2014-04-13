@@ -260,7 +260,7 @@ public class LectureTests {
         groupSelector.addKey("lecture", lectureSelector);
 
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
-        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
+        assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
 
         List<PhoenixLectureGroup> groups = EntityUtil.extractEntityList(response);
         assertNull("Elements in group", groups);

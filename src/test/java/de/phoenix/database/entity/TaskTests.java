@@ -293,6 +293,6 @@ public class TaskTests {
     public void searchNonExistingTask() {
         WebResource getAllTasksResource = PhoenixTask.getResource(CLIENT, BASE_URL);
         ClientResponse response = getAllTasksResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixTask>().addKey("title", "troll"));
-        assertEquals(Status.NOT_FOUND, response.getClientResponseStatus());
+        assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
     }
 }

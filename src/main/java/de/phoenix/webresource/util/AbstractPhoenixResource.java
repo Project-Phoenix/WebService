@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -211,7 +210,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
 
             List<T> entities = searchEntity(selectEntity, session);
             if (entities.isEmpty()) {
-                return Response.status(Status.NOT_FOUND).build();
+                return Response.status(PhoenixStatusType.NO_ENTITIES).build();
             }
 
             List<E> result = ConverterUtil.convert(entities);
