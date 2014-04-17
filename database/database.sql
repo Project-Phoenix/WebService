@@ -354,13 +354,13 @@ CREATE TABLE IF NOT EXISTS `phoenix`.`taskTest` (
   CONSTRAINT `fk_test_task1`
     FOREIGN KEY (`task`)
     REFERENCES `phoenix`.`task` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_test_text1`
     FOREIGN KEY (`text`)
     REFERENCES `phoenix`.`text` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 

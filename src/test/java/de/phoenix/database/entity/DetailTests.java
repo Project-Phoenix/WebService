@@ -18,9 +18,10 @@
 
 package de.phoenix.database.entity;
 
-import static de.phoenix.database.EntityTest.CLIENT;
 import static de.phoenix.database.EntityTest.BASE_URL;
+import static de.phoenix.database.EntityTest.CLIENT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Arrays;
 
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.date.Weekday;
 import de.phoenix.junit.OrderedRunner;
@@ -60,10 +62,11 @@ public class DetailTests {
 
         // Create sample detail
         PhoenixDetails pDetail1 = new PhoenixDetails("room1", Weekday.MONDAY, nowTime, nowTime.plusHours(1), Period.days(1), nowDate, nowDate.plusDays(1));
+        PhoenixDetails pDetail2 = new PhoenixDetails("room2", Weekday.SATURDAY, nowTime, nowTime.plusHours(1), Period.days(1), nowDate, nowDate.plusDays(1));
 
         // Create a lecture
         String title = "TestLecture";
-        PhoenixLecture newLecture = new PhoenixLecture(title, Arrays.asList(pDetail1));
+        PhoenixLecture newLecture = new PhoenixLecture(title, Arrays.asList(pDetail1, pDetail2));
         ClientResponse response = PhoenixLecture.createResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, newLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
@@ -101,6 +104,23 @@ public class DetailTests {
 
         assertEquals(updatedDetail.getStartDate(), newDetail.getStartDate());
         assertEquals(updatedDetail.getEndDate(), newDetail.getEndDate());
+    }
+
+    @Test
+    public void deleteDetail() {
+        PhoenixDetails toDeleteDetail = pLecture.getLectureDetails().get(1);
+
+        WebResource resource = PhoenixDetails.deleteResource(CLIENT, BASE_URL);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createSelect(toDeleteDetail));
+        assertEquals(200, response.getStatus());
+
+        // Check if the lecture does't have the detail now
+        response = PhoenixLecture.getResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectEntity<PhoenixLecture>().addKey("title", "TestLecture"));
+        assertEquals(200, response.getStatus());
+
+        PhoenixLecture lecture = EntityUtil.extractEntity(response);
+        assertEquals(1, lecture.getLectureDetails().size());
+        assertNotEquals("room2", lecture.getLectureDetails().get(0).getRoom());
     }
 
 }
