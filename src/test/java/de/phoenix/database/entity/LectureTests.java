@@ -31,6 +31,8 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
@@ -41,6 +43,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 
+import de.phoenix.database.DatabaseManager;
+import de.phoenix.database.entity.criteria.DetailsCriteriaFactory;
 import de.phoenix.date.Weekday;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
@@ -139,8 +143,10 @@ public class LectureTests {
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
 
+        PhoenixDetails detail2 = new PhoenixDetails("G29-K059", Weekday.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
+
         // Create second group
-        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail));
+        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail2));
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
@@ -269,6 +275,7 @@ public class LectureTests {
     @Test
     @Order(11)
     public void deleteLectureGroup() {
+
         WebResource ws = PhoenixLectureGroup.deleteResource(CLIENT, BASE_URL);
 
         // Create Lecture Group Selector
@@ -284,8 +291,42 @@ public class LectureTests {
         // are selected)
         groupSelector.addKey("lecture", lectureSelector);
 
+        ClientResponse response = PhoenixLectureGroup.getResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // Get the detail to check, if the details are also deleted
+        PhoenixLectureGroup group = EntityUtil.extractEntity(response);
+        PhoenixDetails detail = group.getDetails().get(0);
+
         // Send delete response
-        ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
         assertEquals(Status.OK, response.getClientResponseStatus());
+
+        // Check, if the detail of the lecture group was also deleted
+        Session session = DatabaseManager.getSession();
+        Criteria criteria = DetailsCriteriaFactory.getInstance().extractCriteria(KeyReader.createSelect(detail), session);
+        assertNull(criteria.uniqueResult());
+    }
+
+    @Test
+    @Order(12)
+    public void deleteLectureAndItsDetails() {
+        WebResource resource = PhoenixLecture.createResource(CLIENT, BASE_URL);
+        ClientResponse response = null;
+
+        // Create the lecture to delete
+        PhoenixDetails detail = new PhoenixDetails("toDeleteRoom", Weekday.MONDAY, LocalTime.now(), LocalTime.now().plusHours(1), Period.weeks(1), LocalDate.now(), LocalDate.now().plusDays(1));
+        PhoenixLecture lecture = new PhoenixLecture("toDeleteLecture", Arrays.asList(detail));
+        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
+        assertEquals(200, response.getStatus());
+
+        // Delete the lecture
+        resource = PhoenixLecture.deleteResource(CLIENT, BASE_URL);
+        response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createSelect(lecture));
+        assertEquals(200, response.getStatus());
+
+        Session session = DatabaseManager.getSession();
+        Criteria criteria = DetailsCriteriaFactory.getInstance().extractCriteria(KeyReader.createSelect(detail), session);
+        assertNull(criteria.uniqueResult());
     }
 }

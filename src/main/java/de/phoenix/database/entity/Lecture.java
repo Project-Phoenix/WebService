@@ -72,7 +72,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
             @JoinColumn(name = "additionalInfo_id", referencedColumnName = "id")})
     //@formatter:on
     @ManyToMany
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.DELETE})
     private List<Details> detailsList;
 
     public Lecture() {
