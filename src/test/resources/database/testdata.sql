@@ -153,11 +153,11 @@ INSERT INTO `taskSubmissionText` (`taskSubmission_id`, `text_id`) VALUES
     (8, 30);
 
 INSERT INTO `taskTest` (`id`, `timeout`, `task`, `text`) VALUES
-    (1, 10, 4, 14),
-    (2, 10, 21, 15),
-    (3, 10, 22, 17),
-    (4, 10, 23, 19),
-    (5, 10, 24, 21);
+    (1, 10000, 4, 14),
+    (2, 10000, 21, 15),
+    (3, 10000, 22, 17),
+    (4, 10000, 23, 19),
+    (5, 10000, 24, 21);
 
 INSERT INTO `text` (`id`, `content`, `creationDate`, `sha1`, `title`, `type`) VALUES
     (1, 'public class Prime {\r\n\r\n      public static boolean isPrime(int n){\r\n      // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n\r\n     public static int nextPrime(int n){\r\n     // hier bitte Quelltext einfuegen\r\n\r\n     }\r\n  \r\n     public static void main(String[] args) {\r\n     // hier bitte Testrahmen einfuegen\r\n\r\n    }\r\n}', '2014-01-23 23:59:51', 'f6c4c0f42e8f61733e5117f779ede24ada20974e', 'Prime', 'java'),
