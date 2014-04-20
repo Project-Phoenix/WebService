@@ -49,10 +49,10 @@ INSERT INTO `lectureGroupDetails` (`group_id`, `additionalInfo_id`) VALUES
     (10, 11);
 
 INSERT INTO `lectureGroupTaskSheet` (`id`, `defaultDeadline`, `defaultReleaseDate`, `taskSheet`, `lectureGroup`) VALUES
+    (3, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW(), 1, 1),
+    (4, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW(), 1, 2),
     (1, '2014-04-21 10:00:00', '2014-04-17 17:55:00', 1, 3),
     (2, '2014-04-21 10:00:00', '2014-04-17 17:55:00', 1, 5),
-    (3, '2014-04-21 10:00:00', '2014-04-17 17:55:00', 1, 1),
-    (4, '2014-04-24 10:00:00', '2014-04-17 17:55:00', 1, 2),
     (5, '2014-04-21 12:00:00', '2014-04-17 17:55:00', 1, 10),
     (6, '2014-04-21 08:00:00', '2014-04-17 17:55:00', 1, 9),
     (7, '2014-04-21 10:00:00', '2014-04-17 17:55:00', 1, 8),

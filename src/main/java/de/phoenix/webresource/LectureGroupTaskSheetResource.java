@@ -38,6 +38,7 @@ import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.database.entity.criteria.LectureGroupTaskSheetCriteriaFactory;
 import de.phoenix.database.entity.criteria.TaskSheetCriteriaFactory;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
@@ -97,5 +98,32 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(SelectEntity<PhoenixLectureGroupTaskSheet> selectEntity) {
         return onGet(selectEntity);
+    }
+
+    @Path(PhoenixLectureGroupTaskSheet.WEB_RESOURCE_CURRENT_TASKSHEET)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response current(SelectEntity<PhoenixLectureGroup> groupSelector) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+
+            LectureGroup lectureGroup = searchUnique(LectureGroupCriteriaFactory.getInstance(), session, groupSelector);
+            List<LectureGroupTaskSheet> taskSheetList = lectureGroup.getLectureGroupTaskSheetList();
+            // TODO: Implement task specific dates
+            for (LectureGroupTaskSheet lectureGroupTaskSheet : taskSheetList) {
+                DateTime releaseDate = lectureGroupTaskSheet.getDefaultReleaseDate();
+                DateTime deadline = lectureGroupTaskSheet.getDefaultDeadline();
+                if ((releaseDate.isBeforeNow() || releaseDate.isEqualNow()) && deadline.isAfterNow())
+                    return Response.ok(lectureGroupTaskSheet.convert()).build();
+            }
+
+            return Response.status(PhoenixStatusType.NO_CURRENT_TASKSHEET).build();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 }
