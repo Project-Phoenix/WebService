@@ -54,17 +54,11 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createLecture(PhoenixLecture phoenixLecture) {
-        return onCreate(phoenixLecture, LectureCreator.INSTANCE);
-    }
-
-    private static class LectureCreator implements EntityCreator<Lecture, PhoenixLecture> {
-
-        private final static LectureCreator INSTANCE = new LectureCreator();
-
-        @Override
-        public Lecture create(PhoenixLecture phoenixEntity, Session session) {
-            return new Lecture(phoenixEntity);
-        }
+        return onCreate(phoenixLecture, new EntityCreator<Lecture, PhoenixLecture>() {
+            public Lecture create(PhoenixLecture phoenixEntity) {
+                return new Lecture(phoenixEntity);
+            }
+        });
     }
 
     @Path(PhoenixLecture.WEB_RESOURCE_UPDATE)

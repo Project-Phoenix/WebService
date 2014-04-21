@@ -61,17 +61,11 @@ public class TaskResource extends AbstractPhoenixResource<Task, PhoenixTask> {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTask(PhoenixTask phoenixTask) {
-        return onCreate(phoenixTask, TaskCreator.INSTANCE);
-    }
-
-    private static class TaskCreator implements EntityCreator<Task, PhoenixTask> {
-
-        private final static TaskCreator INSTANCE = new TaskCreator();
-
-        @Override
-        public Task create(PhoenixTask phoenixTask, Session session) {
-            return new Task(phoenixTask);
-        }
+        return onCreate(phoenixTask, new EntityCreator<Task, PhoenixTask>() {
+            public Task create(PhoenixTask phoenixEntity) {
+                return new Task(phoenixEntity);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

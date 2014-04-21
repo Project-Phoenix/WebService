@@ -78,7 +78,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
         try {
             Transaction trans = session.beginTransaction();
 
-            T entity = creator.create(phoenixEntity, session);
+            T entity = creator.create(phoenixEntity);
 
             return handlePossibleDuplicateInsert(session, trans, entity);
         } finally {
@@ -129,7 +129,7 @@ public abstract class AbstractPhoenixResource<T extends Convertable<E>, E extend
      * @param <E>
      */
     protected interface EntityCreator<T extends Convertable<E>, E> {
-        public T create(E phoenixEntity, Session session);
+        public T create(E phoenixEntity);
     }
 
     /**
