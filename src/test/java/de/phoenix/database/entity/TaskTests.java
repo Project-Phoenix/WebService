@@ -21,8 +21,7 @@ package de.phoenix.database.entity;
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static de.phoenix.database.EntityTest.CLIENT;
 import static de.phoenix.database.EntityTest.READER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -252,6 +251,7 @@ public class TaskTests {
         assertEquals(ClientResponse.Status.OK, response.getClientResponseStatus());
 
         PhoenixTask task = EntityUtil.extractEntity(response);
+        assertTrue("task is not an instance of PhoenixAutomaticTask", task instanceof PhoenixAutomaticTask);
 
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(new File("src/test/resources/task/ternarySearch/goodImpl/TernarySearch.java")));
         wr = PhoenixTask.submitResource(CLIENT, BASE_URL);
