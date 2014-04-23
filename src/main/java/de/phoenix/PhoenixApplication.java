@@ -37,7 +37,7 @@ public class PhoenixApplication extends PackagesResourceConfig {
     public static File submissionPipelineFile;
 
     public PhoenixApplication() {
-        super("de.phoenix.webresource", "de.phoenix.rs");
+        super("de.phoenix.webresource", "de.phoenix.rs", "de.phoenix.debug");
 
         try {
             extractSubmissionPipeline();
