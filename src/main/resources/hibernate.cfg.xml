@@ -37,6 +37,8 @@
         <mapping class="de.phoenix.database.entity.TaskSubmissionDates" />
         <mapping class="de.phoenix.database.entity.TaskTest" />
         <mapping class="de.phoenix.database.entity.Text" />
+        <mapping class="de.phoenix.database.entity.Userlevel" />
+        <mapping class="de.phoenix.database.entity.User" />
 
     </session-factory>
 </hibernate-configuration>

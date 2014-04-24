@@ -20,7 +20,12 @@ package de.phoenix.database;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
+
+import de.phoenix.database.entity.Userlevel;
+import de.phoenix.security.permission.datastructure.PermissionTree;
 
 /**
  * Wrapper class to the database access via Hibernate
@@ -33,6 +38,7 @@ public class DatabaseManager {
     private DatabaseManager() {
         Configuration config = new Configuration().configure("hibernate.cfg.xml");
         this.sessionFactory = config.buildSessionFactory();
+        this.createDefaultUser();
     }
 
     public final static DatabaseManager getInstance() {
@@ -69,6 +75,41 @@ public class DatabaseManager {
      */
     public Session openSession() {
         return sessionFactory.openSession();
+    }
+
+    private void createDefaultUser() {
+        Session session = openSession();
+        try {
+            Transaction trans = session.beginTransaction();
+            System.out.println("Add default user levels...");
+            if (!existsUserLevel("admin", session)) {
+
+                Userlevel adminLevel = new Userlevel();
+                adminLevel.setName("admin");
+                PermissionTree tree = new PermissionTree();
+                tree.addNode("*");
+                adminLevel.setPermissionList(tree);
+
+                session.save(adminLevel);
+            }
+            if (!existsUserLevel("default", session)) {
+
+                Userlevel defaultLevel = new Userlevel();
+                defaultLevel.setName("default");
+                PermissionTree tree = new PermissionTree();
+                defaultLevel.setPermissionList(tree);
+                session.save(defaultLevel);
+            }
+
+            trans.commit();
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    private boolean existsUserLevel(String name, Session session) {
+        return session.createCriteria(Userlevel.class).add(Restrictions.eq("name", name)).uniqueResult() != null;
     }
 
 }

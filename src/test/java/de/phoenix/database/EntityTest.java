@@ -40,11 +40,12 @@ import de.phoenix.database.entity.LectureTests;
 import de.phoenix.database.entity.MultiFileTaskTests;
 import de.phoenix.database.entity.TaskSheetTests;
 import de.phoenix.database.entity.TaskTests;
+import de.phoenix.database.entity.UserTests;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.util.TextFileReader;
 
 @RunWith(Suite.class)
-@SuiteClasses({ConnectionTests.class, LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class, MultiFileTaskTests.class})
+@SuiteClasses({ConnectionTests.class, LectureTests.class, TaskTests.class, TaskSheetTests.class, DetailTests.class, LectureGroupTests.class, MultiFileTaskTests.class, UserTests.class})
 public class EntityTest {
 
     public final static String BASE_URL = "http://localhost:7766/rest";

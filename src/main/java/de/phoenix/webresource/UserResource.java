@@ -1,0 +1,81 @@
+/*
+ * Copyright (C) 2014 Project-Phoenix
+ * 
+ * This file is part of WebService.
+ * 
+ * WebService is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * WebService is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with WebService.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package de.phoenix.webresource;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import de.phoenix.database.DatabaseManager;
+import de.phoenix.database.entity.User;
+import de.phoenix.database.entity.Userlevel;
+import de.phoenix.database.entity.criteria.UserCriteriaFactory;
+import de.phoenix.database.entity.criteria.UserLevelCriteriaFactory;
+import de.phoenix.rs.key.KeyReader;
+import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.security.Encrypter;
+import de.phoenix.security.SaltedPassword;
+import de.phoenix.security.user.CreatePhoenixUser;
+import de.phoenix.security.user.PhoenixUser;
+import de.phoenix.webresource.util.AbstractPhoenixResource;
+
+@Path(PhoenixUser.WEB_RESOURCE_ROOT)
+public class UserResource extends AbstractPhoenixResource<User, PhoenixUser> {
+
+    public UserResource() {
+        super(UserCriteriaFactory.getInstance());
+    }
+
+    @Path(PhoenixUser.WEB_RESOURCE_CREATE)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(CreatePhoenixUser createPhoenixUser) {
+        Session session = DatabaseManager.getSession();
+        try {
+            Transaction trans = session.beginTransaction();
+
+            SaltedPassword pw = Encrypter.getInstance().encryptPassword((String) createPhoenixUser.getAttribute("password"));
+            PhoenixUser pUser = (PhoenixUser) createPhoenixUser.getAttribute("user");
+            User entity = new User(pUser, pw);
+            Userlevel level = searchUnique(UserLevelCriteriaFactory.getInstance(), session, KeyReader.createSelect(pUser.getUserLevel()));
+            entity.setUserlevelId(level);
+
+            return handlePossibleDuplicateInsert(session, trans, entity);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    @Path(PhoenixUser.WEB_RESOURCE_GET)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response get(SelectEntity<PhoenixUser> userSelector) {
+        return onGet(userSelector);
+    }
+
+}
