@@ -21,6 +21,7 @@ package de.phoenix.database.entity;
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static de.phoenix.database.EntityTest.CLIENT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -211,6 +212,9 @@ public class TaskSheetTests {
 
         ClientResponse response = getCurrentTaskSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        PhoenixLectureGroupTaskSheet taskSheet = EntityUtil.extractEntity(response);
+        assertNotNull(taskSheet);
     }
 
     @Test

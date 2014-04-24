@@ -18,6 +18,7 @@
 
 package de.phoenix.webresource;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -115,8 +116,10 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
             for (LectureGroupTaskSheet lectureGroupTaskSheet : taskSheetList) {
                 DateTime releaseDate = lectureGroupTaskSheet.getDefaultReleaseDate();
                 DateTime deadline = lectureGroupTaskSheet.getDefaultDeadline();
-                if ((releaseDate.isBeforeNow() || releaseDate.isEqualNow()) && deadline.isAfterNow())
-                    return Response.ok(lectureGroupTaskSheet.convert()).build();
+                if ((releaseDate.isBeforeNow() || releaseDate.isEqualNow()) && deadline.isAfterNow()) {
+                    return Response.ok(Arrays.asList(lectureGroupTaskSheet.convert())).build();
+
+                }
             }
 
             return Response.status(PhoenixStatusType.NO_CURRENT_TASKSHEET).build();
