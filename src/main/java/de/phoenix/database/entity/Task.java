@@ -301,7 +301,6 @@ public class Task implements Serializable, Convertable<PhoenixTask> {
     public PhoenixTask convert() {
         PhoenixTask pTask = null;
         if (isAutomaticTest) {
-//            pTask = new PhoenixAutomaticTask(Convert, answerPattern, description, title, backend, tests)
             pTask = new PhoenixAutomaticTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle(), getBackend(), ConverterUtil.convert(getTaskTests()));
         } else {
             pTask = new PhoenixTask(ConverterUtil.convert(getAttachments()), ConverterUtil.convert(getTexts()), getDescription(), getTitle());

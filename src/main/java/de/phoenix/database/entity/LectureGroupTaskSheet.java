@@ -186,7 +186,7 @@ public class LectureGroupTaskSheet implements Serializable, Convertable<PhoenixL
             tasks.add(new PhoenixDatedTask(defaultReleaseDate, defaultDeadline, task.convert()));
         }
 
-        return new PhoenixLectureGroupTaskSheet(this.getTaskSheet().getTitle(), this.lectureGroup.convert(), tasks);
+        return new PhoenixLectureGroupTaskSheet(this.getTaskSheet().getTitle(), lectureGroup != null ? this.lectureGroup.convert() : null, tasks);
     }
 
     @Override

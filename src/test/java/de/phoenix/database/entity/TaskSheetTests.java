@@ -21,7 +21,9 @@ package de.phoenix.database.entity;
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static de.phoenix.database.EntityTest.CLIENT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -215,6 +217,8 @@ public class TaskSheetTests {
 
         PhoenixLectureGroupTaskSheet taskSheet = EntityUtil.extractEntity(response);
         assertNotNull(taskSheet);
+        assertNull(taskSheet.getLectureGroup());
+        assertFalse(taskSheet.getTasks().isEmpty());
     }
 
     @Test

@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.LectureGroup;
 import de.phoenix.database.entity.LectureGroupTaskSheet;
+import de.phoenix.database.entity.Task;
 import de.phoenix.database.entity.TaskSheet;
 import de.phoenix.database.entity.criteria.LectureGroupCriteriaFactory;
 import de.phoenix.database.entity.criteria.LectureGroupTaskSheetCriteriaFactory;
@@ -117,6 +118,14 @@ public class LectureGroupTaskSheetResource extends AbstractPhoenixResource<Lectu
                 DateTime releaseDate = lectureGroupTaskSheet.getDefaultReleaseDate();
                 DateTime deadline = lectureGroupTaskSheet.getDefaultDeadline();
                 if ((releaseDate.isBeforeNow() || releaseDate.isEqualNow()) && deadline.isAfterNow()) {
+                    // Convert the tasks to normal task, so we dont't send the
+                    // tests with it
+                    for (Task task : lectureGroupTaskSheet.getTaskSheet().getTasks()) {
+                        task.setAutomaticTest(false);
+                    }
+                    // Remove reference on the lecture group to avoid references
+                    // on other information
+                    lectureGroupTaskSheet.setLectureGroup(null);
                     return Response.ok(Arrays.asList(lectureGroupTaskSheet.convert())).build();
 
                 }
