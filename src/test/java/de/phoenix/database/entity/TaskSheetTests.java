@@ -44,6 +44,7 @@ import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixStatusType;
+import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
 import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTask;
@@ -53,6 +54,9 @@ import de.phoenix.rs.entity.connection.LectureGroupTaskSheetConnection;
 import de.phoenix.rs.entity.connection.TaskSheetConnection;
 import de.phoenix.rs.entity.connection.TaskSubmissionDatesConnection;
 import de.phoenix.rs.entity.disconnection.DisconnectTaskTaskSheet;
+import de.phoenix.rs.entity.titleonly.LectureGroupTitle;
+import de.phoenix.rs.entity.titleonly.LectureTitle;
+import de.phoenix.rs.entity.titleonly.TaskSheetTitle;
 import de.phoenix.rs.key.ConnectionEntity;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectAllEntity;
@@ -263,5 +267,32 @@ public class TaskSheetTests {
         WebResource createTaskSubmissionDateResource = PhoenixTaskSubmissionDates.createResource(CLIENT, BASE_URL);
         response = createTaskSubmissionDateResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, connectionEntity);
         assertEquals(Status.OK, response.getClientResponseStatus());
+    }
+
+    @Test
+    @Order(10)
+    public void getTitlesOnly() {
+
+        WebResource getTitlesOnlyResource = PhoenixLecture.getOnlyTitlesResource(CLIENT, BASE_URL);
+        ClientResponse response = getTitlesOnlyResource.get(ClientResponse.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // Get all lecture titles and their assigned lecturegroup titles
+        List<LectureTitle> lectureTitles = EntityUtil.extractEntityList(response);
+        assertFalse(lectureTitles.isEmpty());
+
+        for (LectureTitle lectureTitle : lectureTitles) {
+            assertNotNull(lectureTitle.getTitle());
+
+            // iterate over all lecturegroup titles assigned to the lecture
+            for (LectureGroupTitle lectureGroupTitle : lectureTitle) {
+                assertNotNull(lectureGroupTitle.getTitle());
+
+                for (TaskSheetTitle taskSheetTitle : lectureGroupTitle) {
+                    assertNotNull(taskSheetTitle);
+                }
+            }
+        }
+
     }
 }

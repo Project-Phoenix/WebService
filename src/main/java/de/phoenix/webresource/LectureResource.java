@@ -18,9 +18,11 @@
 
 package de.phoenix.webresource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -34,11 +36,16 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.Details;
 import de.phoenix.database.entity.Lecture;
 import de.phoenix.database.entity.LectureGroup;
+import de.phoenix.database.entity.LectureGroupTaskSheet;
 import de.phoenix.database.entity.criteria.LectureCriteriaFactory;
 import de.phoenix.rs.entity.PhoenixDetails;
 import de.phoenix.rs.entity.PhoenixLecture;
 import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.entity.titleonly.LectureGroupTitle;
+import de.phoenix.rs.entity.titleonly.LectureTitle;
+import de.phoenix.rs.entity.titleonly.TaskSheetTitle;
 import de.phoenix.rs.key.AddToEntity;
+import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.rs.key.UpdateEntity;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
@@ -137,4 +144,40 @@ public class LectureResource extends AbstractPhoenixResource<Lecture, PhoenixLec
                 session.close();
         }
     }
+
+    @Path(PhoenixLecture.WEB_RESOURCE_GET_ONLY_TITLES)
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTitlesOnly() {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            List<LectureTitle> lectureTitles = new ArrayList<LectureTitle>();
+            List<LectureGroupTitle> groupTitles = null;
+            List<TaskSheetTitle> taskSheetTitles = null;
+
+            List<Lecture> lectures = searchEntity(new SelectAllEntity<PhoenixLecture>(), session);
+
+            for (Lecture lecture : lectures) {
+                groupTitles = new ArrayList<LectureGroupTitle>();
+
+                for (LectureGroup lectureGroup : lecture.getLectureGroups()) {
+                    taskSheetTitles = new ArrayList<TaskSheetTitle>();
+
+                    for (LectureGroupTaskSheet lectureGroupTaskSheet : lectureGroup.getLectureGroupTaskSheetList()) {
+                        taskSheetTitles.add(new TaskSheetTitle(lectureGroupTaskSheet.getTaskSheet().getTitle()));
+                    }
+                    groupTitles.add(new LectureGroupTitle(lectureGroup.getName(), taskSheetTitles));
+                }
+
+                lectureTitles.add(new LectureTitle(lecture.getTitle(), groupTitles));
+            }
+
+            return Response.ok(lectureTitles).build();
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
 }
