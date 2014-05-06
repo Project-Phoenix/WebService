@@ -25,7 +25,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.entity.Userlevel;
-import de.phoenix.security.permission.datastructure.PermissionTree;
+import de.phoenix.security.user.PermissionTree;
 
 /**
  * Wrapper class to the database access via Hibernate

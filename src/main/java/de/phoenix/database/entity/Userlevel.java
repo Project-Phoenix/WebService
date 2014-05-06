@@ -38,7 +38,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.security.permission.datastructure.PermissionTree;
+import de.phoenix.security.user.PermissionTree;
 import de.phoenix.security.user.PhoenixUserLevel;
 
 @Entity

@@ -24,6 +24,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -36,7 +37,9 @@ import de.phoenix.database.entity.criteria.UserLevelCriteriaFactory;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.security.Encrypter;
+import de.phoenix.security.TokenManager;
 import de.phoenix.security.SaltedPassword;
+import de.phoenix.security.login.LoginAttempt;
 import de.phoenix.security.user.CreatePhoenixUser;
 import de.phoenix.security.user.PhoenixUser;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
@@ -76,6 +79,36 @@ public class UserResource extends AbstractPhoenixResource<User, PhoenixUser> {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response get(SelectEntity<PhoenixUser> userSelector) {
         return onGet(userSelector);
+    }
+
+    private TokenManager tokenManager = TokenManager.INSTANCE;
+
+    @Path(PhoenixUser.WEB_RESOURCE_LOGIN)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response login(LoginAttempt loginAttempt) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            User user = (User) UserCriteriaFactory.getInstance().extractCriteria(new SelectEntity<PhoenixUser>().addKey("username", loginAttempt.getUsername()), session).uniqueResult();
+            if (user == null) {
+                return Response.status(Status.UNAUTHORIZED).build();
+            }
+            String origHash = user.getHash();
+            String toProveHash = loginAttempt.getPassword();
+
+            String salt = user.getSalt();
+            if (Encrypter.getInstance().validatePassword(toProveHash, origHash, salt)) {
+                return Response.ok(tokenManager.createToken(user)).build();
+            } else {
+                return Response.status(Status.UNAUTHORIZED).build();
+            }
+
+        } finally {
+            if (session != null)
+                session.close();
+        }
     }
 
 }

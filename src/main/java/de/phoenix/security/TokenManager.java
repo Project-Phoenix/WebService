@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Project-Phoenix
+ * Copyright (C) 2014 Project-Phoenix
  * 
  * This file is part of WebService.
  * 
@@ -20,90 +20,46 @@ package de.phoenix.security;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.HttpHeaders;
+import de.phoenix.database.entity.User;
+import de.phoenix.security.login.PhoenixToken;
 
-/**
- * Manages the token by holding them in maps and generating new ones
- * 
- */
 public class TokenManager {
 
-    /* Singletone Start */
-    private static final TokenManager INSTANCE = new TokenManager();
+    private Map<PhoenixToken, User> tokenMap;
+    private Map<String, PhoenixToken> usernameTokenMap;
 
     private TokenManager() {
-        tokenmapByID = new HashMap<String, Token>();
-
+        this.tokenMap = new HashMap<PhoenixToken, User>();
+        this.usernameTokenMap = new HashMap<String, PhoenixToken>();
     }
 
-    public final static TokenManager getInstance() {
-        return INSTANCE;
-    }
+    public final static TokenManager INSTANCE = new TokenManager();
 
-    /* Singletone End */
+    public PhoenixToken createToken(User user) {
+        PhoenixToken token = new PhoenixToken();
 
-    // Maps for fast access to tokens
-    private Map<String, Token> tokenmapByID;
+        // Delete old session if user tries to login twice
+        if (usernameTokenMap.containsKey(user.getUsername())) {
+            PhoenixToken tmp = usernameTokenMap.remove(user.getUsername());
+            tokenMap.remove(tmp);
+        }
 
-    // Time for token before it exeeds
-    private final static long TOKEN_DURATION = TimeUnit.HOURS.toMillis(1);
-
-    /**
-     * Generates a token for the user by using {@link UUID#randomUUID()}
-     * 
-     * @param owner
-     *            The owner of the token. Every owner can have one token per
-     *            time!
-     * @return A valid token
-     */
-    public Token generateToken(String owner) {
-        // Generate a unique, but also random order of chars hard to guess
-        UUID tokenID = UUID.randomUUID();
-
-        // Generate a new token based on its unique id
-        Token token = new Token(tokenID.toString(), owner, TOKEN_DURATION);
-
-        // save temponary
-        tokenmapByID.put(token.getID(), token);
+        tokenMap.put(token, user);
+        usernameTokenMap.put(user.getUsername(), token);
         return token;
     }
 
-    /**
-     * Checks if the token attached to every webresource call is valid by
-     * checking the existence of the ID and then if the token is maybe expired.
-     * Expired tokens or not existing tokes are invalid and denied
-     * 
-     * @param headers
-     *            The headers directly from the http request
-     * @return True, when the token is valid and not expired
-     */
-    public boolean isValidToken(HttpHeaders headers) {
-        return isValidToken(extractTokenID(headers));
+    public User getUserByToken(String token) {
+        return getUserByToken(new PhoenixToken(token));
     }
 
-    public boolean isValidToken(String tokenID) {
-        if (tokenID == null)
-            return false;
-        return isValidToken(tokenmapByID.get(tokenID));
+    public User getUserByToken(PhoenixToken token) {
+        return tokenMap.get(token);
     }
 
-    public boolean isValidToken(Token token) {
-        return token != null && !token.isExpired();
-    }
-
-    public String extractTokenID(HttpHeaders headers) {
-        return headers.getRequestHeaders().getFirst(TokenFilter.TOKEN_HEAD);
-    }
-
-    public Token getToken(HttpHeaders headers) {
-        return getToken(extractTokenID(headers));
-    }
-
-    public Token getToken(String tokenID) {
-        return tokenmapByID.get(tokenID);
+    public boolean isValid(PhoenixToken token) {
+        return tokenMap.containsKey(token);
     }
 
 }

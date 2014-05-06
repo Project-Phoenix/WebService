@@ -21,6 +21,9 @@ package de.phoenix.database.entity;
 import static de.phoenix.database.EntityTest.BASE_URL;
 import static de.phoenix.database.EntityTest.CLIENT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.ws.rs.core.MediaType;
 
@@ -40,13 +43,17 @@ import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.key.SelectEntity;
-import de.phoenix.security.permission.datastructure.PermissionTree;
+import de.phoenix.security.TokenManager;
+import de.phoenix.security.login.LoginAttempt;
+import de.phoenix.security.login.PhoenixToken;
+import de.phoenix.security.login.PlainLoginAttempt;
 import de.phoenix.security.user.CreatePhoenixUser;
+import de.phoenix.security.user.PermissionTree;
 import de.phoenix.security.user.PhoenixUser;
 
 @RunWith(OrderedRunner.class)
 public class UserTests {
-    
+
     @BeforeClass
     public static void createDefaultUser() {
         Session session = DatabaseManager.getSession();
@@ -100,5 +107,66 @@ public class UserTests {
 
         PhoenixUser pUserFromDatabase = EntityUtil.extractEntity(response);
         assertEquals("Meldanor", pUserFromDatabase.getUsername());
+    }
+
+    @Test
+    @Order(2)
+    public void loginCorrectUser() {
+
+        LoginAttempt loginAttempt = new PlainLoginAttempt("Meldanor", "testpassword");
+
+        WebResource loginResource = PhoenixUser.loginResource(CLIENT, BASE_URL);
+        ClientResponse response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, loginAttempt);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        PhoenixToken token = response.getEntity(PhoenixToken.class);
+        assertNotNull(token);
+
+        assertTrue(TokenManager.INSTANCE.isValid(token));
+    }
+
+    @Test
+    @Order(3)
+    public void loginIncorrectCredentials() {
+
+        LoginAttempt attempt = new PlainLoginAttempt("NichtMeldanor", "testpassword");
+
+        WebResource loginResource = PhoenixUser.loginResource(CLIENT, BASE_URL);
+        ClientResponse response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, attempt);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        attempt = new PlainLoginAttempt("Meldanor", "wrongpassword");
+        response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, attempt);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        attempt = new PlainLoginAttempt("NichtMeldanor", "wrongpassword");
+        response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, attempt);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @Order(4)
+    public void loginTwice() {
+
+        // First login
+        LoginAttempt attempt = new PlainLoginAttempt("Meldanor", "testpassword");
+
+        WebResource loginResource = PhoenixUser.loginResource(CLIENT, BASE_URL);
+        ClientResponse response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, attempt);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        PhoenixToken token = response.getEntity(PhoenixToken.class);
+        assertNotNull(token);
+        assertTrue(TokenManager.INSTANCE.isValid(token));
+
+        // Second login - old token should be deleted on server side
+        PhoenixToken firstToken = token;
+        response = loginResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, attempt);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        token = response.getEntity(PhoenixToken.class);
+        assertTrue(TokenManager.INSTANCE.isValid(token));
+        assertFalse(TokenManager.INSTANCE.isValid(firstToken));
+
     }
 }
