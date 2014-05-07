@@ -42,6 +42,7 @@ import de.phoenix.database.DatabaseManager;
 import de.phoenix.junit.OrderedRunner;
 import de.phoenix.junit.OrderedRunner.Order;
 import de.phoenix.rs.EntityUtil;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.security.TokenManager;
 import de.phoenix.security.login.LoginAttempt;
@@ -168,5 +169,43 @@ public class UserTests {
         assertTrue(TokenManager.INSTANCE.isValid(token));
         assertFalse(TokenManager.INSTANCE.isValid(firstToken));
 
+    }
+
+    @Test
+    @Order(5)
+    public void createDuplicateAccount() {
+        // Duplicate Username = Meldanor
+        PhoenixUser pUser = new PhoenixUser("TestSurname", "TestName", "Meldanor", "OtherEmail@phoenix.de");
+        CreatePhoenixUser create = new CreatePhoenixUser("testpassword", pUser);
+
+        WebResource createResource = PhoenixUser.createResource(CLIENT, BASE_URL);
+        ClientResponse response = createResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, create);
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+        assertEquals("Username:Meldanor", response.getEntity(String.class));
+
+        // Check if the user was not created
+        SelectEntity<PhoenixUser> userSelector = new SelectEntity<PhoenixUser>().addKey("surname", "TestSurname").addKey("name", "TestName");
+        WebResource getResource = PhoenixUser.getResource(CLIENT, BASE_URL);
+        response = getResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userSelector);
+        assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @Order(6)
+    public void createDuplicateEMail() {
+        // Duplicate E-Mail: Test@phoenix.de
+        PhoenixUser pUser = new PhoenixUser("TestSurname", "TestName", "TestAccount", "Test@phoenix.de");
+        CreatePhoenixUser create = new CreatePhoenixUser("testpassword", pUser);
+
+        WebResource createResource = PhoenixUser.createResource(CLIENT, BASE_URL);
+        ClientResponse response = createResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, create);
+        assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
+        assertEquals("Mail:Test@phoenix.de", response.getEntity(String.class));
+
+        // Check if the user was not created
+        SelectEntity<PhoenixUser> userSelector = new SelectEntity<PhoenixUser>().addKey("surname", "TestSurname").addKey("name", "TestName");
+        WebResource getResource = PhoenixUser.getResource(CLIENT, BASE_URL);
+        response = getResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userSelector);
+        assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
     }
 }

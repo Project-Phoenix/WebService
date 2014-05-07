@@ -28,12 +28,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 import de.phoenix.database.DatabaseManager;
 import de.phoenix.database.entity.User;
 import de.phoenix.database.entity.Userlevel;
 import de.phoenix.database.entity.criteria.UserCriteriaFactory;
 import de.phoenix.database.entity.criteria.UserLevelCriteriaFactory;
+import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.security.Encrypter;
@@ -58,10 +60,18 @@ public class UserResource extends AbstractPhoenixResource<User, PhoenixUser> {
     public Response create(CreatePhoenixUser createPhoenixUser) {
         Session session = DatabaseManager.getSession();
         try {
+            PhoenixUser pUser = (PhoenixUser) createPhoenixUser.getAttribute("user");
+            if (isMailInUse(pUser, session)) {
+                return Response.status(PhoenixStatusType.DUPLIATE_ENTITY).entity("Mail:" + pUser.getMail()).build();
+            }
+            if (isUsernameInUse(pUser, session)) {
+                return Response.status(PhoenixStatusType.DUPLIATE_ENTITY).entity("Username:" + pUser.getUsername()).build();
+            }
+
             Transaction trans = session.beginTransaction();
 
             SaltedPassword pw = Encrypter.getInstance().encryptPassword((String) createPhoenixUser.getAttribute("password"));
-            PhoenixUser pUser = (PhoenixUser) createPhoenixUser.getAttribute("user");
+
             User entity = new User(pUser, pw);
             Userlevel level = searchUnique(UserLevelCriteriaFactory.getInstance(), session, KeyReader.createSelect(pUser.getUserLevel()));
             entity.setUserlevelId(level);
@@ -71,6 +81,17 @@ public class UserResource extends AbstractPhoenixResource<User, PhoenixUser> {
             if (session != null)
                 session.close();
         }
+    }
+
+    private boolean isMailInUse(PhoenixUser user, Session session) {
+
+        String mail = user.getMail();
+        return session.createCriteria(User.class).add(Restrictions.eq("mail", mail)).uniqueResult() != null;
+    }
+
+    private boolean isUsernameInUse(PhoenixUser user, Session session) {
+        String username = user.getUsername();
+        return session.createCriteria(User.class).add(Restrictions.eq("username", username)).uniqueResult() != null;
     }
 
     @Path(PhoenixUser.WEB_RESOURCE_GET)
