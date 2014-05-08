@@ -18,6 +18,8 @@
 
 package de.phoenix.webresource;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -39,11 +41,14 @@ import de.phoenix.rs.PhoenixStatusType;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.security.Encrypter;
-import de.phoenix.security.TokenManager;
 import de.phoenix.security.SaltedPassword;
+import de.phoenix.security.TokenManager;
 import de.phoenix.security.login.LoginAttempt;
 import de.phoenix.security.user.CreatePhoenixUser;
 import de.phoenix.security.user.PhoenixUser;
+import de.phoenix.security.user.permission.ChangeUserLevelPermission;
+import de.phoenix.security.user.permission.PermissionTree;
+import de.phoenix.security.user.permission.PhoenixUserLevel;
 import de.phoenix.webresource.util.AbstractPhoenixResource;
 
 @Path(PhoenixUser.WEB_RESOURCE_ROOT)
@@ -126,6 +131,66 @@ public class UserResource extends AbstractPhoenixResource<User, PhoenixUser> {
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    @Path(PhoenixUserLevel.WEB_RESOURCE_CREATE)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createUserLevel(PhoenixUserLevel userLevel) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            Transaction trans = session.beginTransaction();
+            Userlevel parent = searchParent(userLevel.getParent(), session);
+
+            Userlevel newUserLevel = new Userlevel(userLevel, parent);
+            return handlePossibleDuplicateInsert(session, trans, newUserLevel);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    private Userlevel searchParent(PhoenixUserLevel pParent, Session session) {
+        if (pParent == null)
+            return null;
+
+        return (Userlevel) session.createCriteria(Userlevel.class).add(Restrictions.eq("name", pParent.getName())).uniqueResult();
+    }
+
+    @Path(PhoenixUserLevel.WEB_RESOURCE_CHANGE_PERMISSION)
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response changeUserLevelPermission(ChangeUserLevelPermission changeUserLevelPermission) {
+
+        Session session = DatabaseManager.getSession();
+        try {
+            Transaction trans = session.beginTransaction();
+            Userlevel userlevel = searchUnique(UserLevelCriteriaFactory.getInstance(), session, changeUserLevelPermission.getFirstSelectEntity(PhoenixUserLevel.class));
+            PermissionTree permissionTree = userlevel.getPermissionTree();
+            boolean addMode = changeUserLevelPermission.getAttribute("add");
+            List<String> permissionNodes = changeUserLevelPermission.getAttribute("permissionNodes");
+            if (addMode) {
+                for (String node : permissionNodes) {
+                    permissionTree.addNode(node);
+                }
+            } else {
+                for (String node : permissionNodes) {
+                    permissionTree.removeNode(node);
+                }
+            }
+
+            userlevel.setPermissionList(permissionTree);
+            session.update(userlevel);
+            trans.commit();
+
+            return Response.ok().build();
         } finally {
             if (session != null)
                 session.close();

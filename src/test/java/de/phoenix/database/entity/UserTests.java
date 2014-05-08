@@ -25,6 +25,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 
 import org.hibernate.Session;
@@ -49,8 +52,12 @@ import de.phoenix.security.login.LoginAttempt;
 import de.phoenix.security.login.PhoenixToken;
 import de.phoenix.security.login.PlainLoginAttempt;
 import de.phoenix.security.user.CreatePhoenixUser;
-import de.phoenix.security.user.PermissionTree;
 import de.phoenix.security.user.PhoenixUser;
+import de.phoenix.security.user.permission.ChangeUserLevelPermission;
+import de.phoenix.security.user.permission.ChangeUserLevelPermission.AddPermissionsToUserLevel;
+import de.phoenix.security.user.permission.ChangeUserLevelPermission.RemovePermissionsFromUserLevel;
+import de.phoenix.security.user.permission.PermissionTree;
+import de.phoenix.security.user.permission.PhoenixUserLevel;
 
 @RunWith(OrderedRunner.class)
 public class UserTests {
@@ -207,5 +214,59 @@ public class UserTests {
         WebResource getResource = PhoenixUser.getResource(CLIENT, BASE_URL);
         response = getResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userSelector);
         assertEquals(PhoenixStatusType.NO_ENTITIES.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    @Order(7)
+    public void createUserlevel() {
+
+        PermissionTree baseTree = new PermissionTree();
+        baseTree.addNode("viewCurrentTasksheet");
+        baseTree.addNode("submit");
+
+        PhoenixUserLevel base = new PhoenixUserLevel("base", baseTree);
+
+        WebResource createResource = PhoenixUserLevel.createResource(CLIENT, BASE_URL);
+
+        ClientResponse response = createResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, base);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        Session session = DatabaseManager.getSession();
+        assertNotNull(session.createCriteria(Userlevel.class).add(Restrictions.eq("name", "base")).uniqueResult());
+        session.close();
+    }
+
+    @Test
+    @Order(8)
+    public void changePermissionNodes() {
+
+        // Add two permission nodes to the base user level
+        SelectEntity<PhoenixUserLevel> userLevelSelector = new SelectEntity<PhoenixUserLevel>().addKey("name", "base");
+        List<String> permissionNodes = Arrays.asList("dance", "haveFun");
+        ChangeUserLevelPermission addPermission = new AddPermissionsToUserLevel(userLevelSelector, permissionNodes);
+
+        // Send change to server
+        WebResource changePermissions = PhoenixUserLevel.changePermissionResource(CLIENT, BASE_URL);
+        ClientResponse response = changePermissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addPermission);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // Check, if the change was successfull
+        Session session = DatabaseManager.getSession();
+        Userlevel userlevel = (Userlevel) session.createCriteria(Userlevel.class).add(Restrictions.eq("name", "base")).uniqueResult();
+        assertNotNull(userlevel);
+        assertTrue(userlevel.getPermissionTree().hasNode("dance"));
+        assertTrue(userlevel.getPermissionTree().hasNode("haveFun"));
+        session.close();
+
+        // Remove the given permission nodes and send them to the server
+        ChangeUserLevelPermission removePermission = new RemovePermissionsFromUserLevel(userLevelSelector, permissionNodes);
+        response = changePermissions.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, removePermission);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // Check, if the userlevel has lost his new permissions
+        userlevel = (Userlevel) session.createCriteria(Userlevel.class).add(Restrictions.eq("name", "base")).uniqueResult();
+        assertNotNull(userlevel);
+        assertFalse(userlevel.getPermissionTree().hasNode("dance"));
+        assertFalse(userlevel.getPermissionTree().hasNode("haveFun"));
     }
 }

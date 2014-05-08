@@ -26,7 +26,7 @@ import de.phoenix.database.entity.User;
 import de.phoenix.database.entity.Userlevel;
 import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.security.user.PhoenixUser;
-import de.phoenix.security.user.PhoenixUserLevel;
+import de.phoenix.security.user.permission.PhoenixUserLevel;
 
 public class UserCriteriaFactory extends CriteriaFactory<User, PhoenixUser> {
 

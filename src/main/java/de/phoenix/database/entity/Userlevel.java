@@ -38,8 +38,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.phoenix.database.entity.util.Convertable;
-import de.phoenix.security.user.PermissionTree;
-import de.phoenix.security.user.PhoenixUserLevel;
+import de.phoenix.security.user.permission.PermissionTree;
+import de.phoenix.security.user.permission.PhoenixUserLevel;
 
 @Entity
 @Table(name = "userlevel")
@@ -72,6 +72,12 @@ public class Userlevel implements Serializable, Convertable<PhoenixUserLevel> {
 
     public Userlevel(Integer id) {
         this.id = id;
+    }
+
+    public Userlevel(PhoenixUserLevel pUserlevel, Userlevel parent) {
+        this.name = pUserlevel.getName();
+        this.parent = parent;
+        this.setPermissionList(pUserlevel.getPermissions());
     }
 
     public Integer getId() {

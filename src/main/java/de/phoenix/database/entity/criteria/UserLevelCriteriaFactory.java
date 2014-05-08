@@ -23,7 +23,7 @@ import org.hibernate.Session;
 
 import de.phoenix.database.entity.Userlevel;
 import de.phoenix.rs.key.SelectEntity;
-import de.phoenix.security.user.PhoenixUserLevel;
+import de.phoenix.security.user.permission.PhoenixUserLevel;
 
 public class UserLevelCriteriaFactory extends CriteriaFactory<Userlevel, PhoenixUserLevel> {
 
