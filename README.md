@@ -9,10 +9,10 @@ This project is developed as a Maven 3 project.
 
 ## Libraries
 
-REST: Jersey 1.17 https://jersey.java.net/
-JSON for REST: Faster-XML-Jackson https://github.com/FasterXML/jackson
-JPA Library for MySQL Connection: Hibernate 3.6 http://hibernate.org/
-Hashing and common codec function: Apache Commons Codec http://commons.apache.org/proper/commons-codec/
+* REST: Jersey 1.17 https://jersey.java.net/
+* JSON for REST: Faster-XML-Jackson https://github.com/FasterXML/jackson
+* JPA Library for MySQL Connection: Hibernate 3.6 http://hibernate.org/
+* Hashing functions: Apache Commons Codec http://commons.apache.org/proper/commons-codec/
 
 ## Installation
 
