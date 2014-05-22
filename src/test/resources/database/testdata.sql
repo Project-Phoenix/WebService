@@ -19,23 +19,23 @@ INSERT INTO `details` (`id`, `room`, `weekday`, `startTime`, `endTime`, `interva
     (5, 'G29-K059', 2, '10:15:00', '11:45:00', 'P1W', '2013-10-21', '2014-01-31'),
     (8, 'G29-K059', 3, '10:15:00', '11:45:00', 'P1W', '2013-10-21', '2014-01-31');
 
-INSERT INTO `lecture` (`id`, `title`) VALUES
-    (1, 'Einführung in die Informatik');
+INSERT INTO `lecture` (`id`, `title`, `description`) VALUES
+    (1, 'Einführung in die Informatik', 'Das ist eine Beschreibung dieser Veranstaltung.');
 
 INSERT INTO `lectureDetails` (`lecture_id`, `additionalInfo_id`) VALUES
     (1, 1),
     (1, 2);
 
-INSERT INTO `lectureGroup` (`id`, `name`, `maxMember`, `submissionDeadlineTime`, `submissionDeadlineWeekday`, `lecture`) VALUES
-    (1, 'Gruppe 1', 24, '11:00:00', 1, 1),
-    (2, 'Gruppe 2', 22, '11:00:00', 4, 1),
-    (3, 'Gruppe 3', 22, '11:00:00', 1, 1),
-    (5, 'Gruppe 4', 22, '11:00:00', 1, 1),
-    (6, 'Gruppe 5', 22, '11:00:00', 1, 1),
-    (7, 'Gruppe 6', 24, '11:00:00', 1, 1),
-    (8, 'Gruppe 7', 23, '11:00:00', 1, 1),
-    (9, 'Gruppe 8', 22, '11:00:00', 1, 1),
-    (10, 'Gruppe 9', 22, '11:00:00', 1, 1);
+INSERT INTO `lectureGroup` (`id`, `name`, `description`, `maxMember`, `submissionDeadlineTime`, `submissionDeadlineWeekday`, `lecture`) VALUES
+    (1, 'Gruppe 1', 'Gruppenbeschreibung. Toll!', 24, '11:00:00', 1, 1),
+    (2, 'Gruppe 2', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 4, 1),
+    (3, 'Gruppe 3', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 1, 1),
+    (5, 'Gruppe 4', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 1, 1),
+    (6, 'Gruppe 5', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 1, 1),
+    (7, 'Gruppe 6', 'Gruppenbeschreibung. Toll!', 24, '11:00:00', 1, 1),
+    (8, 'Gruppe 7', 'Gruppenbeschreibung. Toll!', 23, '11:00:00', 1, 1),
+    (9, 'Gruppe 8', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 1, 1),
+    (10, 'Gruppe 9', 'Gruppenbeschreibung. Toll!', 22, '11:00:00', 1, 1);
 
 INSERT INTO `lectureGroupDetails` (`group_id`, `additionalInfo_id`) VALUES
     (1, 3),

@@ -74,7 +74,7 @@ public class LectureTests {
         LocalDate endDate = new LocalDate(2014, 03, 31);
         PhoenixDetails detail = new PhoenixDetails("G29-336", Weekday.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
 
-        PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, Arrays.asList(detail));
+        PhoenixLecture lecture = new PhoenixLecture(TEST_LECTURE_TITLE, "description", Arrays.asList(detail));
 
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
@@ -100,7 +100,7 @@ public class LectureTests {
     @Order(3)
     public void createDuplicateLecture() {
         WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
-        PhoenixLecture duplicateLecture = new PhoenixLecture(TEST_LECTURE_TITLE, new ArrayList<PhoenixDetails>());
+        PhoenixLecture duplicateLecture = new PhoenixLecture(TEST_LECTURE_TITLE, "description", new ArrayList<PhoenixDetails>());
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, duplicateLecture);
         assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
     }
@@ -138,7 +138,7 @@ public class LectureTests {
         // default submission time on Monday is 10 o'clock
         // In the room G29-k058 and other details described above
         // and the assigned lecture
-        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail));
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, "description", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail));
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
@@ -146,7 +146,7 @@ public class LectureTests {
         PhoenixDetails detail2 = new PhoenixDetails("G29-K059", Weekday.MONDAY, startTime, endTime, Period.weeks(1), startDate, endDate);
 
         // Create second group
-        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail2));
+        group = new PhoenixLectureGroup(TEST_GROUP_NAME + "_Second", "description", TEST_GROUP_MAX_SIZE, Weekday.MONDAY, new LocalTime(10, 00), Arrays.asList(detail2));
 
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
@@ -167,7 +167,7 @@ public class LectureTests {
         // Add group to lecture
         WebResource ws2 = PhoenixLecture.addGroupResource(CLIENT, BASE_URL);
 
-        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, "description", 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(lec, Arrays.asList(group)));
         assertEquals(PhoenixStatusType.DUPLIATE_ENTITY.getStatusCode(), response.getStatus());
     }
@@ -178,14 +178,14 @@ public class LectureTests {
         WebResource ws = PhoenixLecture.createResource(CLIENT, BASE_URL);
 
         // Create a new temporary lecture
-        PhoenixLecture newLecture = new PhoenixLecture(TEST_LECTURE_TITLE + "2", new ArrayList<PhoenixDetails>());
+        PhoenixLecture newLecture = new PhoenixLecture(TEST_LECTURE_TITLE + "2", "description", new ArrayList<PhoenixDetails>());
         ClientResponse response = ws.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, newLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Add group to lecture
         WebResource ws2 = PhoenixLecture.addGroupResource(CLIENT, BASE_URL);
 
-        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
+        PhoenixLectureGroup group = new PhoenixLectureGroup(TEST_GROUP_NAME, "description", 1, Weekday.MONDAY, new LocalTime(10, 00), new ArrayList<PhoenixDetails>());
         response = ws2.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(newLecture, Arrays.asList(group)));
         assertEquals(Status.OK, response.getClientResponseStatus());
     }
@@ -316,7 +316,7 @@ public class LectureTests {
 
         // Create the lecture to delete
         PhoenixDetails detail = new PhoenixDetails("toDeleteRoom", Weekday.MONDAY, LocalTime.now(), LocalTime.now().plusHours(1), Period.weeks(1), LocalDate.now(), LocalDate.now().plusDays(1));
-        PhoenixLecture lecture = new PhoenixLecture("toDeleteLecture", Arrays.asList(detail));
+        PhoenixLecture lecture = new PhoenixLecture("toDeleteLecture", "description", Arrays.asList(detail));
         response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, lecture);
         assertEquals(200, response.getStatus());
 

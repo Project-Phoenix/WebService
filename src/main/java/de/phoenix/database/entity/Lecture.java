@@ -30,6 +30,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -62,6 +63,10 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
     @Column(name = "title", unique = true)
     private String title;
 
+    @Lob
+    @Column(name = "description")
+    private String description;
+
     @OneToMany(mappedBy = "lecture")
     @Cascade(CascadeType.SAVE_UPDATE)
     private List<LectureGroup> lectureGroupList;
@@ -84,6 +89,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     public Lecture(PhoenixLecture lecture) {
         this.title = lecture.getTitle();
+        this.description = lecture.getDescription();
 
         List<PhoenixDetails> phoenixDetails = lecture.getLectureDetails();
         this.detailsList = new ArrayList<Details>(phoenixDetails.size());
@@ -107,6 +113,14 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     public void setTitle(String name) {
         this.title = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @XmlTransient
@@ -163,7 +177,7 @@ public class Lecture implements Serializable, Convertable<PhoenixLecture> {
 
     @Override
     public PhoenixLecture convert() {
-        return new PhoenixLecture(getTitle(), ConverterUtil.convert(getDetails()));
+        return new PhoenixLecture(getTitle(), getDescription(), ConverterUtil.convert(getDetails()));
     }
 
     @Override

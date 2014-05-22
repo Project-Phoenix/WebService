@@ -30,6 +30,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -65,6 +66,10 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     @Column(name = "name")
     private String name;
+
+    @Lob
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "maxMember")
     private Integer maxMember;
@@ -103,6 +108,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
     public LectureGroup(PhoenixLectureGroup phoenixLectureGroup, Lecture lecture) {
         this.maxMember = phoenixLectureGroup.getMaxMember();
         this.name = phoenixLectureGroup.getName();
+        this.description = phoenixLectureGroup.getDescription();
         this.submissionDeadlineTime = phoenixLectureGroup.getSubmissionDeadlineTime();
         this.submissionDeadlineWeekday = phoenixLectureGroup.getSubmissionDeadlineWeekday().getDateTimeConstant();
         this.lecture = lecture;
@@ -127,6 +133,14 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Integer getMaxMember() {
@@ -208,7 +222,7 @@ public class LectureGroup implements Serializable, Convertable<PhoenixLectureGro
 
     @Override
     public PhoenixLectureGroup convert() {
-        return new PhoenixLectureGroup(getName(), getMaxMember(), Weekday.forID(getSubmissionDeadlineWeekday()), new LocalTime(getSubmissionDeadlineTime()), ConverterUtil.convert(getDetails()), getLecture().convert());
+        return new PhoenixLectureGroup(getName(), getDescription(), getMaxMember(), Weekday.forID(getSubmissionDeadlineWeekday()), new LocalTime(getSubmissionDeadlineTime()), ConverterUtil.convert(getDetails()), getLecture().convert());
     }
 
     @Override

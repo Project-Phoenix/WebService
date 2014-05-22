@@ -67,14 +67,14 @@ public class LectureGroupTests {
         String groupTitle = "testGroup";
 
         // simple lecture
-        PhoenixLecture pLecture = new PhoenixLecture("TestTitle", new ArrayList<PhoenixDetails>());
+        PhoenixLecture pLecture = new PhoenixLecture("TestTitle", "description", new ArrayList<PhoenixDetails>());
         WebResource res = PhoenixLecture.createResource(CLIENT, BASE_URL);
         ClientResponse response = res.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, pLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
         // Sample Detail
         PhoenixDetails pDetail = new PhoenixDetails("testRoom", Weekday.MONDAY, nowTime, nowTime.plusHours(1), Period.days(1), nowDate, nowDate.plusDays(1));
-        pGroup = new PhoenixLectureGroup(groupTitle, 1, Weekday.MONDAY, nowTime, Arrays.asList(pDetail));
+        pGroup = new PhoenixLectureGroup(groupTitle, "description", 1, Weekday.MONDAY, nowTime, Arrays.asList(pDetail));
 
         // Create group
         AddToEntity<PhoenixLecture, PhoenixLectureGroup> addToEntity = KeyReader.createAddTo(pLecture, Arrays.asList(pGroup));
@@ -94,7 +94,7 @@ public class LectureGroupTests {
     @Test
     public void updateGroup() {
         // Change the weekday to Friday
-        PhoenixLectureGroup pNewGroup = new PhoenixLectureGroup(pGroup.getName(), pGroup.getMaxMember(), Weekday.FRIDAY, pGroup.getSubmissionDeadlineTime(), pGroup.getDetails());
+        PhoenixLectureGroup pNewGroup = new PhoenixLectureGroup(pGroup.getName(), pGroup.getDescription(), pGroup.getMaxMember(), Weekday.FRIDAY, pGroup.getSubmissionDeadlineTime(), pGroup.getDetails());
 
         UpdateEntity<PhoenixLectureGroup> updateEntity = KeyReader.createUpdate(pGroup, pNewGroup);
 

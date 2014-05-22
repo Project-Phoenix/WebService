@@ -66,7 +66,7 @@ public class DetailTests {
 
         // Create a lecture
         String title = "TestLecture";
-        PhoenixLecture newLecture = new PhoenixLecture(title, Arrays.asList(pDetail1, pDetail2));
+        PhoenixLecture newLecture = new PhoenixLecture(title, "description", Arrays.asList(pDetail1, pDetail2));
         ClientResponse response = PhoenixLecture.createResource(CLIENT, BASE_URL).type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, newLecture);
         assertEquals(Status.OK, response.getClientResponseStatus());
 
