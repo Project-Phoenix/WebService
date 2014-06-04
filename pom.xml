@@ -4,7 +4,7 @@
 	<groupId>de.phoenix</groupId>
 	<artifactId>WebService</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.9</version>
 	<name>WebService Jersey Webapp</name>
 	<build>
 		<finalName>PhoenixWebService</finalName>
@@ -126,13 +126,13 @@
 		<dependency>
 			<groupId>de.phoenix</groupId>
 			<artifactId>library</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>de.phoenix</groupId>
 			<artifactId>SubmissionPipeline</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 
 		<dependency>

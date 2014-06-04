@@ -47,17 +47,23 @@ public class PhoenixApplication extends PackagesResourceConfig {
 
     }
 
+    // TODO: Always change this version with the pom.xml
+    // TODO: Think about automatic replacement
+    public final static String HelperVersion = "0.9";
+
     private void extractSubmissionPipeline() throws IOException {
-        InputStream in = getClass().getClassLoader().getResourceAsStream("../lib/SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+
+        String helperFile = "SubmissionPipeline-" + HelperVersion + ".jar";
+        InputStream in = getClass().getClassLoader().getResourceAsStream("../lib/" + helperFile);
         if (in == null) {
-            DebugLog.log("Can't find the submission pipeline program!");
+            DebugLog.log("Can't find the submission pipeline program! FileName:" + helperFile);
             return;
         }
 
         submissionPipelineDir = new File(System.getProperty("java.io.tmpdir"), "phoenixhelper");
         submissionPipelineDir.mkdir();
 
-        submissionPipelineFile = new File(submissionPipelineDir, "SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+        submissionPipelineFile = new File(PhoenixApplication.submissionPipelineDir, helperFile);
 
         OutputStream out = new FileOutputStream(submissionPipelineFile);
         byte[] buffer = new byte[2048];

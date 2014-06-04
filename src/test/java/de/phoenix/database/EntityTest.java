@@ -69,8 +69,10 @@ public class EntityTest {
             READER = new TextFileReader();
         };
 
+
         private void copyHelper() throws IOException {
-            InputStream in = getClass().getResourceAsStream("/SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+            String helperFile = "SubmissionPipeline-" + PhoenixApplication.HelperVersion + ".jar";
+            InputStream in = getClass().getResourceAsStream("/" + helperFile);
             if (in == null) {
                 System.err.println("Can't find the helper programm");
                 System.exit(1);
@@ -80,7 +82,7 @@ public class EntityTest {
             PhoenixApplication.submissionPipelineDir = new File("tmp");
             PhoenixApplication.submissionPipelineDir.mkdir();
 
-            PhoenixApplication.submissionPipelineFile = new File(PhoenixApplication.submissionPipelineDir, "SubmissionPipeline-0.0.1-SNAPSHOT.jar");
+            PhoenixApplication.submissionPipelineFile = new File(PhoenixApplication.submissionPipelineDir, helperFile);
 
             OutputStream out = new FileOutputStream(PhoenixApplication.submissionPipelineFile);
             byte[] buffer = new byte[2048];
