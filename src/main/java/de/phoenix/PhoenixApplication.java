@@ -49,7 +49,7 @@ public class PhoenixApplication extends PackagesResourceConfig {
 
     // TODO: Always change this version with the pom.xml
     // TODO: Think about automatic replacement
-    public final static String HelperVersion = "1.0-SNAPSHOT";
+    public final static String HelperVersion = "0.9";
 
     private void extractSubmissionPipeline() throws IOException {
 

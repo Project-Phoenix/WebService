@@ -128,13 +128,13 @@ INSERT INTO `taskSheetTasks` (`taskSheet_id`, `task_id`) VALUES
 
 INSERT INTO `taskSubmission` (`id`, `date`, `task`, `status`, `statusText`) VALUES
     (1, '2014-04-17 15:02:11', 5, 1, ''),
-    (2, '2014-04-17 15:05:58', 21, 4, 'Tests passed!'),
+    (2, '2014-04-17 15:05:58', 21, 5, 'Tests passed!'),
     (3, '2014-04-17 15:27:41', 22, 0, '[NPalindromeTest.java:16: error: cannot access NPalindrome\n        assertEquals("numDigits(1): ", 1, NPalindrome.numDigits(1));\n                                          ^\n  bad class file: de.phoenix.debug.NPalindrome\n    class file contains wrong class: de.phoenix.debug.NPalindrome\n    Please remove or make sure it appears in the correct subdirectory of the classpath.]'),
-    (4, '2014-04-17 15:28:00', 22, 3, '[testGetDigit(NPalindromeTest): String index out of range: -2, testNumDigits(NPalindromeTest): test timed out after 10 milliseconds]'),
-    (5, '2014-04-17 15:33:15', 22, 3, '[testGetDigit(NPalindromeTest): getDigit(12345,-8):  expected:<5> but was:<0>]'),
-    (6, '2014-04-17 15:34:18', 22, 4, 'Tests passed!'),
-    (7, '2014-04-17 16:33:42', 23, 4, 'Tests passed!'),
-    (8, '2014-04-17 17:36:17', 24, 4, 'Tests passed!');
+    (4, '2014-04-17 15:28:00', 22, 4, '[testGetDigit(NPalindromeTest): String index out of range: -2, testNumDigits(NPalindromeTest): test timed out after 10 milliseconds]'),
+    (5, '2014-04-17 15:33:15', 22, 4, '[testGetDigit(NPalindromeTest): getDigit(12345,-8):  expected:<5> but was:<0>]'),
+    (6, '2014-04-17 15:34:18', 22, 5, 'Tests passed!'),
+    (7, '2014-04-17 16:33:42', 23, 5, 'Tests passed!'),
+    (8, '2014-04-17 17:36:17', 24, 5, 'Tests passed!');
 
 INSERT INTO `taskSubmissionDates` (`id`, `deadline`, `releasedate`, `lectureGroupTaskSheet`, `task`) VALUES
     (1, '2014-04-21 09:00:00', '2014-04-17 15:55:00', 3, 1),
